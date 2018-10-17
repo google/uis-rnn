@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is the library forthe  Unbounded Interleaved-State Recurrent Neural Network
+This is the library for the Unbounded Interleaved-State Recurrent Neural Network
 (UIS-RNN) algorithm, corresponding to the paper
 [Fully Supervised Speaker Diarization](https://arxiv.org/abs/1810.04719).
 
