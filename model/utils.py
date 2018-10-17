@@ -1,3 +1,17 @@
+# Copyright 2018 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import numpy as np
 import torch
 
@@ -19,7 +33,7 @@ def weighted_mse_loss(input, target, weight=1):
   entry_num = float(streched_tensor.size()[0])
   non_zero_entry_num = torch.sum(streched_tensor[:,0]!=0).float()
   weighted_tensor = torch.mm(((input-target)**2).view(-1,observation_dim),(torch.diag(weight.float().view(-1))))
-  return torch.mean(weighted_tensor)*weight.nelement()*entry_num/non_zero_entry_num 
+  return torch.mean(weighted_tensor)*weight.nelement()*entry_num/non_zero_entry_num
 
 
 def sample_permuted_segments(index_sequence, number_samples):
@@ -80,7 +94,7 @@ def sequence_acc(sequence1, sequence2):
     best_seq2_idx = np.argmax(n_match)
     n_forward_match += np.max(n_match)
     copy_unique_id2 = np.delete(copy_unique_id2, best_seq2_idx)
-    
+
   return n_forward_match/len(sequence1)
 
 
