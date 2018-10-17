@@ -15,3 +15,15 @@ This library depends on:
 * python 3.5+
 * numpy 1.15.1
 * pytorch 0.4.0
+
+## Tutorial
+
+To get started, simpy run this command:
+
+```bash
+python3 demo.py
+```
+
+This will train a UIS-RNN model using `data/training_data.npz`,
+then perform inference on `data/testing_data.npz`, and print the
+inference results.
