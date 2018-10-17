@@ -40,7 +40,9 @@ def diarization_experiment(args):
     predict_labels.append(predict_label)
     accuracy, length = evaluate_result(args, test_cluster_id, predict_label)
     test_record.append((accuracy, length))
+    print('ground truth labels:')
     print(test_cluster_id)
+    print('predict labels:')
     print(predict_label)
     print('----------------------')
 
