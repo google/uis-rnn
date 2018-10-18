@@ -20,7 +20,7 @@ from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.uisrnn import fit, predict
+from model.uisrnn import UISRNN
 from model.utils import evaluate_result, output_result
 
 
@@ -40,17 +40,20 @@ def diarization_experiment(args):
   test_sequences = test_data['test_sequences']
   test_cluster_ids = test_data['test_cluster_ids']
 
+  _ , observation_dim = train_sequence.shape
+  input_dim = observation_dim
+
+  model = UISRNN(args, input_dim, observation_dim, .5)
   # training
   if args.pretrain == None:
-    model = fit(args, train_sequence, train_cluster_id)
-    torch.save(model.rnn_model.state_dict(), 'rnn_model {}'.format(args.dataset))
+    model.fit(args, train_sequence, train_cluster_id)
+    model.save(args)
   else: # use pretrained model
-    model = init_model(args, train_sequence, train_cluster_id)
-    model.rnn_model.load_state_dict(torch.load('rnn_model {}'.format(args.dataset)))
+    model.load(args)
 
   # testing
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
-    predict_label = predict(args, model, test_sequence, test_cluster_id)
+    predict_label = model.predict(args, test_sequence, test_cluster_id)
     predict_labels.append(predict_label)
     accuracy, length = evaluate_result(args, test_cluster_id, predict_label)
     test_record.append((accuracy, length))
