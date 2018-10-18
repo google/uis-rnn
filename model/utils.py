@@ -49,7 +49,7 @@ def sample_permuted_segments(index_sequence, number_samples):
   else:
     prev = 0
     for i in range(len(index_sequence) - 1):
-      if (index_sequence[i + 1] != index_sequence[i] + 1):
+      if index_sequence[i + 1] != index_sequence[i] + 1:
         segments.append(index_sequence[prev:(i + 1)])
         prev = i + 1
       if i + 1 == len(index_sequence) - 1:

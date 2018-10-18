@@ -15,7 +15,6 @@
 import unittest
 
 from model.utils import sample_permuted_segments
-import numpy as np
 
 
 class TestSamplePermutedSegments(unittest.TestCase):

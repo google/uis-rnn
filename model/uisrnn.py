@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from model.utils import pack_seq, resize_seq, weighted_mse_loss
 import numpy as np
 import torch
 from torch import optim
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-
-from model.utils import pack_seq, resize_seq, weighted_mse_loss
 
 
 class NormalRNN(nn.Module):
@@ -52,7 +51,7 @@ class UISRNN():
                                  observation_dim).cuda()
       self.rnn_init_hidden = nn.Parameter(
           torch.zeros(1, args.rnn_hidden_size).cuda())
-      if args.sigma2 == None:
+      if args.sigma2 is None:
         self.sigma2 = nn.Parameter(.1 * torch.ones(observation_dim).cuda())
       else:
         self.sigma2 = nn.Parameter(
@@ -62,7 +61,7 @@ class UISRNN():
                                  args.rnn_depth, args.rnn_dropout,
                                  observation_dim)
       self.rnn_init_hidden = nn.Parameter(torch.zeros(1, args.rnn_hidden_size))
-      if args.sigma2 == None:
+      if args.sigma2 is None:
         self.sigma2 = nn.Parameter(.1 * torch.ones(observation_dim))
       else:
         self.sigma2 = nn.Parameter(args.sigma2 * torch.ones(observation_dim))
@@ -104,7 +103,7 @@ class UISRNN():
 
       self.rnn_model.train()
       if args.optimizer == 'adam':
-        if args.sigma2 == None:  # train sigma2
+        if args.sigma2 is None:  # train sigma2
           optimizer = optim.Adam(
               [
                   {
@@ -191,7 +190,6 @@ class UISRNN():
                                   rnn_truth, 1 / (2 * self.sigma2))
         weight = (((rnn_truth != 0).float() * mean[:-1, :, :] - rnn_truth)
                   **2).view(-1, observation_dim)
-        sum_weight = torch.sum(weight, dim=0).squeeze()
         num_non_zero = torch.sum((weight != 0).float(), dim=0).squeeze()
         loss2 = ((2 * args.alpha + num_non_zero + 2) /
                  (2 * num_non_zero) * torch.log(self.sigma2)).sum() + (
@@ -246,9 +244,11 @@ class UISRNN():
       if torch.cuda.is_available():
         test_sequence = test_sequence.cuda()
       # bookkeeping for beam search
+      # each cell consists of:
+      # (mean_set, hidden_set, score/-likelihood, trace, block_counts)
       proposal_set = [
           ([], [], 0, [], [])
-      ]  # each cell consists of: (mean_set, hidden_set, score/-likelihood, trace, block_counts)
+      ]
       max_speakers = 0
 
       for t in np.arange(0, args.test_iteration * test_sequence_length,
@@ -347,7 +347,7 @@ class UISRNN():
                                        score_set.shape)
           prev_proposal_idx = total_idx[0]
           new_speaker_idx = total_idx[1:]
-          (mean_set, hidden_set, score, trace,
+          (mean_set, hidden_set, _, trace,
            block_counts) = proposal_set[prev_proposal_idx]
           new_mean_set = mean_set.copy()
           new_hidden_set = hidden_set.copy()
