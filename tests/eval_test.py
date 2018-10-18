@@ -14,7 +14,7 @@
 
 import unittest
 
-from model.utils import sequence_acc
+from model.eval import sequence_acc
 
 class TestSequenceAcc(unittest.TestCase):
 
