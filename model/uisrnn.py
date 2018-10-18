@@ -19,7 +19,7 @@ from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.utils import sample_permuted_segments, weighted_mse_loss
+from model.utils import pack_seq, resize_seq, weighted_mse_loss
 
 
 class NormalRNN(nn.Module):
@@ -66,6 +66,31 @@ class UISRNN():
     self.rnn_model.load_state_dict(torch.load('rnn_model {}'.format(args.dataset)))
   
   def fit(self, args, train_sequence, train_cluster_id):
+    '''Fit UISRNN model.
+
+    Args:
+      args: Model and training configurations. See demo for description.
+
+      train_sequence (real 2d numpy array, size: N by D): The training d_vector sequence.
+        N: summation of lengths of all utterances
+        D: observation dimension
+        Example: 
+          train_sequence= [[1.2 3.0 -4.1 6.0]    --> an entry of speaker #0 from utterance 'iaaa'
+                           [0.8 -1.1 0.4 0.5]    --> an entry of speaker #1 from utterance 'iaaa'
+                           [-0.2 1.0 3.8 5.7]    --> an entry of speaker #0 from utterance 'iaaa'
+                           [3.8 -0.1 1.5 2.3]    --> an entry of speaker #0 from utterance 'ibbb'
+                           [1.2 1.4 3.6 -2.7]]   --> an entry of speaker #0 from utterance 'ibbb'
+          Here N=5, d=4.
+        Note that we concatenate all training utterances into a single sequence.
+
+      train_cluster_id (a vector of strings, size: N): The speaker id sequence.
+        Example:
+          train_speaker_id = ['iaaa_0', 'iaaa_1', 'iaaa_0', 'ibbb_0', 'ibbb_0']
+          Here 'iaaa_0' means the entry belongs to 'speaker #0' in utterance 'iaaa'.
+          Note that the order of entries within an utterance are preserved, and all utterances
+          are simply concatenated together.
+    '''
+
     if args.model_type == 'generative':
       _ , observation_dim = train_sequence.shape
       input_dim = observation_dim
@@ -149,18 +174,29 @@ class UISRNN():
             t, float(loss.data), float(loss1.data), float(loss2.data), float(loss3.data)))
         train_loss.append(float(loss1.data)) # only save the likelihood part
 
-  def predict(self, args, test_sequence, test_cluster_id):
-    '''Model testing
-
-    Predict cluster labels given the input test sequence
+  def predict(self, args, test_sequence):
+    '''Predict test sequence labels using UISRNN model.
 
     Args:
-      model:
-      test_sequence:
-      test_cluster_id:
+      args: Model and testing configurations. See demo for description.
+
+      test_sequence (real 2d numpy array, size: N by D): The test d_vector sequence.
+        N: length of one test utterance
+        D: observation dimension
+        Example: 
+          test_sequence= [[2.2 -1.0 3.0 5.6]    --> 1st entry of utterance 'iccc'
+                          [0.5 1.8 -3.2 0.4]    --> 2nd entry of utterance 'iccc'
+                          [-2.2 5.0 1.8 3.7]    --> 3rd entry of utterance 'iccc'
+                          [-3.8 0.1 1.4 3.3]    --> 4th entry of utterance 'iccc'
+                          [0.1 2.7 3.5 -1.7]]   --> 5th entry of utterance 'iccc'
+          Here N=5, d=4.
+    
     Returns:
-      predicted sequence of cluster ids
+      predict_speaker_id (a vector of integers, size: N): Predicted speaker id sequence.
+      Example:
+        predict_speaker_id = [0, 1, 0, 0, 1]
     '''
+    test_sequence_length = test_sequence.shape[0]
     if args.model_type == 'generative':
       self.rnn_model.eval()
       test_sequence = np.tile(test_sequence, (args.test_iteration,1))
@@ -171,8 +207,8 @@ class UISRNN():
       proposal_set = [([],[],0,[],[])] # each cell consists of: (mean_set, hidden_set, score/-likelihood, trace, block_counts)
       max_speakers = 0
 
-      for t in np.arange(0,args.test_iteration*len(test_cluster_id),args.look_ahead):
-        l_remain = args.test_iteration*len(test_cluster_id)-t
+      for t in np.arange(0,args.test_iteration*test_sequence_length,args.look_ahead):
+        l_remain = args.test_iteration*test_sequence_length-t
         score_set = float('inf')*np.ones(np.append(args.beam_size, max_speakers+1+np.arange(np.min([l_remain,args.look_ahead]))))
         for proposal_rank, proposal in enumerate(proposal_set):
           mean_buffer = list(proposal[0])
@@ -273,52 +309,6 @@ class UISRNN():
               new_trace.append(speaker)
           new_proposal_set.append((new_mean_set,new_hidden_set,new_score,new_trace,new_block_counts))
         proposal_set = new_proposal_set
-      return proposal_set[0][3][-len(test_cluster_id):]
 
-
-def resize_seq(args, sequence, cluster_id):
-  '''Resize sequences for packing and batching
-
-  Args:
-    sequence (real numpy matrix, size: seq_len*obs_size): observation sequence
-    cluster_id (real vector, size: seq_len): cluster indicator sequence
-  Returns:
-    packed_rnn_input:
-    rnn_truth:
-    bias: flipping coin head probability
-  '''
-
-  obs_size = np.shape(sequence)[1]
-  # merge sub-sequences that belong to a single cluster to a single sequence
-  unique_id = np.unique(cluster_id)
-  if args.permutation is None:
-    num_clusters = len(unique_id)
-  else:
-    num_clusters = len(unique_id)*args.permutation
-  sub_sequences = []
-  seq_lengths = []
-  if args.permutation is None:
-    for i in unique_id:
-      sub_sequences.append(sequence[np.where(cluster_id==i),:][0])
-      seq_lengths.append(len(np.where(cluster_id==i)[0])+1)
-  else:
-    for i in unique_id:
-      idx_set = np.where(cluster_id==i)[0]
-      sampled_idx_sets = sample_permuted_segments(idx_set, args.permutation)
-      for j in range(args.permutation):
-        sub_sequences.append(sequence[sampled_idx_sets[j],:])
-        seq_lengths.append(len(idx_set)+1)
-
-  # compute bias
-  transit_num = 0
-  for entry in range(len(cluster_id)-1):
-     transit_num += (cluster_id[entry]!=cluster_id[entry+1])
-  # return sub_sequences, seq_lengths, transit_num/(len(cluster_id)-1)
-  return sub_sequences, seq_lengths, 0.158
-
-
-def pack_seq(rnn_input, sorted_seq_lengths):
-  packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(rnn_input, sorted_seq_lengths, batch_first=False)
-  # ground truth is the shifted input
-  rnn_truth = rnn_input[1:,:,:]
-  return packed_rnn_input, rnn_truth
+      predict_speaker_id = proposal_set[0][3][-test_sequence_length:]
+      return predict_speaker_id

@@ -21,7 +21,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from model.uisrnn import UISRNN
-from model.utils import evaluate_result, output_result
+from model.utils import output_result
+from model.eval import evaluate_result
 
 
 def diarization_experiment(args):
@@ -53,7 +54,7 @@ def diarization_experiment(args):
 
   # testing
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
-    predict_label = model.predict(args, test_sequence, test_cluster_id)
+    predict_label = model.predict(args, test_sequence)
     predict_labels.append(predict_label)
     accuracy, length = evaluate_result(args, test_cluster_id, predict_label)
     test_record.append((accuracy, length))
