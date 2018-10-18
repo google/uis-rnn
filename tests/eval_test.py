@@ -16,6 +16,7 @@ import unittest
 
 from model.eval import sequence_acc
 
+
 class TestSequenceAcc(unittest.TestCase):
 
   def test_mismatched_sequences(self):
@@ -23,7 +24,7 @@ class TestSequenceAcc(unittest.TestCase):
     sequence2 = [3, 3, 4, 4, 1]
     accuracy = sequence_acc(sequence1, sequence2)
     self.assertEqual(0.8, accuracy)
-    
+
   def test_equivalent_sequences(self):
     sequence1 = [0, 0, 1, 2, 2]
     sequence2 = [3, 3, 4, 1, 1]
@@ -32,4 +33,4 @@ class TestSequenceAcc(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+  unittest.main()

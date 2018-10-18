@@ -16,14 +16,14 @@ import numpy as np
 
 
 def sequence_acc(sequence1, sequence2):
-  '''Find the best matching of two sequences of integers
+  """Find the best matching of two sequences of integers
 
-  Args:
-    two numpy sequences
+  Args: two numpy sequences
+
   Returns:
     best matching accuracy
     e.g. if sequence1=[0,0,1,2,2], sequence2=[3,3,4,4,1], then accuracy=4/5=0.8
-  '''
+  """
 
   unique_id1, counts1 = np.unique(sequence1, return_counts=True)
   unique_id2, counts2 = np.unique(sequence2, return_counts=True)
@@ -43,15 +43,19 @@ def sequence_acc(sequence1, sequence2):
       break
     n_match = []
     for seq2_idx in copy_unique_id2:
-      n_match.append(len(
-        np.intersect1d(np.where(sequence1==unique_id1[seq1_idx])[0], np.where(sequence2==seq2_idx)[0])))
+      n_match.append(
+          len(
+              np.intersect1d(
+                  np.where(sequence1 == unique_id1[seq1_idx])[0],
+                  np.where(sequence2 == seq2_idx)[0])))
     best_seq2_idx = np.argmax(n_match)
     n_forward_match += np.max(n_match)
     copy_unique_id2 = np.delete(copy_unique_id2, best_seq2_idx)
 
-  return n_forward_match/len(sequence1)
+  return n_forward_match / len(sequence1)
 
 
 def evaluate_result(args, true_labels, predict_labels):
-  accuracy = np.max((sequence_acc(true_labels,predict_labels),sequence_acc(predict_labels,true_labels)))
+  accuracy = np.max((sequence_acc(true_labels, predict_labels),
+                     sequence_acc(predict_labels, true_labels)))
   return accuracy, len(true_labels)

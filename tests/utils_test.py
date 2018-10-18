@@ -17,17 +17,19 @@ import unittest
 
 from model.utils import sample_permuted_segments
 
+
 class TestSamplePermutedSegments(unittest.TestCase):
 
   def test_short_sequence(self):
     index_sequence = [5, 2, 3, 2, 1]
     number_samples = 10
-    sampled_index_sequences = sample_permuted_segments(index_sequence, number_samples)
+    sampled_index_sequences = sample_permuted_segments(index_sequence,
+                                                       number_samples)
     self.assertEqual(10, len(sampled_index_sequences))
     for output_sequence in sampled_index_sequences:
-      self.assertEqual((5, ), output_sequence.shape)
+      self.assertEqual((5,), output_sequence.shape)
       self.assertEqual(4, len(set(output_sequence.tolist())))
 
 
 if __name__ == '__main__':
-    unittest.main()
+  unittest.main()
