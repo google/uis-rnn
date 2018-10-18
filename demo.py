@@ -13,22 +13,20 @@
 # limitations under the License.
 
 import argparse
-import numpy as np
-import torch
-from torch import optim
-from torch.autograd import Variable
-import torch.nn as nn
-import torch.nn.functional as F
 
+from model.evals import evaluate_result
 from model.uisrnn import UISRNN
 from model.utils import output_result
-from model.eval import evaluate_result
+import numpy as np
 
 
 def diarization_experiment(args):
-  """Experiment pipeline
+  """Experiment pipeline.
 
   Load data --> train model --> test model --> output result
+
+  Args:
+    args: return value of parser.parse_args()
   """
 
   predict_labels = []
@@ -46,7 +44,7 @@ def diarization_experiment(args):
 
   model = UISRNN(args, input_dim, observation_dim, .5)
   # training
-  if args.pretrain == None:
+  if args.pretrain is None:
     model.fit(args, train_sequence, train_cluster_id)
     model.save(args)
   else:  # use pretrained model
@@ -56,7 +54,7 @@ def diarization_experiment(args):
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
     predict_label = model.predict(args, test_sequence)
     predict_labels.append(predict_label)
-    accuracy, length = evaluate_result(args, test_cluster_id, predict_label)
+    accuracy, length = evaluate_result(test_cluster_id, predict_label)
     test_record.append((accuracy, length))
     print('ground truth labels:')
     print(test_cluster_id)

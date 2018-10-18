@@ -26,7 +26,7 @@ def sequence_acc(sequence1, sequence2):
   """
 
   unique_id1, counts1 = np.unique(sequence1, return_counts=True)
-  unique_id2, counts2 = np.unique(sequence2, return_counts=True)
+  unique_id2, _ = np.unique(sequence2, return_counts=True)
   # transform into numpy arrays
   dict1 = dict(zip(unique_id1, np.arange(len(unique_id1))))
   dict2 = dict(zip(unique_id2, np.arange(len(unique_id2))))
@@ -38,7 +38,7 @@ def sequence_acc(sequence1, sequence2):
   idx1 = np.argsort(counts1)[::-1]
   n_forward_match = 0
   copy_unique_id2 = np.copy(unique_id2)
-  for seq1_rank, seq1_idx in enumerate(idx1):
+  for _, seq1_idx in enumerate(idx1):
     if len(copy_unique_id2) == 0:
       break
     n_match = []
@@ -55,7 +55,7 @@ def sequence_acc(sequence1, sequence2):
   return n_forward_match / len(sequence1)
 
 
-def evaluate_result(args, true_labels, predict_labels):
+def evaluate_result(true_labels, predict_labels):
   accuracy = np.max((sequence_acc(true_labels, predict_labels),
                      sequence_acc(predict_labels, true_labels)))
   return accuracy, len(true_labels)

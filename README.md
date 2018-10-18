@@ -21,7 +21,7 @@ This library depends on:
 To get started, simpy run this command:
 
 ```bash
-python3 demo.py
+python3 demo.py --train_iteration=20000
 ```
 
 This will train a UIS-RNN model using `data/training_data.npz`,
