@@ -67,12 +67,21 @@ class UISRNN():
         self.sigma2 = nn.Parameter(args.sigma2 * torch.ones(observation_dim))
     self.transition_bias = transition_bias
 
-  def save(self, args):
-    torch.save(self.rnn_model.state_dict(), 'rnn_model {}'.format(args.dataset))
+  def save(self, filepath):
+    """Save the model to a file.
 
-  def load(self, args):
-    self.rnn_model.load_state_dict(
-        torch.load('rnn_model {}'.format(args.dataset)))
+    Args:
+      filepath: the path of the file.
+    """
+    torch.save(self.rnn_model.state_dict(), filepath)
+
+  def load(self, filepath):
+    """Load the model from a file.
+
+    Args:
+      filepath: the path of the file.
+    """
+    self.rnn_model.load_state_dict(torch.load(filepath))
 
   def fit(self, args, train_sequence, train_cluster_id):
     """Fit UISRNN model.
@@ -246,9 +255,7 @@ class UISRNN():
       # bookkeeping for beam search
       # each cell consists of:
       # (mean_set, hidden_set, score/-likelihood, trace, block_counts)
-      proposal_set = [
-          ([], [], 0, [], [])
-      ]
+      proposal_set = [([], [], 0, [], [])]
       max_speakers = 0
 
       for t in np.arange(0, args.test_iteration * test_sequence_length,

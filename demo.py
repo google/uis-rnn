@@ -45,9 +45,9 @@ def diarization_experiment(args):
   # training
   if args.pretrain is None:
     model.fit(args, train_sequence, train_cluster_id)
-    model.save(args)
+    model.save('saved_uisrnn_states.model')
   else:  # use pretrained model
-    model.load(args)
+    model.load('saved_uisrnn_states.model')
 
   # testing
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
