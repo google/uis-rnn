@@ -313,8 +313,8 @@ class UISRNN():
                   new_block_counts_buffer[speaker] += 1
                 new_trace_buffer.append(speaker)
               else:  # new speaker
-                init_input = Variable(
-                    torch.zeros(256)).unsqueeze(0).unsqueeze(0)
+                init_input = Variable(torch.zeros(
+                    args.toy_data_d_observation)).unsqueeze(0).unsqueeze(0)
                 if torch.cuda.is_available():
                   init_input = init_input.cuda()
                 mean, hidden = self.rnn_model(init_input,
