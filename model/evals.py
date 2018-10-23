@@ -11,27 +11,37 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Utils for model evaluation."""
 
 import numpy as np
 
 
-def sequence_acc(sequence1, sequence2):
-  """Find the best matching of two sequences of integers
+def compute_approximate_sequence_accuracy(sequence1, sequence2):
+  """Find the best matching of two sequences of integers.
 
-  Args: two numpy sequences
+  For example, if sequence1=[0,0,1,2,2], sequence2=[3,3,4,4,1], then accuracy
+  will be 4/5=0.8. Notice that the two sequences are not exchangable, in other
+  words, you may get different results if you switch the order of the two
+  sequences.
+
+  Args:
+    sequence1: a list of integer - The first sequence to match.
+    sequence2: a list of integer - The second sequence to match.
 
   Returns:
     best matching accuracy
-    e.g. if sequence1=[0,0,1,2,2], sequence2=[3,3,4,4,1], then accuracy=4/5=0.8
   """
+  assert len(sequence1) == len(sequence2), (
+      "The two sequences should should of the same length")
+  assert sequence1, "The sequences cannot be empoty"
 
   unique_id1, counts1 = np.unique(sequence1, return_counts=True)
   unique_id2, _ = np.unique(sequence2, return_counts=True)
   # transform into numpy arrays
   dict1 = dict(zip(unique_id1, np.arange(len(unique_id1))))
   dict2 = dict(zip(unique_id2, np.arange(len(unique_id2))))
-  sequence1 = np.array([dict1[sequence1[i]] for i in range(len(sequence1))])
-  sequence2 = np.array([dict2[sequence2[i]] for i in range(len(sequence2))])
+  sequence1 = np.array([dict1[k] for k in sequence1])
+  sequence2 = np.array([dict2[k] for k in sequence2])
   unique_id1 = np.arange(len(unique_id1))
   unique_id2 = np.arange(len(unique_id2))
 
@@ -39,7 +49,7 @@ def sequence_acc(sequence1, sequence2):
   n_forward_match = 0
   copy_unique_id2 = np.copy(unique_id2)
   for _, seq1_idx in enumerate(idx1):
-    if len(copy_unique_id2) == 0:
+    if not len(copy_unique_id2):
       break
     n_match = []
     for seq2_idx in copy_unique_id2:
@@ -56,6 +66,7 @@ def sequence_acc(sequence1, sequence2):
 
 
 def evaluate_result(true_labels, predict_labels):
-  accuracy = np.max((sequence_acc(true_labels, predict_labels),
-                     sequence_acc(predict_labels, true_labels)))
+  accuracy = np.max((
+      compute_approximate_sequence_accuracy(true_labels, predict_labels),
+      compute_approximate_sequence_accuracy(predict_labels, true_labels)))
   return accuracy, len(true_labels)
