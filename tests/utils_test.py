@@ -14,7 +14,8 @@
 
 import unittest
 
-from model.utils import sample_permuted_segments
+from model import utils
+import numpy as np
 
 
 class TestSamplePermutedSegments(unittest.TestCase):
@@ -22,12 +23,49 @@ class TestSamplePermutedSegments(unittest.TestCase):
   def test_short_sequence(self):
     index_sequence = [5, 2, 3, 2, 1]
     number_samples = 10
-    sampled_index_sequences = sample_permuted_segments(index_sequence,
-                                                       number_samples)
+    sampled_index_sequences = utils.sample_permuted_segments(index_sequence,
+                                                             number_samples)
     self.assertEqual(10, len(sampled_index_sequences))
     for output_sequence in sampled_index_sequences:
       self.assertEqual((5,), output_sequence.shape)
       self.assertEqual(4, len(set(output_sequence.tolist())))
+
+
+class TestResizeSequence(unittest.TestCase):
+
+  def test_resize_sequence(self):
+    sub_sequence, seq_lengths, _ = utils.resize_sequence(
+        sequence=np.array([[1, 1], [2, 2], [1, 1]]),
+        cluster_id=np.array([1, 2, 1]),
+        num_permutations=None)
+    self.assertEqual(len(sub_sequence), 2)
+    self.assertTrue((sub_sequence[0] == [[1, 1], [1, 1]]).all())
+    self.assertTrue((sub_sequence[1] == [[2, 2]]).all())
+    self.assertListEqual(seq_lengths, [3, 2])
+
+  def test_resize_sequence_with_permutation(self):
+    sub_sequence, seq_lengths, _ = utils.resize_sequence(
+        sequence=np.array([[1, 1], [2, 2], [3, 3]]),
+        cluster_id=np.array([1, 2, 1]),
+        num_permutations=None)
+    self.assertEqual(len(sub_sequence), 2)
+    self.assertTrue((sub_sequence[0] == [[1, 1], [3, 3]]).all())
+    self.assertTrue((sub_sequence[1] == [[2, 2]]).all())
+    self.assertListEqual(seq_lengths, [3, 2])
+
+  def test_resize_sequence_with_permutation_2(self):
+    sub_sequence, seq_lengths, _ = utils.resize_sequence(
+        sequence=np.array([[1, 1], [2, 2], [3, 3]]),
+        cluster_id=np.array([1, 2, 1]),
+        num_permutations=2)
+    self.assertEqual(len(sub_sequence), 2 * 2)
+    self.assertTrue((sub_sequence[0] == [[1, 1], [3, 3]]).all() or
+                    (sub_sequence[0] == [[3, 3], [1, 1]]).all())
+    self.assertTrue((sub_sequence[1] == [[1, 1], [3, 3]]).all() or
+                    (sub_sequence[1] == [[3, 3], [1, 1]]).all())
+    self.assertTrue((sub_sequence[2] == [[2, 2]]).all())
+    self.assertTrue((sub_sequence[3] == [[2, 2]]).all())
+    self.assertListEqual(seq_lengths, [3, 3, 2, 2])
 
 
 if __name__ == '__main__':

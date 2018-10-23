@@ -138,8 +138,9 @@ class UISRNN():
               ],
               lr=args.learn_rate)
 
-      sub_sequences, seq_lengths, transition_bias = utils.resize_seq(
-          args, train_sequence, train_cluster_id)
+      sub_sequences, seq_lengths, transition_bias = utils.resize_sequence(
+          sequence=train_sequence, cluster_id=train_cluster_id,
+          num_permutations=args.permutation)
       num_clusters = len(seq_lengths)
       sorted_seq_lengths = np.sort(seq_lengths)[::-1]
       permute_index = np.argsort(seq_lengths)[::-1]

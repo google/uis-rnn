@@ -16,6 +16,9 @@ import numpy as np
 import torch
 
 
+_DEFAULT_BIAS_PROBABILITY = 0.158
+
+
 def weighted_mse_loss(input_tensor, target_tensor, weight=1):
   """Compute weighted mse loss
 
@@ -67,46 +70,49 @@ def sample_permuted_segments(index_sequence, number_samples):
   return sampled_index_sequences
 
 
-def resize_seq(args, sequence, cluster_id):
-  """Resize sequences for packing and batching
+def resize_sequence(sequence, cluster_id, num_permutations=None):
+  """Resize sequences for packing and batching.
 
   Args:
-    sequence (real numpy matrix, size: seq_len*obs_size): observation sequence
-    cluster_id (real vector, size: seq_len): cluster indicator sequence
+    sequence: (real numpy matrix, size: seq_len*obs_size) - observation sequence
+    cluster_id: (numpy vector, size: seq_len) - cluster indicator sequence
+    num_permutations: int - Number of permutations per utterance sampled.
 
   Returns:
-    packed_rnn_input:
-    rnn_truth:
-    bias: flipping coin head probability
+    sub_sequences: a list of numpy array, with obsevation vector from the same
+      cluster in the same list.
+    seq_lengths: the length of each cluster (+1)
+    bias: flipping coin head probability.
   """
 
   obs_size = np.shape(sequence)[1]
   # merge sub-sequences that belong to a single cluster to a single sequence
   unique_id = np.unique(cluster_id)
-  if args.permutation is None:
-    num_clusters = len(unique_id)
+  if num_permutations and num_permutations > 1:
+    num_clusters = len(unique_id) * num_permutations
   else:
-    num_clusters = len(unique_id) * args.permutation
+    num_permutations
   sub_sequences = []
   seq_lengths = []
-  if args.permutation is None:
-    for i in unique_id:
-      sub_sequences.append(sequence[np.where(cluster_id == i), :][0])
-      seq_lengths.append(len(np.where(cluster_id == i)[0]) + 1)
-  else:
+  if num_permutations and num_permutations > 1:
     for i in unique_id:
       idx_set = np.where(cluster_id == i)[0]
-      sampled_idx_sets = sample_permuted_segments(idx_set, args.permutation)
-      for j in range(args.permutation):
+      sampled_idx_sets = sample_permuted_segments(idx_set, num_permutations)
+      for j in range(num_permutations):
         sub_sequences.append(sequence[sampled_idx_sets[j], :])
         seq_lengths.append(len(idx_set) + 1)
+  else:
+    for i in unique_id:
+      idx_set = np.where(cluster_id == i)
+      sub_sequences.append(sequence[idx_set, :][0])
+      seq_lengths.append(len(idx_set[0]) + 1)
 
-  # compute bias
-  transit_num = 0
-  for entry in range(len(cluster_id) - 1):
-    transit_num += (cluster_id[entry] != cluster_id[entry + 1])
+  # # compute bias
+  # transit_num = 0
+  # for entry in range(len(cluster_id) - 1):
+  #   transit_num += (cluster_id[entry] != cluster_id[entry + 1])
   # return sub_sequences, seq_lengths, transit_num/(len(cluster_id)-1)
-  return sub_sequences, seq_lengths, 0.158
+  return sub_sequences, seq_lengths, _DEFAULT_BIAS_PROBABILITY
 
 
 def pack_seq(rnn_input, sorted_seq_lengths):
