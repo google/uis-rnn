@@ -33,7 +33,7 @@ def compute_approximate_sequence_accuracy(sequence1, sequence2):
   """
   assert len(sequence1) == len(sequence2), (
       "The two sequences should should of the same length")
-  assert sequence1, "The sequences cannot be empoty"
+  assert sequence1, "The sequences cannot be empty"
 
   unique_id1, counts1 = np.unique(sequence1, return_counts=True)
   unique_id2, _ = np.unique(sequence2, return_counts=True)
@@ -48,8 +48,8 @@ def compute_approximate_sequence_accuracy(sequence1, sequence2):
   idx1 = np.argsort(counts1)[::-1]
   n_forward_match = 0
   copy_unique_id2 = np.copy(unique_id2)
-  for _, seq1_idx in enumerate(idx1):
-    if not len(copy_unique_id2):
+  for seq1_idx in idx1:
+    if not copy_unique_id2.shape[0]:
       break
     n_match = []
     for seq2_idx in copy_unique_id2:
