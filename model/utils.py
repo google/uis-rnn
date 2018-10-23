@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Utils for UIS-RNN."""
 
 import numpy as np
 import torch
@@ -20,7 +21,7 @@ _DEFAULT_BIAS_PROBABILITY = 0.158
 
 
 def weighted_mse_loss(input_tensor, target_tensor, weight=1):
-  """Compute weighted mse loss
+  """Compute weighted mse loss.
 
   Note that we are doing weighted loss that only sum up over non-zero entries.
 
@@ -45,9 +46,7 @@ def weighted_mse_loss(input_tensor, target_tensor, weight=1):
 
 
 def sample_permuted_segments(index_sequence, number_samples):
-  """ To be added
-
-  """
+  """To be added."""
   segments = []
   if len(index_sequence) == 1:
     segments.append(index_sequence)
@@ -61,7 +60,7 @@ def sample_permuted_segments(index_sequence, number_samples):
         segments.append(index_sequence[prev:])
   # sample permutations
   sampled_index_sequences = []
-  for n in range(number_samples):
+  for _ in range(number_samples):
     segments_array = []
     permutation = np.random.permutation(len(segments))
     for i in range(len(permutation)):
@@ -84,14 +83,8 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
     seq_lengths: the length of each cluster (+1)
     bias: flipping coin head probability.
   """
-
-  obs_size = np.shape(sequence)[1]
   # merge sub-sequences that belong to a single cluster to a single sequence
   unique_id = np.unique(cluster_id)
-  if num_permutations and num_permutations > 1:
-    num_clusters = len(unique_id) * num_permutations
-  else:
-    num_permutations
   sub_sequences = []
   seq_lengths = []
   if num_permutations and num_permutations > 1:
@@ -124,17 +117,15 @@ def pack_seq(rnn_input, sorted_seq_lengths):
 
 
 def output_result(args, test_record):
-  accuracy_array, length_array = zip(*test_record)
-  # print(accuracy_array, length_array)
+  accuracy_array, _ = zip(*test_record)
   total_accuracy = np.mean(accuracy_array)
-  file = open(
-      '{}_{}_layer{}_{}_{:.1f}_result.txt'.format(
-          args.dataset, args.model_type, args.rnn_hidden_size, args.rnn_depth,
-          args.rnn_dropout), 'a')
-  file.write(
-      'dataset:{}  alpha:{}  beta:{}  crp_theta:{}  learning rate:{}  regularization:{}  batch size:{}  acc:{:.6f} \n'
-      .format(args.dataset, args.alpha, args.beta, args.crp_theta,
-              args.learn_rate, args.network_reg, args.batch_size,
-              total_accuracy))
-
-  file.close()
+  filename = '{}_{}_layer{}_{}_{:.1f}_result.txt'.format(
+      args.dataset, args.model_type, args.rnn_hidden_size,
+      args.rnn_depth, args.rnn_dropout)
+  with open(filename, 'a'):
+    file.write(
+        'dataset:{}  alpha:{}  beta:{}  crp_theta:{}  learning rate:{}  '
+        'regularization:{}  batch size:{}  acc:{:.6f} \n'
+        .format(args.dataset, args.alpha, args.beta, args.crp_theta,
+                args.learn_rate, args.network_reg, args.batch_size,
+                total_accuracy))
