@@ -16,25 +16,27 @@ import numpy as np
 import torch
 
 
-def weighted_mse_loss(input, target, weight=1):
+def weighted_mse_loss(input_tensor, target_tensor, weight=1):
   """Compute weighted mse loss
 
   Note that we are doing weighted loss that only sum up over non-zero entries.
 
   Args:
-    input: input tensor
-    target: target tensor
+    input_tensor: input tensor
+    target_tensor: target tensor
     weight: weight tensor, in this case 1/sigma^2
 
   Returns:
     weighted mse loss
   """
-  observation_dim = input.size()[-1]
-  streched_tensor = ((input - target)**2).view(-1, observation_dim)
+  observation_dim = input_tensor.size()[-1]
+  streched_tensor = ((input_tensor - target_tensor)**2).view(-1,
+                                                             observation_dim)
   entry_num = float(streched_tensor.size()[0])
   non_zero_entry_num = torch.sum(streched_tensor[:, 0] != 0).float()
-  weighted_tensor = torch.mm(((input - target)**2).view(-1, observation_dim),
-                             (torch.diag(weight.float().view(-1))))
+  weighted_tensor = torch.mm(
+      ((input_tensor - target_tensor)**2).view(-1, observation_dim),
+      (torch.diag(weight.float().view(-1))))
   return torch.mean(
       weighted_tensor) * weight.nelement() * entry_num / non_zero_entry_num
 

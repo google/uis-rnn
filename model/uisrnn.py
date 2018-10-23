@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from model.utils import pack_seq, resize_seq, weighted_mse_loss
+"""The UISRNN model."""
+from model import utils
 import numpy as np
 import torch
 from torch import optim
-from torch.autograd import Variable
+from torch import autograd
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -138,7 +138,7 @@ class UISRNN():
               ],
               lr=args.learn_rate)
 
-      sub_sequences, seq_lengths, transition_bias = resize_seq(
+      sub_sequences, seq_lengths, transition_bias = utils.resize_seq(
           args, train_sequence, train_cluster_id)
       num_clusters = len(seq_lengths)
       sorted_seq_lengths = np.sort(seq_lengths)[::-1]
@@ -149,11 +149,11 @@ class UISRNN():
         for i in range(num_clusters):
           rnn_input[1:sorted_seq_lengths[i], i, :] = sub_sequences[
               permute_index[i]]
-        rnn_input = Variable(torch.from_numpy(rnn_input).float())
+        rnn_input = autograd.Variable(torch.from_numpy(rnn_input).float())
         if torch.cuda.is_available():
           rnn_input = rnn_input.cuda()
-        packed_train_sequence, rnn_truth = pack_seq(rnn_input,
-                                                    sorted_seq_lengths)
+        packed_train_sequence, rnn_truth = utils.pack_seq(
+            rnn_input, sorted_seq_lengths)
 
       train_loss = []
       for t in range(args.train_iteration):
@@ -166,11 +166,11 @@ class UISRNN():
             mini_batch_rnn_input[1:sorted_seq_lengths[mini_batch[i]],
                                  i, :] = sub_sequences[permute_index[
                                      mini_batch[i]]]
-          mini_batch_rnn_input = Variable(
+          mini_batch_rnn_input = autograd.Variable(
               torch.from_numpy(mini_batch_rnn_input).float())
           if torch.cuda.is_available():
             mini_batch_rnn_input = mini_batch_rnn_input.cuda()
-          packed_train_sequence, rnn_truth = pack_seq(
+          packed_train_sequence, rnn_truth = utils.pack_seq(
               mini_batch_rnn_input, sorted_seq_lengths[mini_batch])
         if torch.cuda.is_available():
           hidden = torch.mm(
@@ -195,8 +195,10 @@ class UISRNN():
               mean.view(mean_size[0], -1))
         mean = mean.view(mean_size)
 
-        loss1 = weighted_mse_loss((rnn_truth != 0).float() * mean[:-1, :, :],
-                                  rnn_truth, 1 / (2 * self.sigma2))
+        loss1 = utils.weighted_mse_loss(
+            input_tensor=(rnn_truth != 0).float() * mean[:-1, :, :],
+            target_tensor=rnn_truth,
+            weight=1 / (2 * self.sigma2))
         weight = (((rnn_truth != 0).float() * mean[:-1, :, :] - rnn_truth)
                   **2).view(-1, observation_dim)
         num_non_zero = torch.sum((weight != 0).float(), dim=0).squeeze()
@@ -249,7 +251,7 @@ class UISRNN():
     if args.model_type == 'generative':
       self.rnn_model.eval()
       test_sequence = np.tile(test_sequence, (args.test_iteration, 1))
-      test_sequence = Variable(torch.from_numpy(test_sequence).float())
+      test_sequence = autograd.Variable(torch.from_numpy(test_sequence).float())
       if torch.cuda.is_available():
         test_sequence = test_sequence.cuda()
       # bookkeeping for beam search
@@ -288,10 +290,10 @@ class UISRNN():
                 break
               if speaker < new_n_speakers:  # existing speakers
                 new_last_speaker = new_trace_buffer[-1]
-                loss = weighted_mse_loss(
-                    torch.squeeze(new_mean_buffer[speaker]),
-                    test_sequence[t + sub_idx, :],
-                    1 / (2 * self.sigma2)).cpu().detach().numpy()
+                loss = utils.weighted_mse_loss(
+                    input_tensor=torch.squeeze(new_mean_buffer[speaker]),
+                    target_tensor=test_sequence[t + sub_idx, :],
+                    weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
                 if speaker == new_last_speaker:
                   loss -= np.log(1 - self.transition_bias)
                 else:
@@ -313,15 +315,16 @@ class UISRNN():
                   new_block_counts_buffer[speaker] += 1
                 new_trace_buffer.append(speaker)
               else:  # new speaker
-                init_input = Variable(torch.zeros(
+                init_input = autograd.Variable(torch.zeros(
                     args.toy_data_d_observation)).unsqueeze(0).unsqueeze(0)
                 if torch.cuda.is_available():
                   init_input = init_input.cuda()
                 mean, hidden = self.rnn_model(init_input,
                                               self.rnn_init_hidden.unsqueeze(0))
-                loss = weighted_mse_loss(
-                    torch.squeeze(mean), test_sequence[t + sub_idx, :],
-                    1 / (2 * self.sigma2)).cpu().detach().numpy()
+                loss = utils.weighted_mse_loss(
+                    input_tensor=torch.squeeze(mean),
+                    target_tensor=test_sequence[t + sub_idx, :],
+                    weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
                 loss -= np.log(self.transition_bias) + np.log(
                     args.crp_theta) - np.log(
                         sum(new_block_counts_buffer) + args.crp_theta)
@@ -367,7 +370,7 @@ class UISRNN():
           for sub_idx, speaker in enumerate(
               new_speaker_idx):  # update the proposal step-by-step
             if speaker == new_n_speakers:
-              init_input = Variable(torch.zeros(
+              init_input = autograd.Variable(torch.zeros(
                   args.toy_data_d_observation)).unsqueeze(0).unsqueeze(0)
               if torch.cuda.is_available():
                 init_input = init_input.cuda()
