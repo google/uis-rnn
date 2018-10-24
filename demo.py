@@ -65,7 +65,7 @@ def diarization_experiment(args):
 
   print('Finish --dataset {} --alpha {} --beta {} --crp_theta {} -l {} -r {}'
         .format(args.dataset, args.alpha, args.beta, args.crp_theta,
-                args.learn_rate, args.network_reg))
+                args.learning_rate, args.network_reg))
 
 
 def main():

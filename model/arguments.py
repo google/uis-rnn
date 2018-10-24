@@ -29,8 +29,6 @@ def parse_arguments():
       help='toy data dimension')
   # model configurations
   parser.add_argument(
-      '--model_type', '-m', default='generative', type=str, help='model type')
-  parser.add_argument(
       '--rnn_hidden_size',
       default=256,
       type=int,
@@ -59,7 +57,7 @@ def parse_arguments():
   parser.add_argument(
       '--optimizer', '-o', default='adam', type=str, help='optimizer')
   parser.add_argument(
-      '--learn_rate', '-l', default=1e-5, type=float, help='leaning rate')
+      '--learning_rate', '-l', default=1e-5, type=float, help='leaning rate')
   parser.add_argument(
       '--train_iteration',
       '-t',
