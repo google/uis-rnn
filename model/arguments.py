@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Arguments for UISRNN."""
 import argparse
+
+_TOY_DATA_D_OBSERVATION = 256
 
 
 def parse_arguments():
@@ -23,10 +25,10 @@ def parse_arguments():
   parser.add_argument(
       '--dataset', '-d', default='toy', type=str, help='dataset type')
   parser.add_argument(
-      '--toy_data_d_observation',
-      default=256,
+      '--d_observation',
+      default=_TOY_DATA_D_OBSERVATION,
       type=int,
-      help='toy data dimension')
+      help='data dimension')
   # model configurations
   parser.add_argument(
       '--rnn_hidden_size',
@@ -37,7 +39,7 @@ def parse_arguments():
   parser.add_argument(
       '--rnn_dropout', default=0.2, type=float, help='rnn dropout rate')
   parser.add_argument(
-      '--network_reg',
+      '--regularization_weight',
       '-r',
       default=1e-5,
       type=float,
@@ -55,7 +57,7 @@ def parse_arguments():
       help='update sigma2 if it equals to None')
   # training/testing configurations
   parser.add_argument(
-      '--optimizer', '-o', default='adam', type=str, help='optimizer')
+      '--optimizer', '-o', default='adam', choices=['adam'], help='optimizer')
   parser.add_argument(
       '--learning_rate', '-l', default=1e-5, type=float, help='leaning rate')
   parser.add_argument(
@@ -73,7 +75,7 @@ def parse_arguments():
   parser.add_argument(
       '--look_ahead', default=1, type=int, help='look ahead steps in testing')
   parser.add_argument(
-      '--permutation',
+      '--num_permutations',
       default=10,
       type=int,
       help='number of permutations per utterance sampled in the training data')

@@ -136,7 +136,7 @@ class UISRNN(object):
     sub_sequences, seq_lengths, transition_bias = utils.resize_sequence(
         sequence=train_sequence,
         cluster_id=train_cluster_id,
-        num_permutations=args.permutation)
+        num_permutations=args.num_permutations)
     num_clusters = len(seq_lengths)
     sorted_seq_lengths = np.sort(seq_lengths)[::-1]
     permute_index = np.argsort(seq_lengths)[::-1]
@@ -209,7 +209,7 @@ class UISRNN(object):
       l2_reg = 0
       for param in self.rnn_model.parameters():
         l2_reg += torch.norm(param)
-      loss3 = args.network_reg * l2_reg
+      loss3 = args.regularization_weight * l2_reg
 
       loss = loss1 + loss2 + loss3
       loss.backward()
@@ -311,7 +311,7 @@ class UISRNN(object):
             else:  # new speaker
               init_input = autograd.Variable(
                   torch.zeros(
-                      args.toy_data_d_observation)).unsqueeze(0).unsqueeze(0)
+                      args.d_observation)).unsqueeze(0).unsqueeze(0)
               if torch.cuda.is_available():
                 init_input = init_input.cuda()
               mean, hidden = self.rnn_model(init_input,
@@ -367,7 +367,7 @@ class UISRNN(object):
           if speaker == new_n_speakers:
             init_input = autograd.Variable(
                 torch.zeros(
-                    args.toy_data_d_observation)).unsqueeze(0).unsqueeze(0)
+                    args.d_observation)).unsqueeze(0).unsqueeze(0)
             if torch.cuda.is_available():
               init_input = init_input.cuda()
             mean, hidden = self.rnn_model(init_input,

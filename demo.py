@@ -47,6 +47,7 @@ def diarization_experiment(args):
     model.fit(args, train_sequence, train_cluster_id)
     model.save('saved_uisrnn_states.model')
   else:  # use pretrained model
+    # TODO: support using pretrained model.
     model.load('saved_uisrnn_states.model')
 
   # testing
@@ -65,7 +66,7 @@ def diarization_experiment(args):
 
   print('Finish --dataset {} --alpha {} --beta {} --crp_theta {} -l {} -r {}'
         .format(args.dataset, args.alpha, args.beta, args.crp_theta,
-                args.learning_rate, args.network_reg))
+                args.learning_rate, args.regularization_weight))
 
 
 def main():

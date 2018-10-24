@@ -25,7 +25,7 @@ class TestUISRNN(unittest.TestCase):
   def test_fit_and_predict(self):
     args = arguments.parse_arguments()
     args.train_iteration = 10
-    args.toy_data_d_observation = 16
+    args.d_observation = 16
     args.rnn_hidden_size = 16
 
     # generate fake data
