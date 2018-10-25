@@ -17,9 +17,6 @@ import numpy as np
 import torch
 
 
-_DEFAULT_BIAS_PROBABILITY = 0.158
-
-
 def weighted_mse_loss(input_tensor, target_tensor, weight=1):
   """Compute weighted mse loss.
 
@@ -46,7 +43,27 @@ def weighted_mse_loss(input_tensor, target_tensor, weight=1):
 
 
 def sample_permuted_segments(index_sequence, number_samples):
-  """To be added."""
+  """Sample sequences with permuted blocks.
+
+  Args:
+    index_sequence: (integer array, size: L)
+      - subsequence index
+      For example, index_sequence = [1,2,6,10,11,12].
+    number_samples: (integer)
+      - number of subsampled block-preserving permuted sequences.
+      For example, number_samples = 5
+
+  Returns:
+    sampled_index_sequences: (a list of numpy arrays)
+      - a list of subsampled block-preserving permuted sequences.
+      For example, sampled_index_sequences = 
+      [[10,11,12,1,2,6],
+       [6,1,2,10,11,12],
+       [1,2,10,11,12,6],
+       [6,1,2,10,11,12],
+       [1,2,6,10,11,12]]
+      The length of "sampled_index_sequences" is "number_samples".
+  """
   segments = []
   if len(index_sequence) == 1:
     segments.append(index_sequence)
@@ -73,7 +90,7 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
   """Resize sequences for packing and batching.
 
   Args:
-    sequence: (real numpy matrix, size: seq_len*obs_size) - observation sequence
+    sequence: (real numpy matrix, size: seq_len*obs_size) - observed sequence
     cluster_id: (numpy vector, size: seq_len) - cluster indicator sequence
     num_permutations: int - Number of permutations per utterance sampled.
 
@@ -100,12 +117,12 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
       sub_sequences.append(sequence[idx_set, :][0])
       seq_lengths.append(len(idx_set[0]) + 1)
 
-  # # compute bias
-  # transit_num = 0
-  # for entry in range(len(cluster_id) - 1):
-  #   transit_num += (cluster_id[entry] != cluster_id[entry + 1])
-  # return sub_sequences, seq_lengths, transit_num/(len(cluster_id)-1)
-  return sub_sequences, seq_lengths, _DEFAULT_BIAS_PROBABILITY
+  # compute bias
+  transit_num = 0
+  for entry in range(len(cluster_id) - 1):
+    transit_num += (cluster_id[entry] != cluster_id[entry + 1])
+  bias = transit_num/(len(cluster_id)-1)
+  return sub_sequences, seq_lengths, bias
 
 
 def pack_seq(rnn_input, sorted_seq_lengths):
@@ -119,13 +136,13 @@ def pack_seq(rnn_input, sorted_seq_lengths):
 def output_result(args, test_record):
   accuracy_array, _ = zip(*test_record)
   total_accuracy = np.mean(accuracy_array)
-  filename = '{}_{}_layer{}_{}_{:.1f}_result.txt'.format(
-      args.dataset, args.model_type, args.rnn_hidden_size,
+  filename = '{}_layer{}_{}_{:.1f}_result.txt'.format(
+      args.dataset, args.rnn_hidden_size,
       args.rnn_depth, args.rnn_dropout)
-  with open(filename, 'a'):
+  with open(filename, 'a') as file:
     file.write(
         'dataset:{}  alpha:{}  beta:{}  crp_theta:{}  learning rate:{}  '
         'regularization:{}  batch size:{}  acc:{:.6f} \n'
         .format(args.dataset, args.alpha, args.beta, args.crp_theta,
-                args.learn_rate, args.network_reg, args.batch_size,
-                total_accuracy))
+                args.learning_rate, args.regularization_weight,
+                args.batch_size, total_accuracy))

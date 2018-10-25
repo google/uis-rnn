@@ -21,23 +21,36 @@ def parse_arguments():
   """Parse arguments."""
   parser = argparse.ArgumentParser(
       description='Bayesian Non-parametric Model For Diarization')
+
   # data configurations
   parser.add_argument(
-      '--dataset', '-d', default='toy', type=str, help='dataset type')
+      '--dataset',
+      '-d',
+      default='toy',
+      type=str,
+      help='dataset type')
   parser.add_argument(
       '--d_observation',
       default=_TOY_DATA_D_OBSERVATION,
       type=int,
       help='data dimension')
+
   # model configurations
   parser.add_argument(
       '--rnn_hidden_size',
-      default=256,
+      default=512,
       type=int,
       help='rnn hidden state dimension')
-  parser.add_argument('--rnn_depth', default=1, type=int, help='rnn depth')
   parser.add_argument(
-      '--rnn_dropout', default=0.2, type=float, help='rnn dropout rate')
+      '--rnn_depth',
+      default=1,
+      type=int,
+      help='rnn depth')
+  parser.add_argument(
+      '--rnn_dropout',
+      default=0.2,
+      type=float,
+      help='rnn dropout rate')
   parser.add_argument(
       '--regularization_weight',
       '-r',
@@ -45,21 +58,39 @@ def parse_arguments():
       type=float,
       help='network regularization multiplicative')
   parser.add_argument(
-      '--alpha', default=1.0, type=float, help='inverse gamma shape')
+      '--alpha',
+      default=1.0,
+      type=float,
+      help='inverse gamma shape')
   parser.add_argument(
-      '--beta', default=1.0, type=float, help='inverse gamma scale')
+      '--beta',
+      default=1.0,
+      type=float,
+      help='inverse gamma scale')
   parser.add_argument(
-      '--crp_theta', default=1.0, type=float, help='crp parameter')
+      '--crp_theta',
+      default=1.0,
+      type=float,
+      help='crp parameter')
   parser.add_argument(
       '--sigma2',
       default=.05,
       type=float,
       help='update sigma2 if it equals to None')
+
   # training/testing configurations
   parser.add_argument(
-      '--optimizer', '-o', default='adam', choices=['adam'], help='optimizer')
+      '--optimizer',
+      '-o',
+      default='adam',
+      choices=['adam'],
+      help='optimizer')
   parser.add_argument(
-      '--learning_rate', '-l', default=1e-5, type=float, help='leaning rate')
+      '--learning_rate',
+      '-l',
+      default=1e-5,
+      type=float,
+      help='leaning rate')
   parser.add_argument(
       '--train_iteration',
       '-t',
@@ -67,20 +98,37 @@ def parse_arguments():
       type=int,
       help='total training iteration')
   parser.add_argument(
-      '--test_iteration', default=2, type=int, help='total testing iteration')
+      '--test_iteration',
+      default=2,
+      type=int,
+      help='total testing iteration')
   parser.add_argument(
-      '--batch_size', '-b', default=10, type=int, help='batch size')
+      '--batch_size',
+      '-b',
+      default=10,
+      type=int,
+      help='batch size')
   parser.add_argument(
-      '--beam_size', '-s', default=10, type=int, help='beam search size')
+      '--beam_size',
+      '-s',
+      default=10,
+      type=int,
+      help='beam search size')
   parser.add_argument(
-      '--look_ahead', default=1, type=int, help='look ahead steps in testing')
+      '--look_ahead',
+      default=1,
+      type=int,
+      help='look ahead steps in testing')
   parser.add_argument(
       '--num_permutations',
       default=10,
       type=int,
       help='number of permutations per utterance sampled in the training data')
   parser.add_argument(
-      '--pretrain', default=None, type=str, help='use pretrained model')
+      '--pretrain',
+      default=None,
+      type=str,
+      help='use pretrained model')
 
   args = parser.parse_args()
   return args
