@@ -121,7 +121,7 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
   transit_num = 0
   for entry in range(len(cluster_id) - 1):
     transit_num += (cluster_id[entry] != cluster_id[entry + 1])
-  bias = transit_num/(len(cluster_id)-1)
+  bias = (transit_num+1)/len(cluster_id)
   return sub_sequences, seq_lengths, bias
 
 
