@@ -46,27 +46,25 @@ class NormalRNN(nn.Module):
 class UISRNN(object):
   """Unbounded Interleaved-State Recurrent Neural Networks """
 
-  def __init__(self, args, input_dim, observation_dim, transition_bias=None):
+  def __init__(self, args, transition_bias=None):
     """Construct the UISRNN object.
 
     Args:
       args: return value of arguments.parse_arguments()
-      input_dim: TODO
-      observation_dim: TODO
       transition_bias: the value of p0 corresponding to Eq. (6) in the paper.
         If given, it will be a fixed value; if not None, it will be estimated
         using Eq. (13) in the paper.
     """
     self.device = torch.device(
         'cuda:0' if torch.cuda.is_available() else 'cpu')
-    self.rnn_model = NormalRNN(input_dim, args.rnn_hidden_size,
+    self.rnn_model = NormalRNN(args.observation_dim, args.rnn_hidden_size,
                                args.rnn_depth, args.rnn_dropout,
-                               observation_dim).to(self.device)
+                               args.observation_dim).to(self.device)
     self.rnn_init_hidden = nn.Parameter(
         torch.zeros(1, args.rnn_hidden_size).to(self.device))
     sigma2 = .1 if args.sigma2 is None else args.sigma2
     self.sigma2 = nn.Parameter(
-        sigma2 * torch.ones(observation_dim).to(self.device))
+        sigma2 * torch.ones(args.observation_dim).to(self.device))
     self.transition_bias = transition_bias
 
   def save(self, filepath):
@@ -139,10 +137,15 @@ class UISRNN(object):
         'iaaa_0' means the entry belongs to speaker #0 in utterance 'iaaa'.
         Note that the order of entries within an utterance are preserved,
         and all utterances are simply concatenated together.
+
+    Raises:
+      ValueError: If train_sequence has wrong dimension.
     """
 
     _, observation_dim = train_sequence.shape
-    input_dim = observation_dim
+    if observation_dim != args.observation_dim:
+      raise ValueError('train_sequence does not match the dimension specified '
+                       'by args.observation_dim.')
 
     self.rnn_model.train()
     optimizer = self.get_optimizer(optimizer=args.optimizer,
@@ -160,7 +163,8 @@ class UISRNN(object):
       self.transition_bias = transition_bias
     if args.batch_size is None:
       # Packing sequences.
-      rnn_input = np.zeros((sorted_seq_lengths[0], num_clusters, input_dim))
+      rnn_input = np.zeros((sorted_seq_lengths[0], num_clusters,
+                            args.observation_dim))
       for i in range(num_clusters):
         rnn_input[1:sorted_seq_lengths[i], i, :] = sub_sequences[
             permute_index[i]]
@@ -175,7 +179,7 @@ class UISRNN(object):
       if args.batch_size is not None:
         mini_batch = np.sort(np.random.choice(num_clusters, args.batch_size))
         mini_batch_rnn_input = np.zeros((sorted_seq_lengths[mini_batch[0]],
-                                         args.batch_size, input_dim))
+                                         args.batch_size, args.observation_dim))
         for i in range(args.batch_size):
           mini_batch_rnn_input[1:sorted_seq_lengths[mini_batch[i]],
                                i, :] = sub_sequences[permute_index[
@@ -256,8 +260,14 @@ class UISRNN(object):
       predict_speaker_id: (integer array, size: N)
         - predicted speaker id sequence.
         For example, predict_speaker_id = [0, 1, 0, 0, 1]
+
+    Raises:
+      ValueError: If test_sequence has wrong dimension.
     """
-    test_sequence_length = test_sequence.shape[0]
+    test_sequence_length, observation_dim = test_sequence.shape
+    if observation_dim != args.observation_dim:
+      raise ValueError('test_sequence does not match the dimension specified '
+                       'by args.observation_dim.')
     self.rnn_model.eval()
     test_sequence = np.tile(test_sequence, (args.test_iteration, 1))
     test_sequence = autograd.Variable(
@@ -324,7 +334,7 @@ class UISRNN(object):
               new_trace_buffer.append(speaker)
             else:  # new speaker
               init_input = autograd.Variable(
-                  torch.zeros(args.d_observation)
+                  torch.zeros(args.observation_dim)
                   ).unsqueeze(0).unsqueeze(0).to(self.device)
               mean, hidden = self.rnn_model(init_input,
                                             self.rnn_init_hidden.unsqueeze(0))
@@ -378,7 +388,7 @@ class UISRNN(object):
             new_speaker_idx):  # update the proposal step-by-step
           if speaker == new_n_speakers:
             init_input = autograd.Variable(
-                torch.zeros(args.d_observation)
+                torch.zeros(args.observation_dim)
                 ).unsqueeze(0).unsqueeze(0).to(self.device)
             mean, hidden = self.rnn_model(init_input,
                                           self.rnn_init_hidden.unsqueeze(0))

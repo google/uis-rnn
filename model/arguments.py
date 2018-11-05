@@ -24,16 +24,10 @@ def parse_arguments():
 
   # data configurations
   parser.add_argument(
-      '--dataset',
-      '-d',
-      default='toy',
-      type=str,
-      help='dataset type')
-  parser.add_argument(
-      '--d_observation',
+      '--observation_dim',
       default=_TOY_DATA_D_OBSERVATION,
       type=int,
-      help='data dimension')
+      help='The dimension of the embeddings (e.g. d-vectors).')
 
   # model configurations
   parser.add_argument(

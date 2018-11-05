@@ -25,29 +25,65 @@ class TestUISRNN(unittest.TestCase):
   def test_fit_and_predict(self):
     args = arguments.parse_arguments()
     args.train_iteration = 10
-    args.d_observation = 16
+    args.observation_dim = 16
     args.rnn_hidden_size = 16
 
     # generate fake data
-    input_dim = 16
-    observation_dim = input_dim
-    train_sequence = np.random.rand(1000, input_dim)
+    train_sequence = np.random.rand(1000, args.observation_dim)
     train_cluster_id = np.array(['A'] * 1000)
     _, observation_dim = train_sequence.shape
-    input_dim = observation_dim
 
-    model = uisrnn.UISRNN(args, input_dim, observation_dim, .5)
+    model = uisrnn.UISRNN(args, .5)
 
     # training
     model.fit(args, train_sequence, train_cluster_id)
 
     # testing
-    test_sequence = np.random.rand(10, input_dim)
+    test_sequence = np.random.rand(10, args.observation_dim)
     predicted_label = model.predict(args, test_sequence)
+
+  def test_fit_with_wrong_dim(self):
+    args = arguments.parse_arguments()
+    args.train_iteration = 10
+    args.observation_dim = 16
+    args.rnn_hidden_size = 16
+
+    # generate fake data
+    train_sequence = np.random.rand(1000, 18)
+    train_cluster_id = np.array(['A'] * 1000)
+    _, observation_dim = train_sequence.shape
+
+    model = uisrnn.UISRNN(args, .5)
+
+    # training
+    with self.assertRaises(ValueError):
+      model.fit(args, train_sequence, train_cluster_id)
+
+  def test_predict_with_wrong_dim(self):
+    args = arguments.parse_arguments()
+    args.train_iteration = 10
+    args.observation_dim = 16
+    args.rnn_hidden_size = 16
+
+    # generate fake data
+    train_sequence = np.random.rand(1000, args.observation_dim)
+    train_cluster_id = np.array(['A'] * 1000)
+    _, observation_dim = train_sequence.shape
+
+    model = uisrnn.UISRNN(args, .5)
+
+    # training
+    model.fit(args, train_sequence, train_cluster_id)
+
+    # testing
+    test_sequence = np.random.rand(10, 18)
+    with self.assertRaises(ValueError):
+      predicted_label = model.predict(args, test_sequence)
 
   def test_save_and_load(self):
     args = arguments.parse_arguments()
-    model = uisrnn.UISRNN(args, 16, 16, .5)
+    args.observation_dim = 16
+    model = uisrnn.UISRNN(args, .5)
     temp_file_path = tempfile.mktemp()
     model.save(temp_file_path)
     model.load(temp_file_path)

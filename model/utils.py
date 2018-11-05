@@ -136,13 +136,13 @@ def pack_seq(rnn_input, sorted_seq_lengths):
 def output_result(args, test_record):
   accuracy_array, _ = zip(*test_record)
   total_accuracy = np.mean(accuracy_array)
-  filename = '{}_layer{}_{}_{:.1f}_result.txt'.format(
-      args.dataset, args.rnn_hidden_size,
+  filename = 'layer{}_{}_{:.1f}_result.txt'.format(
+      args.rnn_hidden_size,
       args.rnn_depth, args.rnn_dropout)
   with open(filename, 'a') as file:
     file.write(
-        'dataset:{}  alpha:{}  beta:{}  crp_theta:{}  learning rate:{}  '
+        'alpha:{}  beta:{}  crp_theta:{}  learning rate:{}  '
         'regularization:{}  batch size:{}  acc:{:.6f} \n'
-        .format(args.dataset, args.alpha, args.beta, args.crp_theta,
+        .format(args.alpha, args.beta, args.crp_theta,
                 args.learning_rate, args.regularization_weight,
                 args.batch_size, total_accuracy))
