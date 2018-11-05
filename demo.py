@@ -30,7 +30,7 @@ def diarization_experiment(args):
     args: return value of arguments.parse_arguments()
   """
 
-  predict_labels = []
+  predicted_labels = []
   test_record = []
 
   train_data = np.load('./data/training_data.npz')
