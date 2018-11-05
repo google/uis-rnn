@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from model.arguments import parse_arguments
-from model.evals import evaluate_result
-from model.uisrnn import UISRNN
-from model.utils import output_result
+from model import arguments
+from model import evals
+from model import uisrnn
+from model import utils
 import numpy as np
+
+SAVED_STATES_FILE_NAME = 'saved_uisrnn_states.model'
 
 
 def diarization_experiment(args):
@@ -25,7 +27,7 @@ def diarization_experiment(args):
   Load data --> train model --> test model --> output result
 
   Args:
-    args: return value of parser.parse_args()
+    args: return value of arguments.parse_arguments()
   """
 
   predict_labels = []
@@ -41,28 +43,28 @@ def diarization_experiment(args):
   _, observation_dim = train_sequence.shape
   input_dim = observation_dim
 
-  model = UISRNN(args, input_dim, observation_dim, .5)
+  model = uisrnn.UISRNN(args, input_dim, observation_dim, .5)
   # training
   if args.pretrain is None:
     model.fit(args, train_sequence, train_cluster_id)
-    model.save('saved_uisrnn_states.model')
+    model.save(SAVED_STATES_FILE_NAME)
   else:  # use pretrained model
     # TODO: support using pretrained model.
-    model.load('saved_uisrnn_states.model')
+    model.load(SAVED_STATES_FILE_NAME)
 
   # testing
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
-    predict_label = model.predict(args, test_sequence)
-    predict_labels.append(predict_label)
-    accuracy, length = evaluate_result(test_cluster_id, predict_label)
+    predicted_label = model.predict(args, test_sequence)
+    predicted_labels.append(predicted_label)
+    accuracy, length = evals.evaluate_result(test_cluster_id, predicted_label)
     test_record.append((accuracy, length))
-    print('ground truth labels:')
+    print('Ground truth labels:')
     print(test_cluster_id)
-    print('predict labels:')
-    print(predict_label)
+    print('Predicted labels:')
+    print(predicted_label)
     print('----------------------')
 
-  output_result(args, test_record)
+  utils.output_result(args, test_record)
 
   print('Finish --dataset {} --alpha {} --beta {} --crp_theta {} -l {} -r {}'
         .format(args.dataset, args.alpha, args.beta, args.crp_theta,
@@ -75,7 +77,7 @@ def main():
   # torch.manual_seed(1)
   # torch.cuda.manual_seed(1)
 
-  args = parse_arguments()
+  args = arguments.parse_arguments()
 
   diarization_experiment(args)
 

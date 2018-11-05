@@ -46,7 +46,17 @@ class NormalRNN(nn.Module):
 class UISRNN(object):
   """Unbounded Interleaved-State Recurrent Neural Networks """
 
-  def __init__(self, args, input_dim, observation_dim, transition_bias):
+  def __init__(self, args, input_dim, observation_dim, transition_bias=None):
+    """Construct the UISRNN object.
+
+    Args:
+      args: return value of arguments.parse_arguments()
+      input_dim: TODO
+      observation_dim: TODO
+      transition_bias: the value of p0 corresponding to Eq. (6) in the paper.
+        If given, it will be a fixed value; if not None, it will be estimated
+        using Eq. (13) in the paper.
+    """
     self.device = torch.device(
         'cuda:0' if torch.cuda.is_available() else 'cpu')
     self.rnn_model = NormalRNN(input_dim, args.rnn_hidden_size,
@@ -146,7 +156,8 @@ class UISRNN(object):
     num_clusters = len(seq_lengths)
     sorted_seq_lengths = np.sort(seq_lengths)[::-1]
     permute_index = np.argsort(seq_lengths)[::-1]
-    self.transition_bias = transition_bias
+    if self.transition_bias is not None:
+      self.transition_bias = transition_bias
     if args.batch_size is None:
       # Packing sequences.
       rnn_input = np.zeros((sorted_seq_lengths[0], num_clusters, input_dim))
