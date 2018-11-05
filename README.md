@@ -2,9 +2,14 @@
 
 ## Overview
 
-This is the library for the *Unbounded Interleaved-State Recurrent Neural Network
-(UIS-RNN)* algorithm, corresponding to the paper
+This is the library for the
+*Unbounded Interleaved-State Recurrent Neural Network (UIS-RNN)* algorithm,
+corresponding to the paper
 [Fully Supervised Speaker Diarization](https://arxiv.org/abs/1810.04719).
+
+This open source implementation is slightly different than the internal one
+which we used to produce the results in the paper, due to dependencies on
+some internal libraries.
 
 **This is not an official Google product.**
 
@@ -18,7 +23,7 @@ This library depends on:
 
 ## Tutorial
 
-To get started, simpy run this command:
+To get started, simply run this command:
 
 ```bash
 python3 demo.py --train_iteration=20000
@@ -27,6 +32,26 @@ python3 demo.py --train_iteration=20000
 This will train a UIS-RNN model using `data/training_data.npz`,
 then perform inference on `data/testing_data.npz`, and print the
 inference results.
+
+All algorithms are implemented as the `UISRNN` class. First, construct a
+`UISRNN` object by:
+
+```python
+model = UISRNN(args, input_dim, observation_dim, transition_bias)
+```
+
+Next, train the model by calling the `fit()` function:
+
+```python
+model.fit(args, train_sequence, train_cluster_id)
+```
+
+Once we are done with the training, we can run the trained model to perform
+inference on new sequences by calling the `predict()` function:
+
+```python
+predicted_label = model.predict(args, test_sequence)
+```
 
 ## Citations
 

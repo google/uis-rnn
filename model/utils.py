@@ -56,7 +56,7 @@ def sample_permuted_segments(index_sequence, number_samples):
   Returns:
     sampled_index_sequences: (a list of numpy arrays)
       - a list of subsampled block-preserving permuted sequences.
-      For example, sampled_index_sequences = 
+      For example, sampled_index_sequences =
       [[10,11,12,1,2,6],
        [6,1,2,10,11,12],
        [1,2,10,11,12,6],
@@ -121,7 +121,7 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
   transit_num = 0
   for entry in range(len(cluster_id) - 1):
     transit_num += (cluster_id[entry] != cluster_id[entry + 1])
-  bias = (transit_num+1)/len(cluster_id)
+  bias = (transit_num + 1) / len(cluster_id)
   return sub_sequences, seq_lengths, bias
 
 

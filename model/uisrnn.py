@@ -135,7 +135,7 @@ class UISRNN(object):
     input_dim = observation_dim
 
     self.rnn_model.train()
-    optimizer = self.get_optimizer(optimizer=args.optimizer, 
+    optimizer = self.get_optimizer(optimizer=args.optimizer,
                                    sigma2=args.sigma2,
                                    learning_rate=args.learning_rate)
 
@@ -216,12 +216,13 @@ class UISRNN(object):
 
       if np.remainder(t, 10) == 0:
         print('Iter {:d}  '
-              'Training Loss:{:.4f}  '
-              'Negative Log Likelihood:{:.4f}  '
+              'Training Loss:{:.4f}  \n'
+              '  Negative Log Likelihood:{:.4f}  '
               'Sigma2 Prior:{:.4f}  '
-              'Regularization:{:.4f}'.format(t, float(loss.data), 
+              'Regularization:{:.4f}'.format(t, float(loss.data),
                 float(loss1.data), float(loss2.data), float(loss3.data)))
       train_loss.append(float(loss1.data))  # only save the likelihood part
+    print('Done training with {} iterations'.format(args.train_iteration))
 
   def predict(self, args, test_sequence):
     """Predict test sequence labels using UISRNN model.
@@ -371,7 +372,7 @@ class UISRNN(object):
             mean, hidden = self.rnn_model(init_input,
                                           self.rnn_init_hidden.unsqueeze(0))
             mean, hidden = self.rnn_model(
-              test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0), hidden)
+                test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0), hidden)
             new_mean_set.append(mean.clone())
             new_hidden_set.append(hidden.clone())
             new_block_counts.append(1)
