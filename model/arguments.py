@@ -87,7 +87,7 @@ def parse_arguments():
       help='The inverse gamma scale for estimating sigma2. This value is only '
            'meaningful when sigma2 is not given, and estimated from data.')
 
-  # training/testing configurations
+  # training configurations
   parser.add_argument(
       '--optimizer',
       '-o',
@@ -107,33 +107,38 @@ def parse_arguments():
       type=int,
       help='The total number of training iterations.')
   parser.add_argument(
-      '--test_iteration',
-      default=2,
-      type=int,
-      help='The total number of testing iterations.')
-  parser.add_argument(
       '--batch_size',
       '-b',
       default=10,
       type=int,
       help='The batch size for training.')
   parser.add_argument(
-      '--beam_size',
-      '-s',
-      default=10,
-      type=int,
-      help='The beam search size during testing.')
-  parser.add_argument(
-      '--look_ahead',
-      default=1,
-      type=int,
-      help='The number of look ahead steps in testing.')
-  parser.add_argument(
       '--num_permutations',
       default=10,
       type=int,
       help='The number of permutations per utterance sampled in the training '
            'data.')
+
+  # inference configurations
+  parser.add_argument(
+      '--beam_size',
+      '-s',
+      default=10,
+      type=int,
+      help='The beam search size for inference.')
+  parser.add_argument(
+      '--look_ahead',
+      default=1,
+      type=int,
+      help='The number of look ahead steps during inference.')
+  parser.add_argument(
+      '--test_iteration',
+      default=2,
+      type=int,
+      help='During inference, we concatenate M duplicates of the test '
+           'sequence, and run inference on this concatenated sequence. '
+           'Then we return the inference results on the last duplicate as the '
+           'final prediction for the test sequence.')
 
   args = parser.parse_args()
   return args
