@@ -136,7 +136,7 @@ def pack_seq(rnn_input, sorted_seq_lengths):
 def output_result(args, test_record):
   accuracy_array, _ = zip(*test_record)
   total_accuracy = np.mean(accuracy_array)
-  filename = 'layer{}_{}_{:.1f}_result.txt'.format(
+  filename = 'layer_{}_{}_{:.1f}_result.txt'.format(
       args.rnn_hidden_size,
       args.rnn_depth, args.rnn_dropout)
   with open(filename, 'a') as file:

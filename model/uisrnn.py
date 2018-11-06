@@ -131,7 +131,7 @@ class UISRNN(object):
         We concatenate all training utterances into a single sequence.
       train_cluster_id: (a vector of strings, size: N)
         - the speaker id sequence.
-        For example, train_speaker_id =
+        For example, train_cluster_id =
         ['iaaa_0', 'iaaa_1', 'iaaa_0', 'ibbb_0', 'ibbb_0']
         'iaaa_0' means the entry belongs to speaker #0 in utterance 'iaaa'.
         Note that the order of entries within an utterance are preserved,
@@ -253,9 +253,9 @@ class UISRNN(object):
         Here N=5, d=4.
 
     Returns:
-      predict_speaker_id: (integer array, size: N)
+      predicted_cluster_id: (integer array, size: N)
         - predicted speaker id sequence.
-        For example, predict_speaker_id = [0, 1, 0, 0, 1]
+        For example, predicted_cluster_id = [0, 1, 0, 0, 1]
 
     Raises:
       ValueError: If test_sequence has wrong dimension.
@@ -272,14 +272,14 @@ class UISRNN(object):
     # each cell consists of:
     # (mean_set, hidden_set, score/-likelihood, trace, block_counts)
     proposal_set = [([], [], 0, [], [])]
-    max_speakers = 0
+    max_clusters = 0
 
     for t in np.arange(0, args.test_iteration * test_sequence_length,
                        args.look_ahead):
       l_remain = args.test_iteration * test_sequence_length - t
       score_set = float('inf') * np.ones(
           np.append(
-              args.beam_size, max_speakers + 1 + np.arange(
+              args.beam_size, max_clusters + 1 + np.arange(
                   np.min([l_remain, args.look_ahead]))))
       for proposal_rank, proposal in enumerate(proposal_set):
         mean_buffer = list(proposal[0])
@@ -287,48 +287,47 @@ class UISRNN(object):
         score_buffer = proposal[2]
         trace_buffer = proposal[3]
         block_counts_buffer = list(proposal[4])
-        n_speakers = len(mean_buffer)
+        n_clusters = len(mean_buffer)
         proposal_score_subset = float('inf') * np.ones(
-            n_speakers + 1 + np.arange(np.min([l_remain, args.look_ahead])))
-        for speaker_seq, _ in np.ndenumerate(proposal_score_subset):
+            n_clusters + 1 + np.arange(np.min([l_remain, args.look_ahead])))
+        for cluster_seq, _ in np.ndenumerate(proposal_score_subset):
           new_mean_buffer = mean_buffer.copy()
           new_hidden_buffer = hidden_buffer.copy()
           new_trace_buffer = trace_buffer.copy()
           new_block_counts_buffer = block_counts_buffer.copy()
-          new_n_speakers = n_speakers
+          new_n_clusters = n_clusters
           new_loss = 0
           update_score = True
-          for sub_idx, speaker in enumerate(speaker_seq):
-            if speaker > new_n_speakers:  # invalid trace
+          for sub_idx, cluster in enumerate(cluster_seq):
+            if cluster > new_n_clusters:  # invalid trace
               update_score = False
               break
-            if speaker < new_n_speakers:  # existing speakers
-              new_last_speaker = new_trace_buffer[-1]
+            if cluster < new_n_clusters:  # existing clusters
+              new_last_cluster = new_trace_buffer[-1]
               loss = utils.weighted_mse_loss(
-                  input_tensor=torch.squeeze(new_mean_buffer[speaker]),
+                  input_tensor=torch.squeeze(new_mean_buffer[cluster]),
                   target_tensor=test_sequence[t + sub_idx, :],
                   weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
-              if speaker == new_last_speaker:
+              if cluster == new_last_cluster:
                 loss -= np.log(1 - self.transition_bias)
               else:
                 loss -= np.log(self.transition_bias) + np.log(
-                    new_block_counts_buffer[speaker]) - np.log(
+                    new_block_counts_buffer[cluster]) - np.log(
                         sum(new_block_counts_buffer) + args.crp_alpha)
               # update new mean and new hidden
               mean, hidden = self.rnn_model(
                   test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),
-                  new_hidden_buffer[speaker])
-              # new_mean_buffer[speaker] = mean.clone()
-              new_mean_buffer[speaker] = (new_mean_buffer[speaker] * (
-                  (np.array(new_trace_buffer) == speaker).sum() -
+                  new_hidden_buffer[cluster])
+              new_mean_buffer[cluster] = (new_mean_buffer[cluster] * (
+                  (np.array(new_trace_buffer) == cluster).sum() -
                   1).astype(float) + mean.clone()) / (
-                      np.array(new_trace_buffer) == speaker).sum().astype(
+                      np.array(new_trace_buffer) == cluster).sum().astype(
                           float)  # use mean to predict
-              new_hidden_buffer[speaker] = hidden.clone()
-              if speaker != new_trace_buffer[-1]:
-                new_block_counts_buffer[speaker] += 1
-              new_trace_buffer.append(speaker)
-            else:  # new speaker
+              new_hidden_buffer[cluster] = hidden.clone()
+              if cluster != new_trace_buffer[-1]:
+                new_block_counts_buffer[cluster] += 1
+              new_trace_buffer.append(cluster)
+            else:  # new cluster
               init_input = autograd.Variable(
                   torch.zeros(args.observation_dim)
                   ).unsqueeze(0).unsqueeze(0).to(self.device)
@@ -348,12 +347,12 @@ class UISRNN(object):
               new_mean_buffer.append(mean.clone())
               new_hidden_buffer.append(hidden.clone())
               new_block_counts_buffer.append(1)
-              new_trace_buffer.append(speaker)
-              new_n_speakers += 1
+              new_trace_buffer.append(cluster)
+              new_n_clusters += 1
             new_loss += loss
           if update_score:
             score_set[tuple([proposal_rank]) +
-                      speaker_seq] = score_buffer + new_loss
+                      cluster_seq] = score_buffer + new_loss
 
       # find top scores
       score_ranked = np.sort(score_set, axis=None)
@@ -363,13 +362,13 @@ class UISRNN(object):
 
       # update best traces
       new_proposal_set = []
-      max_speakers = 0
+      max_clusters = 0
       for new_proposal_rank in range(
           np.min((len(score_ranked), args.beam_size))):
         total_idx = np.unravel_index(idx_ranked[new_proposal_rank],
                                      score_set.shape)
         prev_proposal_idx = total_idx[0]
-        new_speaker_idx = total_idx[1:]
+        new_cluster_idx = total_idx[1:]
         (mean_set, hidden_set, _, trace,
          block_counts) = proposal_set[prev_proposal_idx]
         new_mean_set = mean_set.copy()
@@ -378,11 +377,11 @@ class UISRNN(object):
             new_proposal_rank]  # can safely update the likelihood for now
         new_trace = trace.copy()
         new_block_counts = block_counts.copy()
-        new_n_speakers = len(new_mean_set)
-        max_speakers = max(max_speakers, new_n_speakers)
-        for sub_idx, speaker in enumerate(
-            new_speaker_idx):  # update the proposal step-by-step
-          if speaker == new_n_speakers:
+        new_n_clusters = len(new_mean_set)
+        max_clusters = max(max_clusters, new_n_clusters)
+        for sub_idx, cluster in enumerate(
+            new_cluster_idx):  # update the proposal step-by-step
+          if cluster == new_n_clusters:
             init_input = autograd.Variable(
                 torch.zeros(args.observation_dim)
                 ).unsqueeze(0).unsqueeze(0).to(self.device)
@@ -393,26 +392,25 @@ class UISRNN(object):
             new_mean_set.append(mean.clone())
             new_hidden_set.append(hidden.clone())
             new_block_counts.append(1)
-            new_trace.append(speaker)
-            new_n_speakers += 1
-            max_speakers = max(max_speakers, new_n_speakers)
+            new_trace.append(cluster)
+            new_n_clusters += 1
+            max_clusters = max(max_clusters, new_n_clusters)
           else:
             mean, hidden = self.rnn_model(
                 test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),
-                new_hidden_set[speaker])
-            # new_mean_set[speaker] = mean.clone()
-            new_mean_set[speaker] = (
-                new_mean_set[speaker] * (
-                    (np.array(new_trace) == speaker).sum() - 1).astype(float) +
-                mean.clone()) / (np.array(new_trace) == speaker).sum().astype(
+                new_hidden_set[cluster])
+            new_mean_set[cluster] = (
+                new_mean_set[cluster] * (
+                    (np.array(new_trace) == cluster).sum() - 1).astype(float) +
+                mean.clone()) / (np.array(new_trace) == cluster).sum().astype(
                     float)  # use mean to predict
-            new_hidden_set[speaker] = hidden.clone()
-            if speaker != new_trace[-1]:
-              new_block_counts[speaker] += 1
-            new_trace.append(speaker)
+            new_hidden_set[cluster] = hidden.clone()
+            if cluster != new_trace[-1]:
+              new_block_counts[cluster] += 1
+            new_trace.append(cluster)
         new_proposal_set.append((new_mean_set, new_hidden_set, new_score,
                                  new_trace, new_block_counts))
       proposal_set = new_proposal_set
 
-    predict_speaker_id = proposal_set[0][3][-test_sequence_length:]
-    return predict_speaker_id
+    predicted_cluster_id = proposal_set[0][3][-test_sequence_length:]
+    return predicted_cluster_id
