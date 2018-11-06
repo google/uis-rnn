@@ -1,4 +1,4 @@
 *~
 *.pyc
 *result.txt
-*.model
+*.uisrnn

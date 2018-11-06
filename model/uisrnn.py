@@ -14,13 +14,18 @@
 """The UISRNN model."""
 from model import utils
 import numpy as np
+import os
+import tempfile
 import torch
 from torch import autograd
 from torch import nn
 from torch import optim
 import torch.nn.functional as F
+import zipfile
 
 _INITIAL_SIGMA2_VALUE = 0.1
+_SAVED_STATES_FILE = 'saved_model.states'
+_SAVED_NPZ_FILE = 'saved_model.npz'
 
 
 class NormalRNN(nn.Module):
@@ -102,15 +107,21 @@ class UISRNN(object):
     Args:
       filepath: the path of the file.
     """
+    tempdir = tempfile.mkdtemp()
     # save states
-    states_filepath = filepath + ".states"
-    torch.save(self.rnn_model.state_dict(), states_filepath)
+    states_file = os.path.join(tempdir, _SAVED_STATES_FILE)
+    torch.save(self.rnn_model.state_dict(), states_file)
 
     # save other parameters
-    npz_filepath = filepath + ".npz"
-    np.savez(npz_filepath,
+    npz_file = os.path.join(tempdir, _SAVED_NPZ_FILE)
+    np.savez(npz_file,
              transition_bias=self.transition_bias,
              sigma2=self.sigma2.detach().numpy())
+
+    # create combined model file
+    with zipfile.ZipFile(filepath, 'w') as myzip:
+      myzip.write(states_file, _SAVED_STATES_FILE)
+      myzip.write(npz_file, _SAVED_NPZ_FILE)
 
   def load(self, filepath):
     """Load the model from a file.
@@ -118,15 +129,22 @@ class UISRNN(object):
     Args:
       filepath: the path of the file.
     """
+    tempdir = tempfile.mkdtemp()
+    # extract zip file
+    with zipfile.ZipFile(filepath) as myzip:
+      myzip.extract(_SAVED_STATES_FILE, path=tempdir)
+      myzip.extract(_SAVED_NPZ_FILE, path=tempdir)
+
     # load states
-    states_filepath = filepath + ".states"
-    self.rnn_model.load_state_dict(torch.load(states_filepath))
+    states_file = os.path.join(tempdir, _SAVED_STATES_FILE)
+    self.rnn_model.load_state_dict(torch.load(states_file))
 
     # load other parameters
-    npz_filepath = filepath + ".npz"
-    data = np.load(npz_filepath)
+    npz_file = os.path.join(tempdir, _SAVED_NPZ_FILE)
+    data = np.load(npz_file)
     self.transition_bias = data['transition_bias']
-    self.sigma2 = nn.Parameter(torch.from_numpy(data['sigma2']).to(self.device))
+    self.sigma2 = nn.Parameter(
+        torch.from_numpy(data['sigma2']).to(self.device))
 
   def fit(self, args, train_sequence, train_cluster_id):
     """Fit UISRNN model.

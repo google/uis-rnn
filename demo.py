@@ -18,7 +18,7 @@ from model import uisrnn
 from model import utils
 import numpy as np
 
-SAVED_STATES_FILE_NAME = 'saved_uisrnn_states.model'
+SAVED_MODEL_NAME = 'saved_model.uisrnn'
 
 
 def diarization_experiment(args):
@@ -43,9 +43,9 @@ def diarization_experiment(args):
   model = uisrnn.UISRNN(args)
   # training
   model.fit(args, train_sequence, train_cluster_id)
-  model.save(SAVED_STATES_FILE_NAME)
+  model.save(SAVED_MODEL_NAME)
   # we can also skip training by calling：
-  # model.load(SAVED_STATES_FILE_NAME)
+  # model.load(SAVED_MODEL_NAME)
 
   # testing
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
