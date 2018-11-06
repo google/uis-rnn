@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import random
+import tempfile
 import unittest
 
 from model import arguments
@@ -75,13 +76,27 @@ class TestIntegration(unittest.TestCase):
 
     model = uisrnn.UISRNN(args)
 
-    # training
+    # run training, and save the model
     model.fit(args, train_sequence, np.array(train_cluster_id))
+    temp_file_path = tempfile.mktemp()
+    model.save(temp_file_path)
 
-    # testing
+    # run testing
     predicted_label = model.predict(args, test_sequence)
 
-    # evaluation
+    # run evaluation
+    accuracy, length = evals.evaluate_result(predicted_label, test_cluster_id)
+    self.assertEqual(1.0, accuracy)
+    self.assertEqual(len(test_cluster_id), length)
+
+    # load new model
+    loaded_model = uisrnn.UISRNN(args)
+    loaded_model.load(temp_file_path)
+
+    # run testing with loaded model
+    predicted_label = loaded_model.predict(args, test_sequence)
+
+    # run evaluation with loaded model
     accuracy, length = evals.evaluate_result(predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)
     self.assertEqual(len(test_cluster_id), length)

@@ -102,7 +102,15 @@ class UISRNN(object):
     Args:
       filepath: the path of the file.
     """
-    torch.save(self.rnn_model.state_dict(), filepath)
+    # save states
+    states_filepath = filepath + ".states"
+    torch.save(self.rnn_model.state_dict(), states_filepath)
+
+    # save other parameters
+    npz_filepath = filepath + ".npz"
+    np.savez(npz_filepath,
+             transition_bias=self.transition_bias,
+             sigma2=self.sigma2.detach().numpy())
 
   def load(self, filepath):
     """Load the model from a file.
@@ -110,7 +118,15 @@ class UISRNN(object):
     Args:
       filepath: the path of the file.
     """
-    self.rnn_model.load_state_dict(torch.load(filepath))
+    # load states
+    states_filepath = filepath + ".states"
+    self.rnn_model.load_state_dict(torch.load(states_filepath))
+
+    # load other parameters
+    npz_filepath = filepath + ".npz"
+    data = np.load(npz_filepath)
+    self.transition_bias = data['transition_bias']
+    self.sigma2 = nn.Parameter(torch.from_numpy(data['sigma2']).to(self.device))
 
   def fit(self, args, train_sequence, train_cluster_id):
     """Fit UISRNN model.
