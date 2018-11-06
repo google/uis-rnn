@@ -22,13 +22,16 @@ import numpy as np
 
 class TestUISRNN(unittest.TestCase):
 
-  def test_fit_and_predict(self):
+  def test_fit_and_predict_single_label(self):
+    """Train and test model while training data has single label."""
     args = arguments.parse_arguments()
-    args.train_iteration = 10
+    args.rnn_depth = 1
+    args.train_iteration = 50
     args.observation_dim = 16
-    args.rnn_hidden_size = 16
+    args.rnn_hidden_size = 8
+    args.test_iteration = 1
 
-    # generate fake data
+    # generate fake training data
     train_sequence = np.random.rand(1000, args.observation_dim)
     train_cluster_id = np.array(['A'] * 1000)
     _, observation_dim = train_sequence.shape
@@ -38,13 +41,15 @@ class TestUISRNN(unittest.TestCase):
     # training
     model.fit(args, train_sequence, train_cluster_id)
 
-    # testing
-    test_sequence = np.random.rand(10, args.observation_dim)
+    # testing, where data has less variation than training
+    test_sequence = np.random.rand(10, args.observation_dim) / 10.0
     predicted_label = model.predict(args, test_sequence)
+    self.assertListEqual([0] * 10, predicted_label)
 
   def test_fit_with_wrong_dim(self):
+    """Training data has wrong dimension."""
     args = arguments.parse_arguments()
-    args.train_iteration = 10
+    args.train_iteration = 5
     args.observation_dim = 16
     args.rnn_hidden_size = 16
 
@@ -60,8 +65,9 @@ class TestUISRNN(unittest.TestCase):
       model.fit(args, train_sequence, train_cluster_id)
 
   def test_predict_with_wrong_dim(self):
+    """Testing data has wrong dimension."""
     args = arguments.parse_arguments()
-    args.train_iteration = 10
+    args.train_iteration = 5
     args.observation_dim = 16
     args.rnn_hidden_size = 16
 
@@ -81,6 +87,7 @@ class TestUISRNN(unittest.TestCase):
       predicted_label = model.predict(args, test_sequence)
 
   def test_save_and_load(self):
+    """Save model and load it."""
     args = arguments.parse_arguments()
     args.observation_dim = 16
     model = uisrnn.UISRNN(args)

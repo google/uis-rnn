@@ -229,10 +229,10 @@ class UISRNN(object):
       self.sigma2.data.clamp_(min=1e-6)
 
       if np.remainder(t, 10) == 0:
-        print('Iter {:d}  '
-              'Training Loss: {:.4f}  \n'
-              '  Negative Log Likelihood: {:.4f}  '
-              'Sigma2 Prior: {:.4f}  '
+        print('Iter: {:d}    '
+              'Training Loss: {:.4f}    \n'
+              '    Negative Log Likelihood: {:.4f}    '
+              'Sigma2 Prior: {:.4f}    '
               'Regularization: {:.4f}'.format(t, float(loss.data),
                 float(loss1.data), float(loss2.data), float(loss3.data)))
       train_loss.append(float(loss1.data))  # only save the likelihood part
