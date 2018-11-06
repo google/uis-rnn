@@ -33,7 +33,7 @@ class TestUISRNN(unittest.TestCase):
     train_cluster_id = np.array(['A'] * 1000)
     _, observation_dim = train_sequence.shape
 
-    model = uisrnn.UISRNN(args, .5)
+    model = uisrnn.UISRNN(args)
 
     # training
     model.fit(args, train_sequence, train_cluster_id)
@@ -53,7 +53,7 @@ class TestUISRNN(unittest.TestCase):
     train_cluster_id = np.array(['A'] * 1000)
     _, observation_dim = train_sequence.shape
 
-    model = uisrnn.UISRNN(args, .5)
+    model = uisrnn.UISRNN(args)
 
     # training
     with self.assertRaises(ValueError):
@@ -70,7 +70,7 @@ class TestUISRNN(unittest.TestCase):
     train_cluster_id = np.array(['A'] * 1000)
     _, observation_dim = train_sequence.shape
 
-    model = uisrnn.UISRNN(args, .5)
+    model = uisrnn.UISRNN(args)
 
     # training
     model.fit(args, train_sequence, train_cluster_id)
@@ -83,7 +83,7 @@ class TestUISRNN(unittest.TestCase):
   def test_save_and_load(self):
     args = arguments.parse_arguments()
     args.observation_dim = 16
-    model = uisrnn.UISRNN(args, .5)
+    model = uisrnn.UISRNN(args)
     temp_file_path = tempfile.mktemp()
     model.save(temp_file_path)
     model.load(temp_file_path)

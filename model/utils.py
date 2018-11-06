@@ -141,8 +141,8 @@ def output_result(args, test_record):
       args.rnn_depth, args.rnn_dropout)
   with open(filename, 'a') as file:
     file.write(
-        'alpha:{}  beta:{}  crp_theta:{}  learning rate:{}  '
+        'sigma_alpha:{}  sigma_beta:{}  crp_alpha:{}  learning rate:{}  '
         'regularization:{}  batch size:{}  acc:{:.6f} \n'
-        .format(args.alpha, args.beta, args.crp_theta,
+        .format(args.sigma_alpha, args.sigma_beta, args.crp_alpha,
                 args.learning_rate, args.regularization_weight,
                 args.batch_size, total_accuracy))

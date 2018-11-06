@@ -40,7 +40,7 @@ def diarization_experiment(args):
   test_sequences = test_data['test_sequences']
   test_cluster_ids = test_data['test_cluster_ids']
 
-  model = uisrnn.UISRNN(args, .5)
+  model = uisrnn.UISRNN(args)
   # training
   if args.pretrain is None:
     model.fit(args, train_sequence, train_cluster_id)
@@ -63,8 +63,8 @@ def diarization_experiment(args):
 
   utils.output_result(args, test_record)
 
-  print('Finish --alpha {} --beta {} --crp_theta {} -l {} -r {}'
-        .format(args.alpha, args.beta, args.crp_theta,
+  print('Finish --sigma_alpha {} --sigma_beta {} --crp_alpha {} -l {} -r {}'
+        .format(args.sigma_alpha, args.sigma_beta, args.crp_alpha,
                 args.learning_rate, args.regularization_weight))
 
 

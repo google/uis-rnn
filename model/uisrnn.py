@@ -20,6 +20,8 @@ from torch import nn
 from torch import optim
 import torch.nn.functional as F
 
+_INITIAL_SIGMA2_VALUE = 0.1
+
 
 class NormalRNN(nn.Module):
   """Normal Recurent Neural Networks."""
@@ -46,14 +48,11 @@ class NormalRNN(nn.Module):
 class UISRNN(object):
   """Unbounded Interleaved-State Recurrent Neural Networks """
 
-  def __init__(self, args, transition_bias=None):
+  def __init__(self, args):
     """Construct the UISRNN object.
 
     Args:
       args: return value of arguments.parse_arguments()
-      transition_bias: the value of p0 corresponding to Eq. (6) in the paper.
-        If given, it will be a fixed value; if not None, it will be estimated
-        using Eq. (13) in the paper.
     """
     self.device = torch.device(
         'cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -62,10 +61,10 @@ class UISRNN(object):
                                args.observation_dim).to(self.device)
     self.rnn_init_hidden = nn.Parameter(
         torch.zeros(1, args.rnn_hidden_size).to(self.device))
-    sigma2 = .1 if args.sigma2 is None else args.sigma2
+    sigma2 = _INITIAL_SIGMA2_VALUE if args.sigma2 is None else args.sigma2
     self.sigma2 = nn.Parameter(
         sigma2 * torch.ones(args.observation_dim).to(self.device))
-    self.transition_bias = transition_bias
+    self.transition_bias = args.transition_bias
 
   def save(self, filepath):
     """Save the model to a file.
@@ -159,7 +158,7 @@ class UISRNN(object):
     num_clusters = len(seq_lengths)
     sorted_seq_lengths = np.sort(seq_lengths)[::-1]
     permute_index = np.argsort(seq_lengths)[::-1]
-    if self.transition_bias is not None:
+    if self.transition_bias is None:
       self.transition_bias = transition_bias
     if args.batch_size is None:
       # Packing sequences.
@@ -212,9 +211,9 @@ class UISRNN(object):
       weight = (((rnn_truth != 0).float() * mean[:-1, :, :] - rnn_truth)
                 **2).view(-1, observation_dim)
       num_non_zero = torch.sum((weight != 0).float(), dim=0).squeeze()
-      loss2 = ((2 * args.alpha + num_non_zero + 2) /
+      loss2 = ((2 * args.sigma_alpha + num_non_zero + 2) /
                (2 * num_non_zero) * torch.log(self.sigma2)).sum() + (
-                   args.beta / (self.sigma2 * num_non_zero)).sum()
+                   args.sigma_beta / (self.sigma2 * num_non_zero)).sum()
       # regularization
       l2_reg = 0
       for param in self.rnn_model.parameters():
@@ -231,10 +230,10 @@ class UISRNN(object):
 
       if np.remainder(t, 10) == 0:
         print('Iter {:d}  '
-              'Training Loss:{:.4f}  \n'
-              '  Negative Log Likelihood:{:.4f}  '
-              'Sigma2 Prior:{:.4f}  '
-              'Regularization:{:.4f}'.format(t, float(loss.data),
+              'Training Loss: {:.4f}  \n'
+              '  Negative Log Likelihood: {:.4f}  '
+              'Sigma2 Prior: {:.4f}  '
+              'Regularization: {:.4f}'.format(t, float(loss.data),
                 float(loss1.data), float(loss2.data), float(loss3.data)))
       train_loss.append(float(loss1.data))  # only save the likelihood part
     print('Done training with {} iterations'.format(args.train_iteration))
@@ -317,7 +316,7 @@ class UISRNN(object):
               else:
                 loss -= np.log(self.transition_bias) + np.log(
                     new_block_counts_buffer[speaker]) - np.log(
-                        sum(new_block_counts_buffer) + args.crp_theta)
+                        sum(new_block_counts_buffer) + args.crp_alpha)
               # update new mean and new hidden
               mean, hidden = self.rnn_model(
                   test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),
@@ -343,8 +342,8 @@ class UISRNN(object):
                   target_tensor=test_sequence[t + sub_idx, :],
                   weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
               loss -= np.log(self.transition_bias) + np.log(
-                  args.crp_theta) - np.log(
-                      sum(new_block_counts_buffer) + args.crp_theta)
+                  args.crp_alpha) - np.log(
+                      sum(new_block_counts_buffer) + args.crp_alpha)
               # update new min and new hidden
               mean, hidden = self.rnn_model(
                   test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),

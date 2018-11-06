@@ -14,7 +14,7 @@
 """Arguments for UISRNN."""
 import argparse
 
-_TOY_DATA_D_OBSERVATION = 256
+_DEFAULT_OBSERVATION_DIM = 256
 
 
 def parse_arguments():
@@ -25,7 +25,7 @@ def parse_arguments():
   # data configurations
   parser.add_argument(
       '--observation_dim',
-      default=_TOY_DATA_D_OBSERVATION,
+      default=_DEFAULT_OBSERVATION_DIM,
       type=int,
       help='The dimension of the embeddings (e.g. d-vectors).')
 
@@ -52,25 +52,40 @@ def parse_arguments():
       type=float,
       help='network regularization multiplicative')
   parser.add_argument(
-      '--alpha',
-      default=1.0,
+      '--transition_bias',
+      default=None,
       type=float,
-      help='inverse gamma shape')
+      help='The value of p0, corresponding to Eq. (6) in the '
+           'paper. If the value is given, we will fix to this value. If the '
+           'value is None, we will estimate it from training data '
+           'using Eq. (13) in the paper.')
   parser.add_argument(
-      '--beta',
+      '--crp_alpha',
       default=1.0,
       type=float,
-      help='inverse gamma scale')
-  parser.add_argument(
-      '--crp_theta',
-      default=1.0,
-      type=float,
-      help='crp parameter')
+      help='The value of alpha for the Chinese restaurant process (CRP), '
+           'corresponding to Eq. (7) in the paper. In this open source '
+           'implementation, currently we only support using a given value '
+           'of crp_alpha.')
   parser.add_argument(
       '--sigma2',
-      default=.05,
+      default=None,
       type=float,
-      help='update sigma2 if it equals to None')
+      help='The value of sigma squared, corresponding to Eq. (11) in the '
+           'paper. If the value is given, we will fix to this value. If the '
+           'value is None, we will estimate it from training data.')
+  parser.add_argument(
+      '--sigma_alpha',
+      default=1.0,
+      type=float,
+      help='The inverse gamma shape for estimating sigma2. This value is only '
+           'meaningful when sigma2 is not given, and estimated from data.')
+  parser.add_argument(
+      '--sigma_beta',
+      default=1.0,
+      type=float,
+      help='The inverse gamma scale for estimating sigma2. This value is only '
+           'meaningful when sigma2 is not given, and estimated from data.')
 
   # training/testing configurations
   parser.add_argument(
