@@ -66,23 +66,7 @@ class UISRNN(object):
         sigma2 * torch.ones(args.observation_dim).to(self.device))
     self.transition_bias = args.transition_bias
 
-  def save(self, filepath):
-    """Save the model to a file.
-
-    Args:
-      filepath: the path of the file.
-    """
-    torch.save(self.rnn_model.state_dict(), filepath)
-
-  def load(self, filepath):
-    """Load the model from a file.
-
-    Args:
-      filepath: the path of the file.
-    """
-    self.rnn_model.load_state_dict(torch.load(filepath))
-
-  def get_optimizer(self, optimizer, sigma2, learning_rate):
+  def _get_optimizer(self, optimizer, sigma2, learning_rate):
     """Get optimizer for UISRNN.
 
     Args:
@@ -111,6 +95,22 @@ class UISRNN(object):
                    )
     assert optimizer == 'adam', 'Only adam optimizer is supported.'
     return optim.Adam(params, lr=learning_rate)
+
+  def save(self, filepath):
+    """Save the model to a file.
+
+    Args:
+      filepath: the path of the file.
+    """
+    torch.save(self.rnn_model.state_dict(), filepath)
+
+  def load(self, filepath):
+    """Load the model from a file.
+
+    Args:
+      filepath: the path of the file.
+    """
+    self.rnn_model.load_state_dict(torch.load(filepath))
 
   def fit(self, args, train_sequence, train_cluster_id):
     """Fit UISRNN model.
@@ -147,9 +147,9 @@ class UISRNN(object):
                        'by args.observation_dim.')
 
     self.rnn_model.train()
-    optimizer = self.get_optimizer(optimizer=args.optimizer,
-                                   sigma2=args.sigma2,
-                                   learning_rate=args.learning_rate)
+    optimizer = self._get_optimizer(optimizer=args.optimizer,
+                                    sigma2=args.sigma2,
+                                    learning_rate=args.learning_rate)
 
     sub_sequences, seq_lengths, transition_bias = utils.resize_sequence(
         sequence=train_sequence,
