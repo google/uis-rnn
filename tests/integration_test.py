@@ -84,7 +84,7 @@ class TestIntegration(unittest.TestCase):
     # evaluation
     accuracy, length = evals.evaluate_result(predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)
-    self.assertEqual(length, len(test_cluster_id))
+    self.assertEqual(len(test_cluster_id), length)
 
 
 if __name__ == '__main__':
