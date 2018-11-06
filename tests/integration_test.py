@@ -66,8 +66,8 @@ class TestIntegration(unittest.TestCase):
 
     # construct model
     args = arguments.parse_arguments()
-    args.rnn_depth = 1
-    args.rnn_hidden_size = 16
+    args.rnn_depth = 2
+    args.rnn_hidden_size = 8
     args.learning_rate = 0.01
     args.train_iteration = 200
     args.observation_dim = 2

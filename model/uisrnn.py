@@ -60,7 +60,7 @@ class UISRNN(object):
                                args.rnn_depth, args.rnn_dropout,
                                args.observation_dim).to(self.device)
     self.rnn_init_hidden = nn.Parameter(
-        torch.zeros(1, args.rnn_hidden_size).to(self.device))
+        torch.zeros(args.rnn_depth, 1, args.rnn_hidden_size).to(self.device))
     sigma2 = _INITIAL_SIGMA2_VALUE if args.sigma2 is None else args.sigma2
     self.sigma2 = nn.Parameter(
         sigma2 * torch.ones(args.observation_dim).to(self.device))
@@ -188,10 +188,7 @@ class UISRNN(object):
         packed_train_sequence, rnn_truth = utils.pack_seq(
             mini_batch_rnn_input, sorted_seq_lengths[mini_batch])
 
-
-      hidden = torch.mm(
-          torch.ones(args.batch_size, 1).float().to(self.device),
-          self.rnn_init_hidden).unsqueeze(0)
+      hidden = self.rnn_init_hidden.repeat(1, args.batch_size, 1)
       mean, _ = self.rnn_model(packed_train_sequence, hidden)
       # use mean to predict
       mean = torch.cumsum(mean, dim=0)
@@ -336,7 +333,7 @@ class UISRNN(object):
                   torch.zeros(args.observation_dim)
                   ).unsqueeze(0).unsqueeze(0).to(self.device)
               mean, hidden = self.rnn_model(init_input,
-                                            self.rnn_init_hidden.unsqueeze(0))
+                                            self.rnn_init_hidden)
               loss = utils.weighted_mse_loss(
                   input_tensor=torch.squeeze(mean),
                   target_tensor=test_sequence[t + sub_idx, :],
@@ -390,7 +387,7 @@ class UISRNN(object):
                 torch.zeros(args.observation_dim)
                 ).unsqueeze(0).unsqueeze(0).to(self.device)
             mean, hidden = self.rnn_model(init_input,
-                                          self.rnn_init_hidden.unsqueeze(0))
+                                          self.rnn_init_hidden)
             mean, hidden = self.rnn_model(
                 test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0), hidden)
             new_mean_set.append(mean.clone())

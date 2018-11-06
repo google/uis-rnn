@@ -26,9 +26,10 @@ class TestUISRNN(unittest.TestCase):
     """Train and test model while training data has single label."""
     args = arguments.parse_arguments()
     args.rnn_depth = 1
-    args.train_iteration = 50
-    args.observation_dim = 16
     args.rnn_hidden_size = 8
+    args.train_iteration = 50
+    args.learning_rate = 0.01
+    args.observation_dim = 16
     args.test_iteration = 1
 
     # generate fake training data
@@ -49,9 +50,11 @@ class TestUISRNN(unittest.TestCase):
   def test_fit_with_wrong_dim(self):
     """Training data has wrong dimension."""
     args = arguments.parse_arguments()
+    args.rnn_depth = 1
+    args.rnn_hidden_size = 8
     args.train_iteration = 5
+    args.learning_rate = 0.01
     args.observation_dim = 16
-    args.rnn_hidden_size = 16
 
     # generate fake data
     train_sequence = np.random.rand(1000, 18)
@@ -67,9 +70,11 @@ class TestUISRNN(unittest.TestCase):
   def test_predict_with_wrong_dim(self):
     """Testing data has wrong dimension."""
     args = arguments.parse_arguments()
+    args.rnn_depth = 1
+    args.rnn_hidden_size = 8
     args.train_iteration = 5
+    args.learning_rate = 0.01
     args.observation_dim = 16
-    args.rnn_hidden_size = 16
 
     # generate fake data
     train_sequence = np.random.rand(1000, args.observation_dim)
