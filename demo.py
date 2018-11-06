@@ -68,11 +68,6 @@ def diarization_experiment(args):
 
 
 def main():
-  # fix random seeds for reproducing results
-  # np.random.seed(1)
-  # torch.manual_seed(1)
-  # torch.cuda.manual_seed(1)
-
   args = arguments.parse_arguments()
   diarization_experiment(args)
 

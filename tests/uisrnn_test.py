@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import tempfile
-import unittest
-
 from model import arguments
 from model import uisrnn
 import numpy as np
+import tempfile
+import unittest
 
 
 class TestUISRNN(unittest.TestCase):
@@ -95,6 +94,8 @@ class TestUISRNN(unittest.TestCase):
     """Save model and load it."""
     args = arguments.parse_arguments()
     args.observation_dim = 16
+    args.transition_bias = 0.5
+    args.sigma2 = 0.05
     model = uisrnn.UISRNN(args)
     temp_file_path = tempfile.mktemp()
     model.save(temp_file_path)

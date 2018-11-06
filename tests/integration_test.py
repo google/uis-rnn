@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import random
-import tempfile
-import unittest
-
 from model import arguments
 from model import evals
 from model import uisrnn
 import numpy as np
+import random
+import tempfile
+import torch
+import unittest
+
 
 def _generate_random_sequence(cluster_id, label_to_center, sigma=0.1):
   """A helper function to generate sequence.
@@ -43,6 +44,13 @@ def _generate_random_sequence(cluster_id, label_to_center, sigma=0.1):
 
 
 class TestIntegration(unittest.TestCase):
+
+  def setUp(self):
+    # fix random seeds for reproducing results
+    np.random.seed(1)
+    random.seed(1)
+    torch.manual_seed(1)
+    torch.cuda.manual_seed(1)
 
   def test_four_clusters(self):
     """Four clusters on vertices of a square."""
