@@ -20,7 +20,7 @@ _DEFAULT_OBSERVATION_DIM = 256
 def parse_arguments():
   """Parse arguments."""
   parser = argparse.ArgumentParser(
-      description='Bayesian Non-parametric Model For Diarization')
+      description='UIS-RNN model for speaker diarization.')
 
   # data configurations
   parser.add_argument(
@@ -34,23 +34,23 @@ def parse_arguments():
       '--rnn_hidden_size',
       default=512,
       type=int,
-      help='rnn hidden state dimension')
+      help='The number of nodes for each RNN layer.')
   parser.add_argument(
       '--rnn_depth',
       default=1,
       type=int,
-      help='rnn depth')
+      help='The number of RNN layers.')
   parser.add_argument(
       '--rnn_dropout',
       default=0.2,
       type=float,
-      help='rnn dropout rate')
+      help='The dropout rate for all RNN layers.')
   parser.add_argument(
       '--regularization_weight',
       '-r',
       default=1e-5,
       type=float,
-      help='network regularization multiplicative')
+      help='The network regularization multiplicative.')
   parser.add_argument(
       '--transition_bias',
       default=None,
@@ -93,51 +93,47 @@ def parse_arguments():
       '-o',
       default='adam',
       choices=['adam'],
-      help='optimizer')
+      help='The optimizer for training.')
   parser.add_argument(
       '--learning_rate',
       '-l',
       default=1e-5,
       type=float,
-      help='leaning rate')
+      help='The leaning rate for training.')
   parser.add_argument(
       '--train_iteration',
       '-t',
       default=20000,
       type=int,
-      help='total training iteration')
+      help='The total number of training iterations.')
   parser.add_argument(
       '--test_iteration',
       default=2,
       type=int,
-      help='total testing iteration')
+      help='The total number of testing iterations.')
   parser.add_argument(
       '--batch_size',
       '-b',
       default=10,
       type=int,
-      help='batch size')
+      help='The batch size for training.')
   parser.add_argument(
       '--beam_size',
       '-s',
       default=10,
       type=int,
-      help='beam search size')
+      help='The beam search size during testing.')
   parser.add_argument(
       '--look_ahead',
       default=1,
       type=int,
-      help='look ahead steps in testing')
+      help='The number of look ahead steps in testing.')
   parser.add_argument(
       '--num_permutations',
       default=10,
       type=int,
-      help='number of permutations per utterance sampled in the training data')
-  parser.add_argument(
-      '--pretrain',
-      default=None,
-      type=str,
-      help='use pretrained model')
+      help='The number of permutations per utterance sampled in the training '
+           'data.')
 
   args = parser.parse_args()
   return args

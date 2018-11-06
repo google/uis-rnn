@@ -42,12 +42,10 @@ def diarization_experiment(args):
 
   model = uisrnn.UISRNN(args)
   # training
-  if args.pretrain is None:
-    model.fit(args, train_sequence, train_cluster_id)
-    model.save(SAVED_STATES_FILE_NAME)
-  else:  # use pretrained model
-    # TODO: support using pretrained model.
-    model.load(SAVED_STATES_FILE_NAME)
+  model.fit(args, train_sequence, train_cluster_id)
+  model.save(SAVED_STATES_FILE_NAME)
+  # we can also skip training by calling：
+  # model.load(SAVED_STATES_FILE_NAME)
 
   # testing
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
@@ -63,7 +61,8 @@ def diarization_experiment(args):
 
   utils.output_result(args, test_record)
 
-  print('Finish --sigma_alpha {} --sigma_beta {} --crp_alpha {} -l {} -r {}'
+  print('Finished diarization experiment with --sigma_alpha {} --sigma_beta {} '
+        '--crp_alpha {} -l {} -r {}'
         .format(args.sigma_alpha, args.sigma_beta, args.crp_alpha,
                 args.learning_rate, args.regularization_weight))
 
@@ -75,7 +74,6 @@ def main():
   # torch.cuda.manual_seed(1)
 
   args = arguments.parse_arguments()
-
   diarization_experiment(args)
 
 

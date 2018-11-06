@@ -37,7 +37,7 @@ All algorithms are implemented as the `UISRNN` class. First, construct a
 `UISRNN` object by:
 
 ```python
-model = UISRNN(args, input_dim, observation_dim, transition_bias)
+model = UISRNN(args)
 ```
 
 Next, train the model by calling the `fit()` function:
