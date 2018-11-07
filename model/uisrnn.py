@@ -116,7 +116,7 @@ class UISRNN(object):
     npz_file = os.path.join(tempdir, _SAVED_NPZ_FILE)
     np.savez(npz_file,
              transition_bias=self.transition_bias,
-             sigma2=self.sigma2.detach().numpy())
+             sigma2=self.sigma2.detach().cpu().numpy())
 
     # create combined model file
     with zipfile.ZipFile(filepath, 'w') as myzip:
@@ -175,10 +175,17 @@ class UISRNN(object):
       ValueError: If train_sequence has wrong dimension.
     """
 
-    _, observation_dim = train_sequence.shape
+    train_total_length, observation_dim = train_sequence.shape
     if observation_dim != args.observation_dim:
       raise ValueError('train_sequence does not match the dimension specified '
                        'by args.observation_dim.')
+    if train_total_length != len(train_cluster_id):
+      raise ValueError('train_sequence length is not equal to '
+                       'train_cluster_id length.')
+    if type(train_sequence).__module__ != np.__name__:
+      raise TypeError('train_sequence type should be an numpy array.')
+    if type(train_cluster_id).__module__ != np.__name__:
+      raise TypeError('train_cluster_id type should be an numpy array.')
 
     self.rnn_model.train()
     optimizer = self._get_optimizer(optimizer=args.optimizer,
@@ -298,6 +305,8 @@ class UISRNN(object):
     if observation_dim != args.observation_dim:
       raise ValueError('test_sequence does not match the dimension specified '
                        'by args.observation_dim.')
+    if type(test_sequence).__module__ != np.__name__:
+      raise TypeError('test_sequence type should be an numpy array.')
     self.rnn_model.eval()
     test_sequence = np.tile(test_sequence, (args.test_iteration, 1))
     test_sequence = autograd.Variable(
