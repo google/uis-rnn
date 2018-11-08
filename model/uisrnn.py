@@ -57,28 +57,28 @@ class UISRNN(object):
     """Construct the UISRNN object.
 
     Args:
-      args: return value of arguments.parse_arguments()
+      args: Model configurations. See arguments.py for details.
     """
+    self.observation_dim = args.observation_dim
     self.device = torch.device(
         'cuda:0' if torch.cuda.is_available() else 'cpu')
-    self.rnn_model = NormalRNN(args.observation_dim, args.rnn_hidden_size,
+    self.rnn_model = NormalRNN(self.observation_dim, args.rnn_hidden_size,
                                args.rnn_depth, args.rnn_dropout,
-                               args.observation_dim).to(self.device)
+                               self.observation_dim).to(self.device)
     self.rnn_init_hidden = nn.Parameter(
         torch.zeros(args.rnn_depth, 1, args.rnn_hidden_size).to(self.device))
-    sigma2 = _INITIAL_SIGMA2_VALUE if args.sigma2 is None else args.sigma2
+    self.estimate_sigma2 = (args.sigma2 is None)
+    sigma2 = _INITIAL_SIGMA2_VALUE if self.estimate_sigma2 else args.sigma2
     self.sigma2 = nn.Parameter(
-        sigma2 * torch.ones(args.observation_dim).to(self.device))
+        sigma2 * torch.ones(self.observation_dim).to(self.device))
     self.transition_bias = args.transition_bias
+    self.crp_alpha = args.crp_alpha
 
-  def _get_optimizer(self, optimizer, sigma2, learning_rate):
+  def _get_optimizer(self, optimizer, learning_rate):
     """Get optimizer for UISRNN.
 
     Args:
       optimizer: string - name of the optimizer.
-      sigma2: - variance parameters.
-        We can either train sigma2 by setting "sigma2=None",
-        or we can fix it by setting sigma2 equals to a scalar in args.
       learning_rate: - learning rate for the entire model.
         We do not customize learning rate for separate parts.
 
@@ -93,7 +93,7 @@ class UISRNN(object):
             'params': self.rnn_init_hidden
         }  # rnn initial hidden state
     ]
-    if sigma2 is None:  # train sigma2
+    if self.estimate_sigma2:  # train sigma2
       params.append({
           'params': self.sigma2
       }  # variance parameters
@@ -116,6 +116,7 @@ class UISRNN(object):
     npz_file = os.path.join(tempdir, _SAVED_NPZ_FILE)
     np.savez(npz_file,
              transition_bias=self.transition_bias,
+             crp_alpha=self.crp_alpha,
              sigma2=self.sigma2.detach().cpu().numpy())
 
     # create combined model file
@@ -143,14 +144,14 @@ class UISRNN(object):
     npz_file = os.path.join(tempdir, _SAVED_NPZ_FILE)
     data = np.load(npz_file)
     self.transition_bias = float(data['transition_bias'])
+    self.crp_alpha = float(data['crp_alpha'])
     self.sigma2 = nn.Parameter(
         torch.from_numpy(data['sigma2']).to(self.device))
 
-  def fit(self, args, train_sequence, train_cluster_id):
+  def fit(self, train_sequence, train_cluster_id, args):
     """Fit UISRNN model.
 
     Args:
-      args: Model and training configurations. See demo for description.
       train_sequence: (real 2d numpy array, size: N by D)
         - the training d_vector sequence.
         N - summation of lengths of all utterances
@@ -170,13 +171,14 @@ class UISRNN(object):
         'iaaa_0' means the entry belongs to speaker #0 in utterance 'iaaa'.
         Note that the order of entries within an utterance are preserved,
         and all utterances are simply concatenated together.
+      args: Training configurations. See arguments.py for details.
 
     Raises:
       ValueError: If train_sequence has wrong dimension.
     """
 
     train_total_length, observation_dim = train_sequence.shape
-    if observation_dim != args.observation_dim:
+    if observation_dim != self.observation_dim:
       raise ValueError('train_sequence does not match the dimension specified '
                        'by args.observation_dim.')
     if train_total_length != len(train_cluster_id):
@@ -189,7 +191,6 @@ class UISRNN(object):
 
     self.rnn_model.train()
     optimizer = self._get_optimizer(optimizer=args.optimizer,
-                                    sigma2=args.sigma2,
                                     learning_rate=args.learning_rate)
 
     sub_sequences, seq_lengths, transition_bias = utils.resize_sequence(
@@ -204,7 +205,7 @@ class UISRNN(object):
     if args.batch_size is None:
       # Packing sequences.
       rnn_input = np.zeros((sorted_seq_lengths[0], num_clusters,
-                            args.observation_dim))
+                            self.observation_dim))
       for i in range(num_clusters):
         rnn_input[1:sorted_seq_lengths[i], i, :] = sub_sequences[
             permute_index[i]]
@@ -219,7 +220,7 @@ class UISRNN(object):
       if args.batch_size is not None:
         mini_batch = np.sort(np.random.choice(num_clusters, args.batch_size))
         mini_batch_rnn_input = np.zeros((sorted_seq_lengths[mini_batch[0]],
-                                         args.batch_size, args.observation_dim))
+                                         args.batch_size, self.observation_dim))
         for i in range(args.batch_size):
           mini_batch_rnn_input[1:sorted_seq_lengths[mini_batch[i]],
                                i, :] = sub_sequences[permute_index[
@@ -276,11 +277,10 @@ class UISRNN(object):
       train_loss.append(float(loss1.data))  # only save the likelihood part
     print('Done training with {} iterations'.format(args.train_iteration))
 
-  def predict(self, args, test_sequence):
+  def predict(self, test_sequence, args):
     """Predict test sequence labels using UISRNN model.
 
     Args:
-      args: Model and testing configurations. See demo for description.
       test_sequence: (real 2d numpy array, size: N by D)
         - the test d_vector sequence.
         N - length of one test utterance
@@ -292,6 +292,7 @@ class UISRNN(object):
          [-3.8 0.1 1.4 3.3]    --> 4th entry of utterance 'iccc'
          [0.1 2.7 3.5 -1.7]]   --> 5th entry of utterance 'iccc'
         Here N=5, d=4.
+      args: Inference configurations. See arguments.py for details.
 
     Returns:
       predicted_cluster_id: (integer array, size: N)
@@ -302,7 +303,7 @@ class UISRNN(object):
       ValueError: If test_sequence has wrong dimension.
     """
     test_sequence_length, observation_dim = test_sequence.shape
-    if observation_dim != args.observation_dim:
+    if observation_dim != self.observation_dim:
       raise ValueError('test_sequence does not match the dimension specified '
                        'by args.observation_dim.')
     if type(test_sequence).__module__ != np.__name__:
@@ -356,7 +357,7 @@ class UISRNN(object):
               else:
                 loss -= np.log(self.transition_bias) + np.log(
                     new_block_counts_buffer[cluster]) - np.log(
-                        sum(new_block_counts_buffer) + args.crp_alpha)
+                        sum(new_block_counts_buffer) + self.crp_alpha)
               # update new mean and new hidden
               mean, hidden = self.rnn_model(
                   test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),
@@ -372,7 +373,7 @@ class UISRNN(object):
               new_trace_buffer.append(cluster)
             else:  # new cluster
               init_input = autograd.Variable(
-                  torch.zeros(args.observation_dim)
+                  torch.zeros(self.observation_dim)
                   ).unsqueeze(0).unsqueeze(0).to(self.device)
               mean, hidden = self.rnn_model(init_input,
                                             self.rnn_init_hidden)
@@ -381,8 +382,8 @@ class UISRNN(object):
                   target_tensor=test_sequence[t + sub_idx, :],
                   weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
               loss -= np.log(self.transition_bias) + np.log(
-                  args.crp_alpha) - np.log(
-                      sum(new_block_counts_buffer) + args.crp_alpha)
+                  self.crp_alpha) - np.log(
+                      sum(new_block_counts_buffer) + self.crp_alpha)
               # update new min and new hidden
               mean, hidden = self.rnn_model(
                   test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),
@@ -426,7 +427,7 @@ class UISRNN(object):
             new_cluster_idx):  # update the proposal step-by-step
           if cluster == new_n_clusters:
             init_input = autograd.Variable(
-                torch.zeros(args.observation_dim)
+                torch.zeros(self.observation_dim)
                 ).unsqueeze(0).unsqueeze(0).to(self.device)
             mean, hidden = self.rnn_model(init_input,
                                           self.rnn_init_hidden)

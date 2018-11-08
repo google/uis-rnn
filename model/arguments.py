@@ -18,40 +18,40 @@ _DEFAULT_OBSERVATION_DIM = 256
 
 
 def parse_arguments():
-  """Parse arguments."""
-  parser = argparse.ArgumentParser(
-      description='UIS-RNN model for speaker diarization.')
+  """Parse arguments.
 
-  # data configurations
-  parser.add_argument(
+  Returns:
+    A tuple of:
+      model_args: model arguments
+      training_args: training arguments
+      inference_args: inference arguments
+  """
+  # model configurations
+  model_parser = argparse.ArgumentParser(
+      description='Model configurations.', add_help=False)
+
+  model_parser.add_argument(
       '--observation_dim',
       default=_DEFAULT_OBSERVATION_DIM,
       type=int,
       help='The dimension of the embeddings (e.g. d-vectors).')
 
-  # model configurations
-  parser.add_argument(
+  model_parser.add_argument(
       '--rnn_hidden_size',
       default=512,
       type=int,
       help='The number of nodes for each RNN layer.')
-  parser.add_argument(
+  model_parser.add_argument(
       '--rnn_depth',
       default=1,
       type=int,
       help='The number of RNN layers.')
-  parser.add_argument(
+  model_parser.add_argument(
       '--rnn_dropout',
       default=0.2,
       type=float,
       help='The dropout rate for all RNN layers.')
-  parser.add_argument(
-      '--regularization_weight',
-      '-r',
-      default=1e-5,
-      type=float,
-      help='The network regularization multiplicative.')
-  parser.add_argument(
+  model_parser.add_argument(
       '--transition_bias',
       default=None,
       type=float,
@@ -59,7 +59,7 @@ def parse_arguments():
            'paper. If the value is given, we will fix to this value. If the '
            'value is None, we will estimate it from training data '
            'using Eq. (13) in the paper.')
-  parser.add_argument(
+  model_parser.add_argument(
       '--crp_alpha',
       default=1.0,
       type=float,
@@ -67,71 +67,83 @@ def parse_arguments():
            'corresponding to Eq. (7) in the paper. In this open source '
            'implementation, currently we only support using a given value '
            'of crp_alpha.')
-  parser.add_argument(
+  model_parser.add_argument(
       '--sigma2',
       default=None,
       type=float,
       help='The value of sigma squared, corresponding to Eq. (11) in the '
            'paper. If the value is given, we will fix to this value. If the '
            'value is None, we will estimate it from training data.')
-  parser.add_argument(
-      '--sigma_alpha',
-      default=1.0,
-      type=float,
-      help='The inverse gamma shape for estimating sigma2. This value is only '
-           'meaningful when sigma2 is not given, and estimated from data.')
-  parser.add_argument(
-      '--sigma_beta',
-      default=1.0,
-      type=float,
-      help='The inverse gamma scale for estimating sigma2. This value is only '
-           'meaningful when sigma2 is not given, and estimated from data.')
 
   # training configurations
-  parser.add_argument(
+  training_parser = argparse.ArgumentParser(
+      description='Training configurations.', add_help=False)
+
+  training_parser.add_argument(
       '--optimizer',
       '-o',
       default='adam',
       choices=['adam'],
       help='The optimizer for training.')
-  parser.add_argument(
+  training_parser.add_argument(
       '--learning_rate',
       '-l',
       default=1e-5,
       type=float,
       help='The leaning rate for training.')
-  parser.add_argument(
+  training_parser.add_argument(
       '--train_iteration',
       '-t',
       default=20000,
       type=int,
       help='The total number of training iterations.')
-  parser.add_argument(
+  training_parser.add_argument(
       '--batch_size',
       '-b',
       default=10,
       type=int,
       help='The batch size for training.')
-  parser.add_argument(
+  training_parser.add_argument(
       '--num_permutations',
       default=10,
       type=int,
       help='The number of permutations per utterance sampled in the training '
            'data.')
+  training_parser.add_argument(
+      '--sigma_alpha',
+      default=1.0,
+      type=float,
+      help='The inverse gamma shape for estimating sigma2. This value is only '
+           'meaningful when sigma2 is not given, and estimated from data.')
+  training_parser.add_argument(
+      '--sigma_beta',
+      default=1.0,
+      type=float,
+      help='The inverse gamma scale for estimating sigma2. This value is only '
+           'meaningful when sigma2 is not given, and estimated from data.')
+  training_parser.add_argument(
+      '--regularization_weight',
+      '-r',
+      default=1e-5,
+      type=float,
+      help='The network regularization multiplicative.')
 
   # inference configurations
-  parser.add_argument(
+  inference_parser = argparse.ArgumentParser(
+      description='Inference configurations.', add_help=False)
+
+  inference_parser.add_argument(
       '--beam_size',
       '-s',
       default=10,
       type=int,
       help='The beam search size for inference.')
-  parser.add_argument(
+  inference_parser.add_argument(
       '--look_ahead',
       default=1,
       type=int,
       help='The number of look ahead steps during inference.')
-  parser.add_argument(
+  inference_parser.add_argument(
       '--test_iteration',
       default=2,
       type=int,
@@ -140,5 +152,14 @@ def parse_arguments():
            'Then we return the inference results on the last duplicate as the '
            'final prediction for the test sequence.')
 
-  args = parser.parse_args()
-  return args
+  # a super parser for sanity checks
+  super_parser = argparse.ArgumentParser(
+      parents=[model_parser, training_parser, inference_parser])
+
+  # get arguments
+  super_parser.parse_args()
+  model_args, _ = model_parser.parse_known_args()
+  training_args, _ = training_parser.parse_known_args()
+  inference_args, _ = inference_parser.parse_known_args()
+
+  return (model_args, training_args, inference_args)

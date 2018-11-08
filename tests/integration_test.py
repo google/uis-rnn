@@ -74,23 +74,23 @@ class TestIntegration(unittest.TestCase):
         test_cluster_id, label_to_center, sigma=0.01)
 
     # construct model
-    args = arguments.parse_arguments()
-    args.rnn_depth = 2
-    args.rnn_hidden_size = 8
-    args.learning_rate = 0.01
-    args.train_iteration = 200
-    args.observation_dim = 2
-    args.test_iteration = 2
+    model_args, training_args, inference_args = arguments.parse_arguments()
+    model_args.rnn_depth = 2
+    model_args.rnn_hidden_size = 8
+    model_args.observation_dim = 2
+    training_args.learning_rate = 0.01
+    training_args.train_iteration = 200
+    inference_args.test_iteration = 2
 
-    model = uisrnn.UISRNN(args)
+    model = uisrnn.UISRNN(model_args)
 
     # run training, and save the model
-    model.fit(args, train_sequence, np.array(train_cluster_id))
+    model.fit(train_sequence, np.array(train_cluster_id), training_args)
     temp_file_path = tempfile.mktemp()
     model.save(temp_file_path)
 
     # run testing
-    predicted_label = model.predict(args, test_sequence)
+    predicted_label = model.predict(test_sequence, inference_args)
 
     # run evaluation
     accuracy, length = evals.evaluate_result(predicted_label, test_cluster_id)
@@ -98,11 +98,11 @@ class TestIntegration(unittest.TestCase):
     self.assertEqual(len(test_cluster_id), length)
 
     # load new model
-    loaded_model = uisrnn.UISRNN(args)
+    loaded_model = uisrnn.UISRNN(model_args)
     loaded_model.load(temp_file_path)
 
     # run testing with loaded model
-    predicted_label = loaded_model.predict(args, test_sequence)
+    predicted_label = loaded_model.predict(test_sequence, inference_args)
 
     # run evaluation with loaded model
     accuracy, length = evals.evaluate_result(predicted_label, test_cluster_id)

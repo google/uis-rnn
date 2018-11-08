@@ -133,16 +133,17 @@ def pack_seq(rnn_input, sorted_seq_lengths):
   return packed_rnn_input, rnn_truth
 
 
-def output_result(args, test_record):
+def output_result(model_args, training_args, test_record):
   accuracy_array, _ = zip(*test_record)
   total_accuracy = np.mean(accuracy_array)
   filename = 'layer_{}_{}_{:.1f}_result.txt'.format(
-      args.rnn_hidden_size,
-      args.rnn_depth, args.rnn_dropout)
-  with open(filename, 'a') as file:
-    file.write(
+      model_args.rnn_hidden_size,
+      model_args.rnn_depth, model_args.rnn_dropout)
+  with open(filename, 'a') as file_object:
+    file_object.write(
         'sigma_alpha:{}  sigma_beta:{}  crp_alpha:{}  learning rate:{}  '
-        'regularization:{}  batch size:{}  acc:{:.6f} \n'
-        .format(args.sigma_alpha, args.sigma_beta, args.crp_alpha,
-                args.learning_rate, args.regularization_weight,
-                args.batch_size, total_accuracy))
+        'regularization:{}  batch size:{}  acc:{:.6f} \n'.format(
+            training_args.sigma_alpha, training_args.sigma_beta,
+            model_args.crp_alpha, training_args.learning_rate,
+            training_args.regularization_weight,
+            training_args.batch_size, total_accuracy))

@@ -21,13 +21,15 @@ import numpy as np
 SAVED_MODEL_NAME = 'saved_model.uisrnn'
 
 
-def diarization_experiment(args):
+def diarization_experiment(model_args, training_args, inference_args):
   """Experiment pipeline.
 
   Load data --> train model --> test model --> output result
 
   Args:
-    args: return value of arguments.parse_arguments()
+    model_args: model configurations
+    training_args: training configurations
+    inference_args: inference configurations
   """
 
   predicted_labels = []
@@ -40,16 +42,17 @@ def diarization_experiment(args):
   test_sequences = test_data['test_sequences']
   test_cluster_ids = test_data['test_cluster_ids']
 
-  model = uisrnn.UISRNN(args)
+  model = uisrnn.UISRNN(model_args)
+
   # training
-  model.fit(args, train_sequence, train_cluster_id)
+  model.fit(train_sequence, train_cluster_id, training_args)
   model.save(SAVED_MODEL_NAME)
   # we can also skip training by calling：
   # model.load(SAVED_MODEL_NAME)
 
   # testing
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
-    predicted_label = model.predict(args, test_sequence)
+    predicted_label = model.predict(test_sequence, inference_args)
     predicted_labels.append(predicted_label)
     accuracy, length = evals.evaluate_result(test_cluster_id, predicted_label)
     test_record.append((accuracy, length))
@@ -59,17 +62,18 @@ def diarization_experiment(args):
     print(predicted_label)
     print('----------------------')
 
-  utils.output_result(args, test_record)
+  utils.output_result(model_args, training_args, test_record)
 
   print('Finished diarization experiment with --sigma_alpha {} --sigma_beta {} '
         '--crp_alpha {} -l {} -r {}'
-        .format(args.sigma_alpha, args.sigma_beta, args.crp_alpha,
-                args.learning_rate, args.regularization_weight))
+        .format(training_args.sigma_alpha, training_args.sigma_beta,
+                model_args.crp_alpha, training_args.learning_rate,
+                training_args.regularization_weight))
 
 
 def main():
-  args = arguments.parse_arguments()
-  diarization_experiment(args)
+  model_args, training_args, inference_args = arguments.parse_arguments()
+  diarization_experiment(model_args, training_args, inference_args)
 
 
 if __name__ == '__main__':
