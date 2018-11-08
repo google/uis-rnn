@@ -43,14 +43,22 @@ model = UISRNN(args)
 Next, train the model by calling the `fit()` function:
 
 ```python
-model.fit(args, train_sequence, train_cluster_id)
+model.fit(train_sequence, train_cluster_id, args)
 ```
 
 Once we are done with the training, we can run the trained model to perform
 inference on new sequences by calling the `predict()` function:
 
 ```python
-predicted_label = model.predict(args, test_sequence)
+predicted_label = model.predict(test_sequence, args)
+```
+
+The definitions of the args are described in `model/arguments.py`.
+
+You can also verify the correctness of this library by running:
+
+```bash
+sh run_tests.sh
 ```
 
 ## Citations
