@@ -17,7 +17,11 @@ import numpy as np
 
 
 def compute_approximate_sequence_accuracy(sequence1, sequence2):
-  """Find the best matching of two sequences of integers.
+  """Find a sub-optimal matching of two sequences of integers.
+
+  This sub-optimal matching is obtained by a greedy algorithm. It's not the
+  best matching. To compute the real best matching, the Hungarian algorithm
+  is needed, which requires additional dependencies.
 
   For example, if sequence1=[0,0,1,2,2], sequence2=[3,3,4,4,1], then accuracy
   will be 4/5=0.8. Notice that the two sequences are not exchangable, in other
@@ -29,7 +33,7 @@ def compute_approximate_sequence_accuracy(sequence1, sequence2):
     sequence2: a list of integer - The second sequence to match.
 
   Returns:
-    best matching accuracy
+    sub-optimal matching accuracy
   """
   assert len(sequence1) == len(sequence2), (
       "The two sequences should should of the same length")
