@@ -43,6 +43,8 @@ This will train a UIS-RNN model using `data/training_data.npz`,
 then store the model on disk, perform inference on `data/testing_data.npz`,
 print the inference results, and save the approximate accuracy in a text file.
 
+*PS. These data are toy data, for demonstration purpose only.*
+
 ### Core APIs
 
 All algorithms are implemented as the `UISRNN` class. First, construct a
