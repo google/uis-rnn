@@ -178,15 +178,17 @@ class UISRNN(object):
       ValueError: If train_sequence or train_cluster_id has wrong dimension.
     """
     # check type
-    if not isinstance(train_sequence, np.ndarray):
-      raise TypeError('train_sequence should be an numpy array.')
-    if not isinstance(train_cluster_id, np.ndarray):
-      raise TypeError('train_cluster_id type be an numpy array.')
+    if (not isinstance(train_sequence, np.ndarray) or
+        train_sequence.dtype != float):
+      raise TypeError('train_sequence should be a numpy array of float type.')
+    if (not isinstance(train_cluster_id, np.ndarray) or
+        not train_cluster_id.dtype.name.startswith('str')):
+      raise TypeError('train_cluster_id type be a numpy array of strings.')
     # check dimension
     if train_sequence.ndim != 2:
-      raise ValueError('train_sequence must be 2-dim array')
+      raise ValueError('train_sequence must be 2-dim array.')
     if train_cluster_id.ndim != 1:
-      raise ValueError('train_cluster_id must be 1-dim array')
+      raise ValueError('train_cluster_id must be 1-dim array.')
     # check length and size
     train_total_length, observation_dim = train_sequence.shape
     if observation_dim != self.observation_dim:
@@ -311,11 +313,12 @@ class UISRNN(object):
       ValueError: If test_sequence has wrong dimension.
     """
     # check type
-    if not isinstance(test_sequence, np.ndarray):
-      raise TypeError('test_sequence type should be an numpy array.')
+    if (not isinstance(test_sequence, np.ndarray) or
+        test_sequence.dtype != float):
+      raise TypeError('test_sequence should be a numpy array of float type.')
     # check dimension
     if test_sequence.ndim != 2:
-      raise ValueError('test_sequence must be 2-dim array')
+      raise ValueError('test_sequence must be 2-dim array.')
     # check size
     test_sequence_length, observation_dim = test_sequence.shape
     if observation_dim != self.observation_dim:
