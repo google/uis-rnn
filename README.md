@@ -19,7 +19,11 @@ which we used to produce the results in the
 [paper](https://arxiv.org/abs/1810.04719), due to dependencies on
 some internal libraries.
 
-**This is NOT an official Google product.**
+We CANNOT share the data, code, or model for the speaker recognition system
+(d-vector embeddings) used in the paper, since the speaker recognition system
+heavily depends on Google's internal infrastructure and proprietary data.
+
+**This library is NOT an official Google product.**
 
 ## Dependencies
 
@@ -43,7 +47,10 @@ This will train a UIS-RNN model using `data/training_data.npz`,
 then store the model on disk, perform inference on `data/testing_data.npz`,
 print the inference results, and save the approximate accuracy in a text file.
 
-*PS. These data are toy data, for demonstration purpose only.*
+PS. The files under `data/` are manually generated *toy data*,
+for demonstration purpose only.
+These data are very simple, so we are supposed to get 100% accuracy on the
+testing data.
 
 ### Core APIs
 
