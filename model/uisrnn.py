@@ -152,8 +152,8 @@ class UISRNN(object):
     """Fit UISRNN model.
 
     Args:
-      train_sequence: (real 2d numpy array, size: N by D)
-        - the training d_vector sequence.
+      train_sequence: 2-dim numpy array of real numbers, size: N * D
+        - the training observation sequence.
         N - summation of lengths of all utterances
         D - observation dimension
         For example, train_sequence =
@@ -162,9 +162,9 @@ class UISRNN(object):
          [-0.2 1.0 3.8 5.7]    --> an entry of speaker #0 from utterance 'iaaa'
          [3.8 -0.1 1.5 2.3]    --> an entry of speaker #0 from utterance 'ibbb'
          [1.2 1.4 3.6 -2.7]]   --> an entry of speaker #0 from utterance 'ibbb'
-        Here N=5, d=4.
+        Here N=5, D=4.
         We concatenate all training utterances into a single sequence.
-      train_cluster_id: (a vector of strings, size: N)
+      train_cluster_id: 1-dim numpy array of strings, size: N
         - the speaker id sequence.
         For example, train_cluster_id =
         ['iaaa_0', 'iaaa_1', 'iaaa_0', 'ibbb_0', 'ibbb_0']
@@ -174,9 +174,20 @@ class UISRNN(object):
       args: Training configurations. See arguments.py for details.
 
     Raises:
-      ValueError: If train_sequence has wrong dimension.
+      TypeError: If train_sequence or train_cluster_id is of wrong type.
+      ValueError: If train_sequence or train_cluster_id has wrong dimension.
     """
-
+    # check type
+    if not isinstance(train_sequence, np.ndarray):
+      raise TypeError('train_sequence should be an numpy array.')
+    if not isinstance(train_cluster_id, np.ndarray):
+      raise TypeError('train_cluster_id type be an numpy array.')
+    # check dimension
+    if train_sequence.ndim != 2:
+      raise ValueError('train_sequence must be 2-dim array')
+    if train_cluster_id.ndim != 1:
+      raise ValueError('train_cluster_id must be 1-dim array')
+    # check length and size
     train_total_length, observation_dim = train_sequence.shape
     if observation_dim != self.observation_dim:
       raise ValueError('train_sequence does not match the dimension specified '
@@ -184,10 +195,6 @@ class UISRNN(object):
     if train_total_length != len(train_cluster_id):
       raise ValueError('train_sequence length is not equal to '
                        'train_cluster_id length.')
-    if type(train_sequence).__module__ != np.__name__:
-      raise TypeError('train_sequence type should be an numpy array.')
-    if type(train_cluster_id).__module__ != np.__name__:
-      raise TypeError('train_cluster_id type should be an numpy array.')
 
     self.rnn_model.train()
     optimizer = self._get_optimizer(optimizer=args.optimizer,
@@ -281,8 +288,8 @@ class UISRNN(object):
     """Predict test sequence labels using UISRNN model.
 
     Args:
-      test_sequence: (real 2d numpy array, size: N by D)
-        - the test d_vector sequence.
+      test_sequence: 2-dim numpy array of real numbers, size: N * D
+        - the test observation sequence.
         N - length of one test utterance
         D - observation dimension
         For example, test_sequence =
@@ -291,7 +298,7 @@ class UISRNN(object):
          [-2.2 5.0 1.8 3.7]    --> 3rd entry of utterance 'iccc'
          [-3.8 0.1 1.4 3.3]    --> 4th entry of utterance 'iccc'
          [0.1 2.7 3.5 -1.7]]   --> 5th entry of utterance 'iccc'
-        Here N=5, d=4.
+        Here N=5, D=4.
       args: Inference configurations. See arguments.py for details.
 
     Returns:
@@ -300,14 +307,21 @@ class UISRNN(object):
         For example, predicted_cluster_id = [0, 1, 0, 0, 1]
 
     Raises:
+      TypeError: If test_sequence is of wrong type.
       ValueError: If test_sequence has wrong dimension.
     """
+    # check type
+    if not isinstance(test_sequence, np.ndarray):
+      raise TypeError('test_sequence type should be an numpy array.')
+    # check dimension
+    if test_sequence.ndim != 2:
+      raise ValueError('test_sequence must be 2-dim array')
+    # check size
     test_sequence_length, observation_dim = test_sequence.shape
     if observation_dim != self.observation_dim:
       raise ValueError('test_sequence does not match the dimension specified '
                        'by args.observation_dim.')
-    if type(test_sequence).__module__ != np.__name__:
-      raise TypeError('test_sequence type should be an numpy array.')
+
     self.rnn_model.eval()
     test_sequence = np.tile(test_sequence, (args.test_iteration, 1))
     test_sequence = autograd.Variable(
