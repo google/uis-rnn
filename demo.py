@@ -61,15 +61,12 @@ def diarization_experiment(model_args, training_args, inference_args):
     print(test_cluster_id)
     print('Predicted labels:')
     print(predicted_label)
-    print('----------------------')
+    print('-' * 80)
 
-  utils.output_result(model_args, training_args, test_record)
+  output_string = utils.output_result(model_args, training_args, test_record)
 
-  print('Finished diarization experiment with --sigma_alpha {} --sigma_beta {} '
-        '--crp_alpha {} -l {} -r {}'
-        .format(training_args.sigma_alpha, training_args.sigma_beta,
-                model_args.crp_alpha, training_args.learning_rate,
-                training_args.regularization_weight))
+  print('Finished diarization experiment')
+  print(output_string)
 
 
 def main():

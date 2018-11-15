@@ -93,6 +93,7 @@ def parse_arguments():
       help='The leaning rate for training.')
   training_parser.add_argument(
       '--learning_rate_half_life',
+      '-hl',
       default=0,
       type=int,
       help='The half life of the leaning rate for training. If this value is '

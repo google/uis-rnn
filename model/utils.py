@@ -177,16 +177,34 @@ def pack_sequence(
 def output_result(model_args, training_args, test_record):
   accuracy_array, _ = zip(*test_record)
   total_accuracy = np.mean(accuracy_array)
+  output_string = """
+Config:
+  sigma_alpha: {}
+  sigma_beta: {}
+  crp_alpha: {}
+  learning rate: {}
+  learning rate half life: {}
+  regularization: {}
+  batch size: {}
+
+Performance:
+  averaged accuracy: {:.6f}
+  accuracy numbers for all testing sequences:
+  """.strip().format(
+      training_args.sigma_alpha,
+      training_args.sigma_beta,
+      model_args.crp_alpha,
+      training_args.learning_rate,
+      training_args.learning_rate_half_life,
+      training_args.regularization_weight,
+      training_args.batch_size,
+      total_accuracy)
+  for accuracy in accuracy_array:
+    output_string += '\n    {:.6f}'.format(accuracy)
+  output_string += '\n' + '=' * 80 + '\n' 
   filename = 'layer_{}_{}_{:.1f}_result.txt'.format(
       model_args.rnn_hidden_size,
       model_args.rnn_depth, model_args.rnn_dropout)
   with open(filename, 'a') as file_object:
-    file_object.write(
-        'sigma_alpha: {}  sigma_beta: {}  crp_alpha: {}  learning rate: {}  '
-        'learning rate half life: {} regularization: {}  batch size: {}  '
-        'accuracy: {:.6f} \n'.format(
-            training_args.sigma_alpha, training_args.sigma_beta,
-            model_args.crp_alpha, training_args.learning_rate,
-            training_args.learning_rate_half_life,
-            training_args.regularization_weight,
-            training_args.batch_size, total_accuracy))
+    file_object.write(output_string)
+  return output_string

@@ -44,7 +44,7 @@ This library depends on:
 To get started, simply run this command:
 
 ```bash
-python3 demo.py --train_iteration=20000
+python3 demo.py --train_iteration=1000 -l=0.001 -hl=100
 ```
 
 This will train a UIS-RNN model using `data/training_data.npz`,
