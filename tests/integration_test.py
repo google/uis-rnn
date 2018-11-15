@@ -79,6 +79,7 @@ class TestIntegration(unittest.TestCase):
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 2
     training_args.learning_rate = 0.01
+    training_args.learning_rate_half_life = 50
     training_args.train_iteration = 200
     inference_args.test_iteration = 2
 

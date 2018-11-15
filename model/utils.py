@@ -183,8 +183,10 @@ def output_result(model_args, training_args, test_record):
   with open(filename, 'a') as file_object:
     file_object.write(
         'sigma_alpha: {}  sigma_beta: {}  crp_alpha: {}  learning rate: {}  '
-        'regularization: {}  batch size: {}  accuracy: {:.6f} \n'.format(
+        'learning rate half life: {} regularization: {}  batch size: {}  '
+        'accuracy: {:.6f} \n'.format(
             training_args.sigma_alpha, training_args.sigma_beta,
             model_args.crp_alpha, training_args.learning_rate,
+            training_args.learning_rate_half_life,
             training_args.regularization_weight,
             training_args.batch_size, total_accuracy))
