@@ -85,7 +85,7 @@ class TestIntegration(unittest.TestCase):
     model = uisrnn.UISRNN(model_args)
 
     # run training, and save the model
-    model.fit(train_sequence, np.array(train_cluster_id), training_args)
+    model.fit(train_sequence, train_cluster_id, training_args)
     temp_file_path = tempfile.mktemp()
     model.save(temp_file_path)
 

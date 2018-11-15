@@ -164,7 +164,7 @@ class UISRNN(object):
          [1.2 1.4 3.6 -2.7]]   --> an entry of speaker #0 from utterance 'ibbb'
         Here N=5, D=4.
         We concatenate all training utterances into a single sequence.
-      train_cluster_id: 1-dim numpy array of strings, size: N
+      train_cluster_id: 1-dim list or numpy array of strings, size: N
         - the speaker id sequence.
         For example, train_cluster_id =
         ['iaaa_0', 'iaaa_1', 'iaaa_0', 'ibbb_0', 'ibbb_0']
@@ -181,6 +181,8 @@ class UISRNN(object):
     if (not isinstance(train_sequence, np.ndarray) or
         train_sequence.dtype != float):
       raise TypeError('train_sequence should be a numpy array of float type.')
+    if isinstance(train_cluster_id, list):
+      train_cluster_id = np.array(train_cluster_id)
     if (not isinstance(train_cluster_id, np.ndarray) or
         not train_cluster_id.dtype.name.startswith('str')):
       raise TypeError('train_cluster_id type be a numpy array of strings.')

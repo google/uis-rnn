@@ -34,7 +34,6 @@ class TestUISRNN(unittest.TestCase):
     # generate fake training data
     train_sequence = np.random.rand(1000, model_args.observation_dim)
     train_cluster_id = np.array(['A'] * 1000)
-    _, observation_dim = train_sequence.shape
 
     model = uisrnn.UISRNN(model_args)
 
@@ -58,7 +57,6 @@ class TestUISRNN(unittest.TestCase):
     # generate fake data
     train_sequence = np.random.rand(1000, 18)
     train_cluster_id = np.array(['A'] * 1000)
-    _, observation_dim = train_sequence.shape
 
     model = uisrnn.UISRNN(model_args)
 
@@ -78,7 +76,6 @@ class TestUISRNN(unittest.TestCase):
     # generate fake data
     train_sequence = np.random.rand(1000, model_args.observation_dim)
     train_cluster_id = np.array(['A'] * 1000)
-    _, observation_dim = train_sequence.shape
 
     model = uisrnn.UISRNN(model_args)
 
@@ -88,7 +85,7 @@ class TestUISRNN(unittest.TestCase):
     # testing
     test_sequence = np.random.rand(10, 18)
     with self.assertRaises(ValueError):
-      predicted_label = model.predict(test_sequence, inference_args)
+      model.predict(test_sequence, inference_args)
 
   def test_save_and_load(self):
     """Save model and load it."""
