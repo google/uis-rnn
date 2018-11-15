@@ -10,6 +10,9 @@ by learning from examples.
 This algorithm was originally proposed in the paper
 [Fully Supervised Speaker Diarization](https://arxiv.org/abs/1810.04719).
 
+The work has been introduced by
+[Google AI Blog](https://ai.googleblog.com/2018/11/accurate-online-speaker-diarization.html).
+
 ![gif](resources/uisrnn.gif)
 
 ## Disclaimer
