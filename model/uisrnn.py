@@ -208,16 +208,16 @@ class UISRNN(object):
         sequence=train_sequence,
         cluster_id=train_cluster_id,
         num_permutations=args.num_permutations)
-    num_clusters = len(seq_lengths)
+    num_speakers = len(seq_lengths)
     sorted_seq_lengths = np.sort(seq_lengths)[::-1]
     permute_index = np.argsort(seq_lengths)[::-1]
     if self.transition_bias is None:
       self.transition_bias = transition_bias
     if args.batch_size is None:
       # Packing sequences.
-      rnn_input = np.zeros((sorted_seq_lengths[0], num_clusters,
+      rnn_input = np.zeros((sorted_seq_lengths[0], num_speakers,
                             self.observation_dim))
-      for i in range(num_clusters):
+      for i in range(num_speakers):
         rnn_input[1:sorted_seq_lengths[i], i, :] = sub_sequences[
             permute_index[i]]
       rnn_input = autograd.Variable(
@@ -229,7 +229,7 @@ class UISRNN(object):
     for t in range(args.train_iteration):
       optimizer.zero_grad()
       if args.batch_size is not None:
-        mini_batch = np.sort(np.random.choice(num_clusters, args.batch_size))
+        mini_batch = np.sort(np.random.choice(num_speakers, args.batch_size))
         mini_batch_rnn_input = np.zeros((sorted_seq_lengths[mini_batch[0]],
                                          args.batch_size, self.observation_dim))
         for i in range(args.batch_size):
