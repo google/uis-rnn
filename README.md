@@ -33,7 +33,7 @@ This library depends on:
 * numpy 1.15.1
 * pytorch 0.4.0
 
-## Tutorial
+## Getting Started
 
 ### Run the demo
 
@@ -52,30 +52,6 @@ for demonstration purpose only.
 These data are very simple, so we are supposed to get 100% accuracy on the
 testing data.
 
-### Core APIs
-
-All algorithms are implemented as the `UISRNN` class. First, construct a
-`UISRNN` object by:
-
-```python
-model = UISRNN(args)
-```
-
-Next, train the model by calling the `fit()` function:
-
-```python
-model.fit(train_sequence, train_cluster_id, args)
-```
-
-Once we are done with the training, we can run the trained model to perform
-inference on new sequences by calling the `predict()` function:
-
-```python
-predicted_label = model.predict(test_sequence, args)
-```
-
-The definitions of the args are described in `model/arguments.py`.
-
 ### Run the tests
 
 You can also verify the correctness of this library by running:
@@ -85,8 +61,84 @@ sh run_tests.sh
 ```
 
 If you fork this library and make local changes, be sure to use these tests
-as a sanity check. Besides, these tests are also great examples for learning
-the APIs.
+as a sanity check.
+
+Besides, these tests are also great examples for learning
+the APIs, especially `tests/integration_test.py`.
+
+## Core APIs
+
+### Glossary
+
+| General Machine Learning | Speaker Diarization    |
+|--------------------------|------------------------|
+| Sequence                 | Utterance              |
+| Observation              | Embedding / d-vector   |
+| Label / Cluster ID       | Speaker                |
+
+### Model construction
+
+All algorithms are implemented as the `UISRNN` class. First, construct a
+`UISRNN` object by:
+
+```python
+model = UISRNN(args)
+```
+
+The definitions of the args are described in `model/arguments.py`.
+
+### Training
+
+Next, train the model by calling the `fit()` function:
+
+```python
+model.fit(train_sequence, train_cluster_id, args)
+```
+
+Here `train_sequence` should be a 2-dim numpy array of type `float`, for
+the **concatenated** observation sequences. For speaker diarization, this
+could be the [d-vector embeddings](https://arxiv.org/abs/1710.10467).
+
+For example, if you have *M* training utterances,
+and each utterance is a sequence of *L* embeddings. Each embedding is
+a vector of *D* numbers. The the shape of `train_sequence` is *N * D*,
+where *N = M * L*.
+
+`train_cluster_id` is a 1-dim list or numpy array of strings, of length *N*.
+It is the **concatenated** ground truth labels of all training data. For
+speaker diarization, these labels are the speaker identifiers for each
+observation (*e.g.* d-vector).
+
+Since we are concatenating observation sequences, it is important to note that,
+ground truth labels in `train_cluster_id` across different sequences are
+supposed to be **globally unique**.
+
+For example, if the set of labels in the first
+sequence is `{'A', 'B', 'C'}`, and the set of labels in the second sequence
+is `{'B', 'C', 'D'}`. Then after concatenation, we should rename them to
+something like `{'1_A', '1_B', '1_C'}` and `{'2_B', '2_C', '2_D'}`,
+unless `'B'` and `'C'` in the two sequences are meaningfully identical
+(in speaker diarization, this means they are the same speakers across
+utterances).
+
+The definitions of the args are described in `model/arguments.py`.
+
+### Prediction
+
+Once we are done with the training, we can run the trained model to perform
+inference on new sequences by calling the `predict()` function:
+
+```python
+predicted_label = model.predict(test_sequence, args)
+```
+
+Here `test_sequence` should be a 2-dim numpy array of type `float`,
+corresponding to a **single** observation sequence.
+
+The returned `predicted_label` is a list of integers, with the same
+length as `test_sequence`.
+
+The definitions of the args are described in `model/arguments.py`.
 
 ## Citations
 
