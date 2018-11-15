@@ -49,7 +49,7 @@ python3 demo.py --train_iteration=20000
 
 This will train a UIS-RNN model using `data/training_data.npz`,
 then store the model on disk, perform inference on `data/testing_data.npz`,
-print the inference results, and save the approximate accuracy in a text file.
+print the inference results, and save the averaged accuracy in a text file.
 
 PS. The files under `data/` are manually generated *toy data*,
 for demonstration purpose only.

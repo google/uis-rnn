@@ -93,9 +93,9 @@ class TestIntegration(unittest.TestCase):
     predicted_label = model.predict(test_sequence, inference_args)
 
     # run evaluation
-    accuracy, length = evals.evaluate_result(predicted_label, test_cluster_id)
+    accuracy = evals.compute_sequence_match_accuracy(
+        predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)
-    self.assertEqual(len(test_cluster_id), length)
 
     # load new model
     loaded_model = uisrnn.UISRNN(model_args)
@@ -105,9 +105,9 @@ class TestIntegration(unittest.TestCase):
     predicted_label = loaded_model.predict(test_sequence, inference_args)
 
     # run evaluation with loaded model
-    accuracy, length = evals.evaluate_result(predicted_label, test_cluster_id)
+    accuracy = evals.compute_sequence_match_accuracy(
+        predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)
-    self.assertEqual(len(test_cluster_id), length)
 
 
 if __name__ == '__main__':

@@ -67,49 +67,5 @@ class TestComputeSequenceMatchAccuracy(unittest.TestCase):
       evals.compute_sequence_match_accuracy([], [])
 
 
-class TestComputeApproximateSequenceAcuracy(unittest.TestCase):
-
-  def test_mismatched_sequences(self):
-    sequence1 = [0, 0, 1, 2, 2]
-    sequence2 = [3, 3, 4, 4, 1]
-    accuracy = evals.compute_approximate_sequence_accuracy(sequence1,
-                                                           sequence2)
-    self.assertEqual(0.8, accuracy)
-
-  def test_equivalent_sequences(self):
-    sequence1 = [0, 0, 1, 2, 2]
-    sequence2 = [3, 3, 4, 1, 1]
-    accuracy = evals.compute_approximate_sequence_accuracy(sequence1,
-                                                           sequence2)
-    self.assertEqual(1.0, accuracy)
-
-  def test_sequences_of_different_lengths(self):
-    sequence1 = [0, 0, 1, 2]
-    sequence2 = [3, 3, 4, 4, 1]
-    with self.assertRaises(Exception):
-      evals.compute_approximate_sequence_accuracy(sequence1, sequence2)
-
-  def test_empty_sequences(self):
-    with self.assertRaises(Exception):
-      evals.compute_approximate_sequence_accuracy([], [])
-
-
-class TestEvaluateResult(unittest.TestCase):
-
-  def test_mismatched_sequences(self):
-    sequence1 = [0, 0, 1, 2, 2]
-    sequence2 = [3, 3, 4, 4, 1]
-    accuracy, length = evals.evaluate_result(sequence1, sequence2)
-    self.assertEqual(0.8, accuracy)
-    self.assertEqual(5, length)
-
-  def test_equivalent_sequences(self):
-    sequence1 = [0, 0, 1, 2, 2]
-    sequence2 = [3, 3, 4, 1, 1]
-    accuracy, length = evals.evaluate_result(sequence1, sequence2)
-    self.assertEqual(1.0, accuracy)
-    self.assertEqual(5, length)
-
-
 if __name__ == '__main__':
   unittest.main()

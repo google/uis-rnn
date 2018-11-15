@@ -54,8 +54,9 @@ def diarization_experiment(model_args, training_args, inference_args):
   for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
     predicted_label = model.predict(test_sequence, inference_args)
     predicted_labels.append(predicted_label)
-    accuracy, length = evals.evaluate_result(test_cluster_id, predicted_label)
-    test_record.append((accuracy, length))
+    accuracy = evals.compute_sequence_match_accuracy(
+        test_cluster_id, predicted_label)
+    test_record.append((accuracy, len(test_cluster_id)))
     print('Ground truth labels:')
     print(test_cluster_id)
     print('Predicted labels:')
