@@ -15,6 +15,7 @@
 
 import numpy as np
 import torch
+from torch import autograd
 
 
 def weighted_mse_loss(input_tensor, target_tensor, weight=1):
@@ -95,10 +96,10 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
     num_permutations: int - Number of permutations per utterance sampled.
 
   Returns:
-    sub_sequences: a list of numpy array, with obsevation vector from the same
+    sub_sequences: A list of numpy array, with obsevation vector from the same
       cluster in the same list.
-    seq_lengths: the length of each cluster (+1)
-    bias: flipping coin head probability.
+    seq_lengths: The length of each cluster (+1).
+    bias: Flipping coin head probability.
   """
   # merge sub-sequences that belong to a single cluster to a single sequence
   unique_id = np.unique(cluster_id)
@@ -125,9 +126,50 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
   return sub_sequences, seq_lengths, bias
 
 
-def pack_seq(rnn_input, sorted_seq_lengths):
-  packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(
-      rnn_input, sorted_seq_lengths, batch_first=False)
+def pack_seq(sub_sequences, seq_lengths, batch_size, observation_dim, device):
+  """Pack sequences for training.
+
+  Args:
+    sub_sequences: A list of numpy array, with obsevation vector from the same
+      cluster in the same list.
+    seq_lengths: The length of each cluster (+1).
+    batch_size: int or None - Run batch learning if batch_size is None. Else,
+      run online learning with specified batch size.
+    observation_dim: int - dimension for observation vectors
+    device: str - Your device. E.g., 'cuda:0' or 'cpu'.
+
+  Returns:
+    packed_rnn_input: (PackedSequence object) packed rnn input
+    rnn_truth: ground truth
+  """
+  num_clusters = len(seq_lengths)
+  sorted_seq_lengths = np.sort(seq_lengths)[::-1]
+  permute_index = np.argsort(seq_lengths)[::-1]
+
+  if batch_size is None:
+    rnn_input = np.zeros((sorted_seq_lengths[0],
+                          num_clusters,
+                          observation_dim))
+    for i in range(num_clusters):
+      rnn_input[1:sorted_seq_lengths[i], i, :] = sub_sequences[permute_index[i]]
+    rnn_input = autograd.Variable(
+                  torch.from_numpy(rnn_input).float()).to(device)
+    packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(rnn_input,
+                                                      sorted_seq_lengths,
+                                                       batch_first=False)
+  else:
+    mini_batch = np.sort(np.random.choice(num_clusters, batch_size))
+    rnn_input = np.zeros((sorted_seq_lengths[mini_batch[0]],
+                          batch_size,
+                          observation_dim))
+    for i in range(batch_size):
+      rnn_input[1:sorted_seq_lengths[mini_batch[i]],
+                      i, :] = sub_sequences[permute_index[mini_batch[i]]]
+    rnn_input = autograd.Variable(
+              torch.from_numpy(rnn_input).float()).to(device)
+    packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(rnn_input,
+                                          sorted_seq_lengths[mini_batch],
+                                                       batch_first=False)
   # ground truth is the shifted input
   rnn_truth = rnn_input[1:, :, :]
   return packed_rnn_input, rnn_truth

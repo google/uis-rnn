@@ -208,39 +208,25 @@ class UISRNN(object):
         sequence=train_sequence,
         cluster_id=train_cluster_id,
         num_permutations=args.num_permutations)
-    num_speakers = len(seq_lengths)
-    sorted_seq_lengths = np.sort(seq_lengths)[::-1]
-    permute_index = np.argsort(seq_lengths)[::-1]
     if self.transition_bias is None:
       self.transition_bias = transition_bias
+    # For batch learning, pack the entire dataset.
     if args.batch_size is None:
-      # Packing sequences.
-      rnn_input = np.zeros((sorted_seq_lengths[0], num_speakers,
-                            self.observation_dim))
-      for i in range(num_speakers):
-        rnn_input[1:sorted_seq_lengths[i], i, :] = sub_sequences[
-            permute_index[i]]
-      rnn_input = autograd.Variable(
-        torch.from_numpy(rnn_input).float()).to(self.device)
-      packed_train_sequence, rnn_truth = utils.pack_seq(rnn_input,
-                                                        sorted_seq_lengths)
-
+      packed_train_sequence, rnn_truth = utils.pack_seq(sub_sequences,
+                                                        seq_lengths,
+                                                        args.batch_size,
+                                                        self.observation_dim,
+                                                        self.device)
     train_loss = []
     for t in range(args.train_iteration):
       optimizer.zero_grad()
+      # For online learning, pack a subset in each iteration.
       if args.batch_size is not None:
-        mini_batch = np.sort(np.random.choice(num_speakers, args.batch_size))
-        mini_batch_rnn_input = np.zeros((sorted_seq_lengths[mini_batch[0]],
-                                         args.batch_size, self.observation_dim))
-        for i in range(args.batch_size):
-          mini_batch_rnn_input[1:sorted_seq_lengths[mini_batch[i]],
-                               i, :] = sub_sequences[permute_index[
-                                   mini_batch[i]]]
-        mini_batch_rnn_input = autograd.Variable(
-            torch.from_numpy(mini_batch_rnn_input).float()).to(self.device)
-        packed_train_sequence, rnn_truth = utils.pack_seq(
-            mini_batch_rnn_input, sorted_seq_lengths[mini_batch])
-
+        packed_train_sequence, rnn_truth = utils.pack_seq(sub_sequences,
+                                                          seq_lengths,
+                                                          args.batch_size,
+                                                          self.observation_dim,
+                                                          self.device)
       hidden = self.rnn_init_hidden.repeat(1, args.batch_size, 1)
       mean, _ = self.rnn_model(packed_train_sequence, hidden)
       # use mean to predict
