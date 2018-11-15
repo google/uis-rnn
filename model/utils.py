@@ -32,8 +32,8 @@ def weighted_mse_loss(input_tensor, target_tensor, weight=1):
     weighted mse loss
   """
   observation_dim = input_tensor.size()[-1]
-  streched_tensor = ((input_tensor - target_tensor)**2).view(-1,
-                                                             observation_dim)
+  streched_tensor = ((input_tensor - target_tensor) ** 2).view(
+      -1, observation_dim)
   entry_num = float(streched_tensor.size()[0])
   non_zero_entry_num = torch.sum(streched_tensor[:, 0] != 0).float()
   weighted_tensor = torch.mm(
@@ -126,7 +126,8 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
   return sub_sequences, seq_lengths, bias
 
 
-def pack_seq(sub_sequences, seq_lengths, batch_size, observation_dim, device):
+def pack_sequence(
+    sub_sequences, seq_lengths, batch_size, observation_dim, device):
   """Pack sequences for training.
 
   Args:
@@ -153,10 +154,9 @@ def pack_seq(sub_sequences, seq_lengths, batch_size, observation_dim, device):
     for i in range(num_clusters):
       rnn_input[1:sorted_seq_lengths[i], i, :] = sub_sequences[permute_index[i]]
     rnn_input = autograd.Variable(
-                  torch.from_numpy(rnn_input).float()).to(device)
-    packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(rnn_input,
-                                                      sorted_seq_lengths,
-                                                       batch_first=False)
+        torch.from_numpy(rnn_input).float()).to(device)
+    packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(
+        rnn_input, sorted_seq_lengths, batch_first=False)
   else:
     mini_batch = np.sort(np.random.choice(num_clusters, batch_size))
     rnn_input = np.zeros((sorted_seq_lengths[mini_batch[0]],
@@ -164,12 +164,11 @@ def pack_seq(sub_sequences, seq_lengths, batch_size, observation_dim, device):
                           observation_dim))
     for i in range(batch_size):
       rnn_input[1:sorted_seq_lengths[mini_batch[i]],
-                      i, :] = sub_sequences[permute_index[mini_batch[i]]]
+                i, :] = sub_sequences[permute_index[mini_batch[i]]]
     rnn_input = autograd.Variable(
-              torch.from_numpy(rnn_input).float()).to(device)
-    packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(rnn_input,
-                                          sorted_seq_lengths[mini_batch],
-                                                       batch_first=False)
+        torch.from_numpy(rnn_input).float()).to(device)
+    packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(
+        rnn_input, sorted_seq_lengths[mini_batch], batch_first=False)
   # ground truth is the shifted input
   rnn_truth = rnn_input[1:, :, :]
   return packed_rnn_input, rnn_truth
@@ -183,8 +182,8 @@ def output_result(model_args, training_args, test_record):
       model_args.rnn_depth, model_args.rnn_dropout)
   with open(filename, 'a') as file_object:
     file_object.write(
-        'sigma_alpha:{}  sigma_beta:{}  crp_alpha:{}  learning rate:{}  '
-        'regularization:{}  batch size:{}  accuracy:{:.6f} \n'.format(
+        'sigma_alpha: {}  sigma_beta: {}  crp_alpha: {}  learning rate: {}  '
+        'regularization: {}  batch size: {}  accuracy: {:.6f} \n'.format(
             training_args.sigma_alpha, training_args.sigma_beta,
             model_args.crp_alpha, training_args.learning_rate,
             training_args.regularization_weight,

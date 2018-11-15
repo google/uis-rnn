@@ -212,21 +212,23 @@ class UISRNN(object):
       self.transition_bias = transition_bias
     # For batch learning, pack the entire dataset.
     if args.batch_size is None:
-      packed_train_sequence, rnn_truth = utils.pack_seq(sub_sequences,
-                                                        seq_lengths,
-                                                        args.batch_size,
-                                                        self.observation_dim,
-                                                        self.device)
+      packed_train_sequence, rnn_truth = utils.pack_sequence(
+          sub_sequences,
+          seq_lengths,
+          args.batch_size,
+          self.observation_dim,
+          self.device)
     train_loss = []
     for t in range(args.train_iteration):
       optimizer.zero_grad()
       # For online learning, pack a subset in each iteration.
       if args.batch_size is not None:
-        packed_train_sequence, rnn_truth = utils.pack_seq(sub_sequences,
-                                                          seq_lengths,
-                                                          args.batch_size,
-                                                          self.observation_dim,
-                                                          self.device)
+        packed_train_sequence, rnn_truth = utils.pack_sequence(
+            sub_sequences,
+            seq_lengths,
+            args.batch_size,
+            self.observation_dim,
+            self.device)
       hidden = self.rnn_init_hidden.repeat(1, args.batch_size, 1)
       mean, _ = self.rnn_model(packed_train_sequence, hidden)
       # use mean to predict
