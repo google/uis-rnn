@@ -201,7 +201,7 @@ Performance:
       total_accuracy)
   for accuracy in accuracy_array:
     output_string += '\n    {:.6f}'.format(accuracy)
-  output_string += '\n' + '=' * 80 + '\n' 
+  output_string += '\n' + '=' * 80 + '\n'
   filename = 'layer_{}_{}_{:.1f}_result.txt'.format(
       model_args.rnn_hidden_size,
       model_args.rnn_depth, model_args.rnn_dropout)

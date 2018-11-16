@@ -45,6 +45,13 @@ class TestComputeSequenceMatchAccuracy(unittest.TestCase):
         sequence1, sequence2)
     self.assertEqual(1.0, accuracy)
 
+  def test_different_num_unique_ids(self):
+    sequence1 = [1, 1]
+    sequence2 = [1, 2]
+    accuracy = evals.compute_sequence_match_accuracy(
+        sequence1, sequence2)
+    self.assertEqual(0.5, accuracy)
+
   def test_symmetry(self):
     sequence1 = [1] * 10 + [2] * 20 + [3] * 30 + [4] * 40
     sequence2 = [1] * 10 + [2] * 20 + [3] * 30 + [4] * 40
