@@ -126,6 +126,11 @@ unless `'B'` and `'C'` in the two sequences are meaningfully identical
 (in speaker diarization, this means they are the same speakers across
 utterances).
 
+The reason we concatenate all training sequences is that, we will be resampling
+and *block-wise* shuffling the training data as a **data augmentation**
+process, such that we result in a robust model even when there is insufficient
+number of training sequences.
+
 The definitions of the args are described in `model/arguments.py`.
 See `training_parser`.
 
