@@ -164,3 +164,26 @@ Our paper is cited as:
   year={2018}
 }
 ```
+
+## References
+
+### Baseline diarization system
+
+To learn more about our baseline diarization system based on
+*unsupervised clustering* algorithms, check out
+[this site](https://google.github.io/speaker-id/publications/LstmDiarization/).
+
+### Speaker recognizer/encoder
+
+To learn more about our speaker embedding system, check out
+[this site](https://google.github.io/speaker-id/publications/GE2E/).
+
+We are aware of several third-party implementations of this work:
+
+* [TensorFlow implementation by Janghyun1230](https://github.com/Janghyun1230/Speaker_Verification)
+* [PyTorch implementaion by HarryVolek](https://github.com/HarryVolek/PyTorch_Speaker_Verification)
+
+Please use your own judgement to decide whether you want to use these
+implementations.
+
+**We are NOT responsible for the correctness of any third-party implementations.**
