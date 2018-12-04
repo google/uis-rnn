@@ -16,6 +16,7 @@ from model import utils
 import numpy as np
 import os
 import tempfile
+import time
 import torch
 from torch import autograd
 from torch import nn
@@ -50,8 +51,19 @@ class NormalRNN(nn.Module):
     return mean, hidden
 
 
+class BeamState(object):
+  """Structure that contains necessary states for beam search."""
+
+  def __init__(self):
+    self.mean_set = []
+    self.hidden_set = []
+    self.neg_lhood = 0
+    self.trace = []
+    self.block_counts = []
+
+
 class UISRNN(object):
-  """Unbounded Interleaved-State Recurrent Neural Networks """
+  """Unbounded Interleaved-State Recurrent Neural Networks."""
 
   def __init__(self, args):
     """Construct the UISRNN object.
@@ -282,6 +294,111 @@ class UISRNN(object):
       train_loss.append(float(loss1.data))  # only save the likelihood part
     print('Done training with {} iterations'.format(args.train_iteration))
 
+  def copy_beam_state(self, beam_state):
+    """Copy a state."""
+
+    new_beam_state = BeamState()
+    new_beam_state.mean_set = beam_state.mean_set.copy()
+    new_beam_state.hidden_set = beam_state.hidden_set.copy()
+    new_beam_state.trace = beam_state.trace.copy()
+    new_beam_state.block_counts = beam_state.block_counts.copy()
+    new_beam_state.neg_lhood = beam_state.neg_lhood
+    return new_beam_state
+
+  def update_beam_state(self, beam_state, look_ahead_seq, cluster_seq):
+    """Update a beam state given a look ahead sequence and known cluster
+    assignments.
+
+    Args:
+      beam_state: A BeamState object.
+      look_ahead_seq: Look ahead sequence, size: look_ahead*D.
+        look_ahead: number of step to look ahead in the beam search.
+        D: observation dimension
+      cluster_seq: Cluster assignment sequence for look_ahead_seq.
+
+    Returns:
+      new_beam_state: An updated BeamState object.
+    """
+
+    loss = 0  
+    new_beam_state = self.copy_beam_state(beam_state)
+    for sub_idx, cluster in enumerate(cluster_seq):
+      if cluster > len(new_beam_state.mean_set):  # invalid trace
+        new_beam_state.neg_lhood = float('inf')
+        break
+      elif cluster < len(new_beam_state.mean_set):  # existing cluster
+        last_cluster = new_beam_state.trace[-1]
+        loss = utils.weighted_mse_loss(
+            input_tensor=torch.squeeze(new_beam_state.mean_set[cluster]),
+            target_tensor=look_ahead_seq[sub_idx, :],
+            weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
+        if cluster == last_cluster:
+          loss -= np.log(1 - self.transition_bias)
+        else:
+          loss -= np.log(self.transition_bias) + np.log(
+              new_beam_state.block_counts[cluster]) - np.log(
+                  sum(new_beam_state.block_counts) + self.crp_alpha)
+        # update new mean and new hidden
+        mean, hidden = self.rnn_model(
+            look_ahead_seq[sub_idx, :].unsqueeze(0).unsqueeze(0),
+            new_beam_state.hidden_set[cluster])
+        new_beam_state.mean_set[cluster] = (new_beam_state.mean_set[cluster]*(
+            (np.array(new_beam_state.trace) == cluster).sum() -
+            1).astype(float) + mean.clone()) / (
+                np.array(new_beam_state.trace) == cluster).sum().astype(
+                    float)  # use mean to predict
+        new_beam_state.hidden_set[cluster] = hidden.clone()
+        if cluster != last_cluster:
+          new_beam_state.block_counts[cluster] += 1
+        new_beam_state.trace.append(cluster)
+      else:  # new cluster
+        init_input = autograd.Variable(
+            torch.zeros(self.observation_dim)
+            ).unsqueeze(0).unsqueeze(0).to(self.device)
+        mean, hidden = self.rnn_model(init_input,
+                                      self.rnn_init_hidden)
+        loss = utils.weighted_mse_loss(
+            input_tensor=torch.squeeze(mean),
+            target_tensor=look_ahead_seq[sub_idx, :],
+            weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
+        loss -= np.log(self.transition_bias) + np.log(
+            self.crp_alpha) - np.log(
+                sum(new_beam_state.block_counts) + self.crp_alpha)
+        # update new min and new hidden
+        mean, hidden = self.rnn_model(
+            look_ahead_seq[sub_idx, :].unsqueeze(0).unsqueeze(0),
+            hidden)
+        new_beam_state.mean_set.append(mean.clone())
+        new_beam_state.hidden_set.append(hidden.clone())
+        new_beam_state.block_counts.append(1)
+        new_beam_state.trace.append(cluster)
+      new_beam_state.neg_lhood += loss
+    return new_beam_state
+
+  def calc_score(self, beam_state, look_ahead_seq):
+    """Calculate negative log likelihoods for all possible state allocations
+       of a look ahead sequence, according to the current beam state.
+
+    Args:
+      beam_state: A BeamState object.
+      look_ahead_seq: Look ahead sequence, size: look_ahead*D.
+        look_ahead: number of step to look ahead in the beam search.
+        D: observation dimension
+
+    Returns:
+      beam_score_set: a set of scores for each possible state allocation.
+    """
+
+    look_ahead, _  = look_ahead_seq.shape
+    beam_num_clusters = len(beam_state.mean_set)
+    beam_score_set = float('inf') * np.ones(beam_num_clusters + 1 + np.arange(
+                                            look_ahead))
+    for cluster_seq, _ in np.ndenumerate(beam_score_set):
+      updated_beam_state = self.update_beam_state(beam_state,
+                                             look_ahead_seq, cluster_seq)
+      beam_score_set[cluster_seq] = updated_beam_state.neg_lhood
+    return beam_score_set
+
   def predict(self, test_sequence, args):
     """Predict test sequence labels using UISRNN model.
 
@@ -326,148 +443,39 @@ class UISRNN(object):
     test_sequence = autograd.Variable(
         torch.from_numpy(test_sequence).float()).to(self.device)
     # bookkeeping for beam search
-    # each cell consists of:
-    # (mean_set, hidden_set, score/-likelihood, trace, block_counts)
-    proposal_set = [([], [], 0, [], [])]
-    max_clusters = 0
-
+    beam_set = [BeamState()]
     for t in np.arange(0, args.test_iteration * test_sequence_length,
                        args.look_ahead):
-      l_remain = args.test_iteration * test_sequence_length - t
+      max_clusters = max([len(beam_state.mean_set) for beam_state in beam_set])
+      look_ahead_seq = test_sequence[t:t+args.look_ahead,:]
+      look_ahead_seq_length = look_ahead_seq.shape[0]
       score_set = float('inf') * np.ones(
           np.append(
               args.beam_size, max_clusters + 1 + np.arange(
-                  np.min([l_remain, args.look_ahead]))))
-      for proposal_rank, proposal in enumerate(proposal_set):
-        mean_buffer = list(proposal[0])
-        hidden_buffer = list(proposal[1])
-        score_buffer = proposal[2]
-        trace_buffer = proposal[3]
-        block_counts_buffer = list(proposal[4])
-        n_clusters = len(mean_buffer)
-        proposal_score_subset = float('inf') * np.ones(
-            n_clusters + 1 + np.arange(np.min([l_remain, args.look_ahead])))
-        for cluster_seq, _ in np.ndenumerate(proposal_score_subset):
-          new_mean_buffer = mean_buffer.copy()
-          new_hidden_buffer = hidden_buffer.copy()
-          new_trace_buffer = trace_buffer.copy()
-          new_block_counts_buffer = block_counts_buffer.copy()
-          new_n_clusters = n_clusters
-          new_loss = 0
-          update_score = True
-          for sub_idx, cluster in enumerate(cluster_seq):
-            if cluster > new_n_clusters:  # invalid trace
-              update_score = False
-              break
-            if cluster < new_n_clusters:  # existing clusters
-              new_last_cluster = new_trace_buffer[-1]
-              loss = utils.weighted_mse_loss(
-                  input_tensor=torch.squeeze(new_mean_buffer[cluster]),
-                  target_tensor=test_sequence[t + sub_idx, :],
-                  weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
-              if cluster == new_last_cluster:
-                loss -= np.log(1 - self.transition_bias)
-              else:
-                loss -= np.log(self.transition_bias) + np.log(
-                    new_block_counts_buffer[cluster]) - np.log(
-                        sum(new_block_counts_buffer) + self.crp_alpha)
-              # update new mean and new hidden
-              mean, hidden = self.rnn_model(
-                  test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),
-                  new_hidden_buffer[cluster])
-              new_mean_buffer[cluster] = (new_mean_buffer[cluster] * (
-                  (np.array(new_trace_buffer) == cluster).sum() -
-                  1).astype(float) + mean.clone()) / (
-                      np.array(new_trace_buffer) == cluster).sum().astype(
-                          float)  # use mean to predict
-              new_hidden_buffer[cluster] = hidden.clone()
-              if cluster != new_trace_buffer[-1]:
-                new_block_counts_buffer[cluster] += 1
-              new_trace_buffer.append(cluster)
-            else:  # new cluster
-              init_input = autograd.Variable(
-                  torch.zeros(self.observation_dim)
-                  ).unsqueeze(0).unsqueeze(0).to(self.device)
-              mean, hidden = self.rnn_model(init_input,
-                                            self.rnn_init_hidden)
-              loss = utils.weighted_mse_loss(
-                  input_tensor=torch.squeeze(mean),
-                  target_tensor=test_sequence[t + sub_idx, :],
-                  weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
-              loss -= np.log(self.transition_bias) + np.log(
-                  self.crp_alpha) - np.log(
-                      sum(new_block_counts_buffer) + self.crp_alpha)
-              # update new min and new hidden
-              mean, hidden = self.rnn_model(
-                  test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),
-                  hidden)
-              new_mean_buffer.append(mean.clone())
-              new_hidden_buffer.append(hidden.clone())
-              new_block_counts_buffer.append(1)
-              new_trace_buffer.append(cluster)
-              new_n_clusters += 1
-            new_loss += loss
-          if update_score:
-            score_set[tuple([proposal_rank]) +
-                      cluster_seq] = score_buffer + new_loss
-
+                  look_ahead_seq_length)))
+      for beam_rank, beam_state in enumerate(beam_set):
+        beam_score_set = self.calc_score(beam_state, look_ahead_seq)
+        score_set[beam_rank,:] = np.pad(beam_score_set,
+            np.tile([[0, max_clusters-len(beam_state.mean_set)]],
+                (look_ahead_seq_length,1)), 'constant',
+                    constant_values=float('inf'))
       # find top scores
       score_ranked = np.sort(score_set, axis=None)
       score_ranked[score_ranked == float('inf')] = 0
       score_ranked = np.trim_zeros(score_ranked)
       idx_ranked = np.argsort(score_set, axis=None)
-
-      # update best traces
-      new_proposal_set = []
-      max_clusters = 0
-      for new_proposal_rank in range(
+      updated_beam_set = []
+      for new_beam_rank in range(
           np.min((len(score_ranked), args.beam_size))):
-        total_idx = np.unravel_index(idx_ranked[new_proposal_rank],
+        total_idx = np.unravel_index(idx_ranked[new_beam_rank],
                                      score_set.shape)
-        prev_proposal_idx = total_idx[0]
-        new_cluster_idx = total_idx[1:]
-        (mean_set, hidden_set, _, trace,
-         block_counts) = proposal_set[prev_proposal_idx]
-        new_mean_set = mean_set.copy()
-        new_hidden_set = hidden_set.copy()
-        new_score = score_ranked[
-            new_proposal_rank]  # can safely update the likelihood for now
-        new_trace = trace.copy()
-        new_block_counts = block_counts.copy()
-        new_n_clusters = len(new_mean_set)
-        max_clusters = max(max_clusters, new_n_clusters)
-        for sub_idx, cluster in enumerate(
-            new_cluster_idx):  # update the proposal step-by-step
-          if cluster == new_n_clusters:
-            init_input = autograd.Variable(
-                torch.zeros(self.observation_dim)
-                ).unsqueeze(0).unsqueeze(0).to(self.device)
-            mean, hidden = self.rnn_model(init_input,
-                                          self.rnn_init_hidden)
-            mean, hidden = self.rnn_model(
-                test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0), hidden)
-            new_mean_set.append(mean.clone())
-            new_hidden_set.append(hidden.clone())
-            new_block_counts.append(1)
-            new_trace.append(cluster)
-            new_n_clusters += 1
-            max_clusters = max(max_clusters, new_n_clusters)
-          else:
-            mean, hidden = self.rnn_model(
-                test_sequence[t + sub_idx, :].unsqueeze(0).unsqueeze(0),
-                new_hidden_set[cluster])
-            new_mean_set[cluster] = (
-                new_mean_set[cluster] * (
-                    (np.array(new_trace) == cluster).sum() - 1).astype(float) +
-                mean.clone()) / (np.array(new_trace) == cluster).sum().astype(
-                    float)  # use mean to predict
-            new_hidden_set[cluster] = hidden.clone()
-            if cluster != new_trace[-1]:
-              new_block_counts[cluster] += 1
-            new_trace.append(cluster)
-        new_proposal_set.append((new_mean_set, new_hidden_set, new_score,
-                                 new_trace, new_block_counts))
-      proposal_set = new_proposal_set
-
-    predicted_cluster_id = proposal_set[0][3][-test_sequence_length:]
+        prev_beam_rank = total_idx[0]
+        cluster_seq = total_idx[1:]
+        updated_beam_state = self.update_beam_state(
+            beam_set[prev_beam_rank], look_ahead_seq, cluster_seq)
+        updated_beam_set.append(updated_beam_state)
+      beam_set = updated_beam_set
+      # for i in range(len(beam_set)):
+      #   print(beam_set[i].trace, len(beam_set[i].mean_set))
+    predicted_cluster_id = beam_set[0].trace[-test_sequence_length:]
     return predicted_cluster_id
