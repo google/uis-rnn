@@ -16,7 +16,6 @@ from model import utils
 import numpy as np
 import os
 import tempfile
-import time
 import torch
 from torch import autograd
 from torch import nn
@@ -475,7 +474,5 @@ class UISRNN(object):
             beam_set[prev_beam_rank], look_ahead_seq, cluster_seq)
         updated_beam_set.append(updated_beam_state)
       beam_set = updated_beam_set
-      # for i in range(len(beam_set)):
-      #   print(beam_set[i].trace, len(beam_set[i].mean_set))
     predicted_cluster_id = beam_set[0].trace[-test_sequence_length:]
     return predicted_cluster_id
