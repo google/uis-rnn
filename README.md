@@ -23,7 +23,8 @@ which we used to produce the results in the
 some internal libraries.
 
 We CANNOT share the data, code, or model for the speaker recognition system
-(d-vector embeddings) used in the paper, since the speaker recognition system
+([d-vector embeddings](https://google.github.io/speaker-id/publications/GE2E/))
+used in the paper, since the speaker recognition system
 heavily depends on Google's internal infrastructure and proprietary data.
 
 **This library is NOT an official Google product.**
@@ -102,7 +103,8 @@ model.fit(train_sequence, train_cluster_id, args)
 
 Here `train_sequence` should be a 2-dim numpy array of type `float`, for
 the **concatenated** observation sequences. For speaker diarization, this
-could be the [d-vector embeddings](https://arxiv.org/abs/1710.10467).
+could be the
+[d-vector embeddings](https://google.github.io/speaker-id/publications/GE2E/).
 
 For example, if you have *M* training utterances,
 and each utterance is a sequence of *L* embeddings. Each embedding is
