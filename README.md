@@ -175,6 +175,11 @@ To learn more about our baseline diarization system based on
 *unsupervised clustering* algorithms, check out
 [this site](https://google.github.io/speaker-id/publications/LstmDiarization/).
 
+Specifically, the ground truth labels for the
+[NIST SRE 2000](https://catalog.ldc.upenn.edu/LDC2001S97)
+dataset (Disk6 and Disk8) can be found
+[here](https://github.com/google/speaker-id/tree/master/publications/LstmDiarization/evaluation/NIST_SRE2000).
+
 ### Speaker recognizer/encoder
 
 To learn more about our speaker embedding system, check out
