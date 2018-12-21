@@ -127,7 +127,7 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
 
 
 def pack_sequence(
-    sub_sequences, seq_lengths, batch_size, observation_dim, device):
+        sub_sequences, seq_lengths, batch_size, observation_dim, device):
   """Pack sequences for training.
 
   Args:
@@ -152,7 +152,8 @@ def pack_sequence(
                           num_clusters,
                           observation_dim))
     for i in range(num_clusters):
-      rnn_input[1:sorted_seq_lengths[i], i, :] = sub_sequences[permute_index[i]]
+      rnn_input[1:sorted_seq_lengths[i], i,
+                :] = sub_sequences[permute_index[i]]
     rnn_input = autograd.Variable(
         torch.from_numpy(rnn_input).float()).to(device)
     packed_rnn_input = torch.nn.utils.rnn.pack_padded_sequence(

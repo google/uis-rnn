@@ -23,9 +23,9 @@ class TestComputeSequenceMatchAccuracy(unittest.TestCase):
   def test_get_list_inverse_index(self):
     unique_ids = ['a', 3, 'abc']
     expected = {
-      'a': 0,
-      3: 1,
-      'abc': 2
+        'a': 0,
+        3: 1,
+        'abc': 2
     }
     self.assertDictEqual(
         expected,

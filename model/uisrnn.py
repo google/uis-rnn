@@ -108,7 +108,7 @@ class UISRNN(object):
       params.append({
           'params': self.sigma2
       }  # variance parameters
-                   )
+      )
     assert optimizer == 'adam', 'Only adam optimizer is supported.'
     return optim.Adam(params, lr=learning_rate)
 
@@ -190,12 +190,12 @@ class UISRNN(object):
     """
     # check type
     if (not isinstance(train_sequence, np.ndarray) or
-        train_sequence.dtype != float):
+            train_sequence.dtype != float):
       raise TypeError('train_sequence should be a numpy array of float type.')
     if isinstance(train_cluster_id, list):
       train_cluster_id = np.array(train_cluster_id)
     if (not isinstance(train_cluster_id, np.ndarray) or
-        not train_cluster_id.dtype.name.startswith('str')):
+            not train_cluster_id.dtype.name.startswith('str')):
       raise TypeError('train_cluster_id type be a numpy array of strings.')
     # check dimension
     if train_sequence.ndim != 2:
@@ -253,7 +253,7 @@ class UISRNN(object):
       mean_size = mean.size()
       mean = torch.mm(
           torch.diag(
-            1.0 / torch.arange(1, mean_size[0] + 1).float().to(self.device)),
+              1.0 / torch.arange(1, mean_size[0] + 1).float().to(self.device)),
           mean.view(mean_size[0], -1))
       mean = mean.view(mean_size)
 
@@ -264,7 +264,7 @@ class UISRNN(object):
           weight=1 / (2 * self.sigma2))
 
       weight = (((rnn_truth != 0).float() * mean[:-1, :, :] - rnn_truth)
-                **2).view(-1, observation_dim)
+                ** 2).view(-1, observation_dim)
       num_non_zero = torch.sum((weight != 0).float(), dim=0).squeeze()
       loss2 = ((2 * args.sigma_alpha + num_non_zero + 2) /
                (2 * num_non_zero) * torch.log(self.sigma2)).sum() + (
@@ -288,8 +288,11 @@ class UISRNN(object):
               'Training Loss: {:.4f}    \n'
               '    Negative Log Likelihood: {:.4f}\t'
               'Sigma2 Prior: {:.4f}\t'
-              'Regularization: {:.4f}'.format(t, float(loss.data),
-                float(loss1.data), float(loss2.data), float(loss3.data)))
+              'Regularization: {:.4f}'.format(t,
+                                              float(loss.data),
+                                              float(loss1.data),
+                                              float(loss2.data),
+                                              float(loss3.data)))
       train_loss.append(float(loss1.data))  # only save the likelihood part
     print('Done training with {} iterations'.format(args.train_iteration))
 
@@ -319,7 +322,7 @@ class UISRNN(object):
       new_beam_state: An updated BeamState object.
     """
 
-    loss = 0  
+    loss = 0
     new_beam_state = self.copy_beam_state(beam_state)
     for sub_idx, cluster in enumerate(cluster_seq):
       if cluster > len(new_beam_state.mean_set):  # invalid trace
@@ -353,7 +356,7 @@ class UISRNN(object):
       else:  # new cluster
         init_input = autograd.Variable(
             torch.zeros(self.observation_dim)
-            ).unsqueeze(0).unsqueeze(0).to(self.device)
+        ).unsqueeze(0).unsqueeze(0).to(self.device)
         mean, hidden = self.rnn_model(init_input,
                                       self.rnn_init_hidden)
         loss = utils.weighted_mse_loss(
@@ -388,13 +391,13 @@ class UISRNN(object):
       beam_score_set: a set of scores for each possible state allocation.
     """
 
-    look_ahead, _  = look_ahead_seq.shape
+    look_ahead, _ = look_ahead_seq.shape
     beam_num_clusters = len(beam_state.mean_set)
     beam_score_set = float('inf') * np.ones(beam_num_clusters + 1 + np.arange(
                                             look_ahead))
     for cluster_seq, _ in np.ndenumerate(beam_score_set):
       updated_beam_state = self.update_beam_state(beam_state,
-                                             look_ahead_seq, cluster_seq)
+                                                  look_ahead_seq, cluster_seq)
       beam_score_set[cluster_seq] = updated_beam_state.neg_lhood
     return beam_score_set
 
@@ -426,7 +429,7 @@ class UISRNN(object):
     """
     # check type
     if (not isinstance(test_sequence, np.ndarray) or
-        test_sequence.dtype != float):
+            test_sequence.dtype != float):
       raise TypeError('test_sequence should be a numpy array of float type.')
     # check dimension
     if test_sequence.ndim != 2:
@@ -446,7 +449,7 @@ class UISRNN(object):
     for t in np.arange(0, args.test_iteration * test_sequence_length,
                        args.look_ahead):
       max_clusters = max([len(beam_state.mean_set) for beam_state in beam_set])
-      look_ahead_seq = test_sequence[t:t+args.look_ahead,:]
+      look_ahead_seq = test_sequence[t:t+args.look_ahead, :]
       look_ahead_seq_length = look_ahead_seq.shape[0]
       score_set = float('inf') * np.ones(
           np.append(
@@ -454,10 +457,11 @@ class UISRNN(object):
                   look_ahead_seq_length)))
       for beam_rank, beam_state in enumerate(beam_set):
         beam_score_set = self.calc_score(beam_state, look_ahead_seq)
-        score_set[beam_rank,:] = np.pad(beam_score_set,
+        score_set[beam_rank, :] = np.pad(
+            beam_score_set,
             np.tile([[0, max_clusters-len(beam_state.mean_set)]],
-                (look_ahead_seq_length,1)), 'constant',
-                    constant_values=float('inf'))
+                    (look_ahead_seq_length, 1)), 'constant',
+            constant_values=float('inf'))
       # find top scores
       score_ranked = np.sort(score_set, axis=None)
       score_ranked[score_ranked == float('inf')] = 0
@@ -465,7 +469,7 @@ class UISRNN(object):
       idx_ranked = np.argsort(score_set, axis=None)
       updated_beam_set = []
       for new_beam_rank in range(
-          np.min((len(score_ranked), args.beam_size))):
+              np.min((len(score_ranked), args.beam_size))):
         total_idx = np.unravel_index(idx_ranked[new_beam_rank],
                                      score_set.shape)
         prev_beam_rank = total_idx[0]

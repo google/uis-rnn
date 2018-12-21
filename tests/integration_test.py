@@ -55,10 +55,10 @@ class TestIntegration(unittest.TestCase):
   def test_four_clusters(self):
     """Four clusters on vertices of a square."""
     label_to_center = {
-      'A': np.array([0.0, 0.0]),
-      'B': np.array([0.0, 1.0]),
-      'C': np.array([1.0, 0.0]),
-      'D': np.array([1.0, 1.0]),
+        'A': np.array([0.0, 0.0]),
+        'B': np.array([0.0, 1.0]),
+        'C': np.array([1.0, 0.0]),
+        'D': np.array([1.0, 1.0]),
     }
 
     # generate training data
