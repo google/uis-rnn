@@ -53,12 +53,19 @@ class NormalRNN(nn.Module):
 class BeamState(object):
   """Structure that contains necessary states for beam search."""
 
-  def __init__(self):
-    self.mean_set = []
-    self.hidden_set = []
-    self.neg_lhood = 0
-    self.trace = []
-    self.block_counts = []
+  def __init__(self, source=None):
+    if not source:
+      self.mean_set = []
+      self.hidden_set = []
+      self.neg_likelihood = 0
+      self.trace = []
+      self.block_counts = []
+    else:
+      self.mean_set = source.mean_set.copy()
+      self.hidden_set = source.hidden_set.copy()
+      self.trace = source.trace.copy()
+      self.block_counts = source.block_counts.copy()
+      self.neg_likelihood = source.neg_likelihood
 
 
 class UISRNN(object):
@@ -296,18 +303,7 @@ class UISRNN(object):
       train_loss.append(float(loss1.data))  # only save the likelihood part
     print('Done training with {} iterations'.format(args.train_iteration))
 
-  def copy_beam_state(self, beam_state):
-    """Copy a state."""
-
-    new_beam_state = BeamState()
-    new_beam_state.mean_set = beam_state.mean_set.copy()
-    new_beam_state.hidden_set = beam_state.hidden_set.copy()
-    new_beam_state.trace = beam_state.trace.copy()
-    new_beam_state.block_counts = beam_state.block_counts.copy()
-    new_beam_state.neg_lhood = beam_state.neg_lhood
-    return new_beam_state
-
-  def update_beam_state(self, beam_state, look_ahead_seq, cluster_seq):
+  def _update_beam_state(self, beam_state, look_ahead_seq, cluster_seq):
     """Update a beam state given a look ahead sequence and known cluster
     assignments.
 
@@ -323,10 +319,10 @@ class UISRNN(object):
     """
 
     loss = 0
-    new_beam_state = self.copy_beam_state(beam_state)
+    new_beam_state = BeamState(beam_state)
     for sub_idx, cluster in enumerate(cluster_seq):
       if cluster > len(new_beam_state.mean_set):  # invalid trace
-        new_beam_state.neg_lhood = float('inf')
+        new_beam_state.neg_likelihood = float('inf')
         break
       elif cluster < len(new_beam_state.mean_set):  # existing cluster
         last_cluster = new_beam_state.trace[-1]
@@ -374,10 +370,10 @@ class UISRNN(object):
         new_beam_state.hidden_set.append(hidden.clone())
         new_beam_state.block_counts.append(1)
         new_beam_state.trace.append(cluster)
-      new_beam_state.neg_lhood += loss
+      new_beam_state.neg_likelihood += loss
     return new_beam_state
 
-  def calc_score(self, beam_state, look_ahead_seq):
+  def _calculate_score(self, beam_state, look_ahead_seq):
     """Calculate negative log likelihoods for all possible state allocations
        of a look ahead sequence, according to the current beam state.
 
@@ -396,9 +392,9 @@ class UISRNN(object):
     beam_score_set = float('inf') * np.ones(beam_num_clusters + 1 + np.arange(
                                             look_ahead))
     for cluster_seq, _ in np.ndenumerate(beam_score_set):
-      updated_beam_state = self.update_beam_state(beam_state,
-                                                  look_ahead_seq, cluster_seq)
-      beam_score_set[cluster_seq] = updated_beam_state.neg_lhood
+      updated_beam_state = self._update_beam_state(beam_state,
+                                                   look_ahead_seq, cluster_seq)
+      beam_score_set[cluster_seq] = updated_beam_state.neg_likelihood
     return beam_score_set
 
   def predict(self, test_sequence, args):
@@ -456,7 +452,7 @@ class UISRNN(object):
               args.beam_size, max_clusters + 1 + np.arange(
                   look_ahead_seq_length)))
       for beam_rank, beam_state in enumerate(beam_set):
-        beam_score_set = self.calc_score(beam_state, look_ahead_seq)
+        beam_score_set = self._calculate_score(beam_state, look_ahead_seq)
         score_set[beam_rank, :] = np.pad(
             beam_score_set,
             np.tile([[0, max_clusters-len(beam_state.mean_set)]],
@@ -474,7 +470,7 @@ class UISRNN(object):
                                      score_set.shape)
         prev_beam_rank = total_idx[0]
         cluster_seq = total_idx[1:]
-        updated_beam_state = self.update_beam_state(
+        updated_beam_state = self._update_beam_state(
             beam_set[prev_beam_rank], look_ahead_seq, cluster_seq)
         updated_beam_set.append(updated_beam_state)
       beam_set = updated_beam_set
