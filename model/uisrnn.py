@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """The UISRNN model."""
+from model import loss_func
 from model import utils
 import numpy as np
 import os
@@ -265,27 +266,25 @@ class UISRNN(object):
       mean = mean.view(mean_size)
 
       # Likelihood part.
-      loss1 = utils.weighted_mse_loss(
+      loss1 = loss_func.weighted_mse_loss(
           input_tensor=(rnn_truth != 0).float() * mean[:-1, :, :],
           target_tensor=rnn_truth,
           weight=1 / (2 * self.sigma2))
 
+      # Sigma2 prior part.
       weight = (((rnn_truth != 0).float() * mean[:-1, :, :] - rnn_truth)
                 ** 2).view(-1, observation_dim)
       num_non_zero = torch.sum((weight != 0).float(), dim=0).squeeze()
-      loss2 = ((2 * args.sigma_alpha + num_non_zero + 2) /
-               (2 * num_non_zero) * torch.log(self.sigma2)).sum() + (
-                   args.sigma_beta / (self.sigma2 * num_non_zero)).sum()
-      # regularization
-      l2_reg = 0
-      for param in self.rnn_model.parameters():
-        l2_reg += torch.norm(param)
-      loss3 = args.regularization_weight * l2_reg
+      loss2 = loss_func.sigma2_prior_loss(
+          num_non_zero, args.sigma_alpha, args.sigma_beta, self.sigma2)
+
+      # Regularization part.
+      loss3 = loss_func.regularization_loss(
+          self.rnn_model.parameters(), args.regularization_weight)
 
       loss = loss1 + loss2 + loss3
       loss.backward()
       nn.utils.clip_grad_norm_(self.rnn_model.parameters(), 5.0)
-      # nn.utils.clip_grad_norm_(self.sigma2, 1.0)
       optimizer.step()
       # avoid numerical issues
       self.sigma2.data.clamp_(min=1e-6)
@@ -326,7 +325,7 @@ class UISRNN(object):
         break
       elif cluster < len(new_beam_state.mean_set):  # existing cluster
         last_cluster = new_beam_state.trace[-1]
-        loss = utils.weighted_mse_loss(
+        loss = loss_func.weighted_mse_loss(
             input_tensor=torch.squeeze(new_beam_state.mean_set[cluster]),
             target_tensor=look_ahead_seq[sub_idx, :],
             weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
@@ -355,7 +354,7 @@ class UISRNN(object):
         ).unsqueeze(0).unsqueeze(0).to(self.device)
         mean, hidden = self.rnn_model(init_input,
                                       self.rnn_init_hidden)
-        loss = utils.weighted_mse_loss(
+        loss = loss_func.weighted_mse_loss(
             input_tensor=torch.squeeze(mean),
             target_tensor=look_ahead_seq[sub_idx, :],
             weight=1 / (2 * self.sigma2)).cpu().detach().numpy()
