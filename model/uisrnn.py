@@ -68,6 +68,12 @@ class BeamState(object):
       self.block_counts = source.block_counts.copy()
       self.neg_likelihood = source.neg_likelihood
 
+  def append(self, mean, hidden, cluster):
+    self.mean_set.append(mean.clone())
+    self.hidden_set.append(hidden.clone())
+    self.block_counts.append(1)
+    self.trace.append(cluster)
+
 
 class UISRNN(object):
   """Unbounded Interleaved-State Recurrent Neural Networks."""
@@ -373,10 +379,7 @@ class UISRNN(object):
         mean, hidden = self.rnn_model(
             look_ahead_seq[sub_idx, :].unsqueeze(0).unsqueeze(0),
             hidden)
-        new_beam_state.mean_set.append(mean.clone())
-        new_beam_state.hidden_set.append(hidden.clone())
-        new_beam_state.block_counts.append(1)
-        new_beam_state.trace.append(cluster)
+        new_beam_state.append(mean, hidden, cluster)
       new_beam_state.neg_likelihood += loss
     return new_beam_state
 
@@ -462,7 +465,7 @@ class UISRNN(object):
         beam_score_set = self._calculate_score(beam_state, look_ahead_seq)
         score_set[beam_rank, :] = np.pad(
             beam_score_set,
-            np.tile([[0, max_clusters-len(beam_state.mean_set)]],
+            np.tile([[0, max_clusters - len(beam_state.mean_set)]],
                     (look_ahead_seq_length, 1)), 'constant',
             constant_values=float('inf'))
       # find top scores
