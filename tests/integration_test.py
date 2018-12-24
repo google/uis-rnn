@@ -78,6 +78,7 @@ class TestIntegration(unittest.TestCase):
     model_args.rnn_depth = 2
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 2
+    model_args.verbosity = 3
     training_args.learning_rate = 0.01
     training_args.learning_rate_half_life = 50
     training_args.train_iteration = 200
@@ -94,6 +95,10 @@ class TestIntegration(unittest.TestCase):
     predicted_label = model.predict(test_sequence, inference_args)
 
     # run evaluation
+    model.logger.print(
+        3, 'Asserting the equivalence between'
+        '\nGround truth: {}\nPredicted: {}'.format(
+            test_cluster_id, predicted_label))
     accuracy = evals.compute_sequence_match_accuracy(
         predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)
@@ -106,6 +111,10 @@ class TestIntegration(unittest.TestCase):
     predicted_label = loaded_model.predict(test_sequence, inference_args)
 
     # run evaluation with loaded model
+    model.logger.print(
+        3, 'Asserting the equivalence between'
+        '\nGround truth: {}\nPredicted: {}'.format(
+            test_cluster_id, predicted_label))
     accuracy = evals.compute_sequence_match_accuracy(
         predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)

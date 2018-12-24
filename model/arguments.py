@@ -74,6 +74,15 @@ def parse_arguments():
       help='The value of sigma squared, corresponding to Eq. (11) in the '
            'paper. If the value is given, we will fix to this value. If the '
            'value is None, we will estimate it from training data.')
+  model_parser.add_argument(
+      '--verbosity',
+      default=2,
+      type=int,
+      help='How verbose will the logging information be. Higher value '
+      'represents more verbose information. A general guideline: '
+      '0 for errors; 1 for finishing important steps; '
+      '2 for finishing less important steps; 3 or above for debugging '
+      'information.')
 
   # training configurations
   training_parser = argparse.ArgumentParser(

@@ -92,6 +92,7 @@ class UISRNN(object):
         sigma2 * torch.ones(self.observation_dim).to(self.device))
     self.transition_bias = args.transition_bias
     self.crp_alpha = args.crp_alpha
+    self.logger = utils.Logger(args.verbosity)
 
   def _get_optimizer(self, optimizer, learning_rate):
     """Get optimizer for UISRNN.
@@ -166,6 +167,10 @@ class UISRNN(object):
     self.crp_alpha = float(data['crp_alpha'])
     self.sigma2 = nn.Parameter(
         torch.from_numpy(data['sigma2']).to(self.device))
+    self.logger.print(
+        3, 'Loaded model with '
+        'transition_bias={}, crp_alpha={}, sigma2={}'.format(
+            self.transition_bias, self.crp_alpha, data['sigma2']))
 
   def fit(self, train_sequence, train_cluster_id, args):
     """Fit UISRNN model.
@@ -243,7 +248,7 @@ class UISRNN(object):
       if args.learning_rate_half_life > 0:
         if t > 0 and t % args.learning_rate_half_life == 0:
           optimizer.param_groups[0]['lr'] /= 2.0
-          print('Changing learning rate to: {}'.format(
+          self.logger.print(2, 'Changing learning rate to: {}'.format(
               optimizer.param_groups[0]['lr']))
       optimizer.zero_grad()
       # For online learning, pack a subset in each iteration.
@@ -290,17 +295,21 @@ class UISRNN(object):
       self.sigma2.data.clamp_(min=1e-6)
 
       if np.remainder(t, 10) == 0:
-        print('Iter: {:d}  \t'
-              'Training Loss: {:.4f}    \n'
-              '    Negative Log Likelihood: {:.4f}\t'
-              'Sigma2 Prior: {:.4f}\t'
-              'Regularization: {:.4f}'.format(t,
-                                              float(loss.data),
-                                              float(loss1.data),
-                                              float(loss2.data),
-                                              float(loss3.data)))
+        self.logger.print(
+            2,
+            'Iter: {:d}  \t'
+            'Training Loss: {:.4f}    \n'
+            '    Negative Log Likelihood: {:.4f}\t'
+            'Sigma2 Prior: {:.4f}\t'
+            'Regularization: {:.4f}'.format(
+                t,
+                float(loss.data),
+                float(loss1.data),
+                float(loss2.data),
+                float(loss3.data)))
       train_loss.append(float(loss1.data))  # only save the likelihood part
-    print('Done training with {} iterations'.format(args.train_iteration))
+    self.logger.print(
+        1, 'Done training with {} iterations'.format(args.train_iteration))
 
   def _update_beam_state(self, beam_state, look_ahead_seq, cluster_seq):
     """Update a beam state given a look ahead sequence and known cluster
