@@ -116,8 +116,7 @@ class UISRNN(object):
     if self.estimate_sigma2:  # train sigma2
       params.append({
           'params': self.sigma2
-      }  # variance parameters
-      )
+      })  # variance parameters
     assert optimizer == 'adam', 'Only adam optimizer is supported.'
     return optim.Adam(params, lr=learning_rate)
 
@@ -289,12 +288,12 @@ class UISRNN(object):
 
       loss = loss1 + loss2 + loss3
       loss.backward()
-      nn.utils.clip_grad_norm_(self.rnn_model.parameters(), 5.0)
+      nn.utils.clip_grad_norm_(self.rnn_model.parameters(), args.grad_max_norm)
       optimizer.step()
       # avoid numerical issues
       self.sigma2.data.clamp_(min=1e-6)
 
-      if np.remainder(t, 10) == 0:
+      if np.remainder(t, 10) == 0 or t == args.train_iteration - 1:
         self.logger.print(
             2,
             'Iter: {:d}  \t'
@@ -397,8 +396,8 @@ class UISRNN(object):
 
     look_ahead, _ = look_ahead_seq.shape
     beam_num_clusters = len(beam_state.mean_set)
-    beam_score_set = float('inf') * np.ones(beam_num_clusters + 1 + np.arange(
-                                            look_ahead))
+    beam_score_set = float('inf') * np.ones(
+        beam_num_clusters + 1 + np.arange(look_ahead))
     for cluster_seq, _ in np.ndenumerate(beam_score_set):
       updated_beam_state = self._update_beam_state(beam_state,
                                                    look_ahead_seq, cluster_seq)

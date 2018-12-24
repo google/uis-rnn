@@ -145,6 +145,11 @@ def parse_arguments():
       default=1e-5,
       type=float,
       help='The network regularization multiplicative.')
+  training_parser.add_argument(
+      '--grad_max_norm',
+      default=5.0,
+      type=float,
+      help='Max norm of the gradient.')
 
   # inference configurations
   inference_parser = argparse.ArgumentParser(
