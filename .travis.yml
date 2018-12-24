@@ -6,4 +6,7 @@ python:
 cache: pip
 
 install:
-  - pip install -r requirements.txt
+  - pip install -q -r requirements.txt
+
+script:
+  - sh run_tests.sh
