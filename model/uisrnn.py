@@ -31,11 +31,11 @@ _SAVED_STATES_FILE = 'saved_model.states'
 _SAVED_NPZ_FILE = 'saved_model.npz'
 
 
-class NormalRNN(nn.Module):
-  """Normal Recurent Neural Networks."""
+class CoreRNN(nn.Module):
+  """The core Recurent Neural Network used by UIS-RNN."""
 
   def __init__(self, input_dim, hidden_size, depth, observation_dim, dropout=0):
-    super(NormalRNN, self).__init__()
+    super(CoreRNN, self).__init__()
     self.hidden_size = hidden_size
     if depth >= 2:
       self.gru = nn.GRU(input_dim, hidden_size, depth, dropout=dropout)
@@ -90,9 +90,9 @@ class UISRNN:
     self.observation_dim = args.observation_dim
     self.device = torch.device(
         'cuda:0' if torch.cuda.is_available() else 'cpu')
-    self.rnn_model = NormalRNN(self.observation_dim, args.rnn_hidden_size,
-                               args.rnn_depth, self.observation_dim,
-                               args.rnn_dropout).to(self.device)
+    self.rnn_model = CoreRNN(self.observation_dim, args.rnn_hidden_size,
+                             args.rnn_depth, self.observation_dim,
+                             args.rnn_dropout).to(self.device)
     self.rnn_init_hidden = nn.Parameter(
         torch.zeros(args.rnn_depth, 1, args.rnn_hidden_size).to(self.device))
     self.estimate_sigma2 = (args.sigma2 is None)

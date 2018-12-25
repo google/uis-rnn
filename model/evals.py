@@ -63,9 +63,9 @@ def compute_sequence_match_accuracy(sequence1, sequence2):
   inverse_index2 = get_list_inverse_index(unique_ids2)
   # get the count matrix
   count_matrix = np.zeros((len(unique_ids1), len(unique_ids2)))
-  for i, _ in enumerate(sequence1):
-    index1 = inverse_index1[sequence1[i]]
-    index2 = inverse_index2[sequence2[i]]
+  for item1, item2 in zip(sequence1, sequence2):
+    index1 = inverse_index1[item1]
+    index2 = inverse_index2[item2]
     count_matrix[index1, index2] += 1.0
   row_index, col_index = optimize.linear_sum_assignment(-count_matrix)
   optimal_match_count = count_matrix[row_index, col_index].sum()
