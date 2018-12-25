@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """The UIS-RNN model."""
-import os
-import tempfile
-import zipfile
-
 import numpy as np
 import torch
 from torch import autograd
@@ -27,8 +23,6 @@ from model import loss_func
 from model import utils
 
 _INITIAL_SIGMA2_VALUE = 0.1
-_SAVED_STATES_FILE = 'saved_model.states'
-_SAVED_NPZ_FILE = 'saved_model.npz'
 
 
 class CoreRNN(nn.Module):
@@ -135,23 +129,12 @@ class UISRNN:
     Args:
       filepath: the path of the file.
     """
-    tempdir = tempfile.mkdtemp()
-    # save states
-    states_file = os.path.join(tempdir, _SAVED_STATES_FILE)
-    torch.save(self.rnn_model.state_dict(), states_file)
-
-    # save other parameters
-    npz_file = os.path.join(tempdir, _SAVED_NPZ_FILE)
-    np.savez(npz_file,
-             transition_bias=self.transition_bias,
-             crp_alpha=self.crp_alpha,
-             sigma2=self.sigma2.detach().cpu().numpy(),
-             rnn_init_hidden=self.rnn_init_hidden.detach().cpu().numpy())
-
-    # create combined model file
-    with zipfile.ZipFile(filepath, 'w') as myzip:
-      myzip.write(states_file, _SAVED_STATES_FILE)
-      myzip.write(npz_file, _SAVED_NPZ_FILE)
+    torch.save({
+        'rnn_state_dict': self.rnn_model.state_dict(),
+        'rnn_init_hidden': self.rnn_init_hidden.detach().cpu().numpy(),
+        'transition_bias': self.transition_bias,
+        'crp_alpha': self.crp_alpha,
+        'sigma2': self.sigma2.detach().cpu().numpy()}, filepath)
 
   def load(self, filepath):
     """Load the model from a file.
@@ -159,30 +142,20 @@ class UISRNN:
     Args:
       filepath: the path of the file.
     """
-    tempdir = tempfile.mkdtemp()
-    # extract zip file
-    with zipfile.ZipFile(filepath) as myzip:
-      myzip.extract(_SAVED_STATES_FILE, path=tempdir)
-      myzip.extract(_SAVED_NPZ_FILE, path=tempdir)
-
-    # load states
-    states_file = os.path.join(tempdir, _SAVED_STATES_FILE)
-    self.rnn_model.load_state_dict(torch.load(states_file))
-
-    # load other parameters
-    npz_file = os.path.join(tempdir, _SAVED_NPZ_FILE)
-    data = np.load(npz_file)
-    self.transition_bias = float(data['transition_bias'])
-    self.crp_alpha = float(data['crp_alpha'])
-    self.sigma2 = nn.Parameter(
-        torch.from_numpy(data['sigma2']).to(self.device))
+    var_dict = torch.load(filepath)
+    self.rnn_model.load_state_dict(var_dict['rnn_state_dict'])
     self.rnn_init_hidden = nn.Parameter(
-        torch.from_numpy(data['rnn_init_hidden']).to(self.device))
+        torch.from_numpy(var_dict['rnn_init_hidden']).to(self.device))
+    self.transition_bias = float(var_dict['transition_bias'])
+    self.crp_alpha = float(var_dict['crp_alpha'])
+    self.sigma2 = nn.Parameter(
+        torch.from_numpy(var_dict['sigma2']).to(self.device))
+
     self.logger.print(
         3, 'Loaded model with transition_bias={}, crp_alpha={}, sigma2={}, '
         'rnn_init_hidden={}'.format(
-            self.transition_bias, self.crp_alpha, data['sigma2'],
-            data['rnn_init_hidden']))
+            self.transition_bias, self.crp_alpha, var_dict['sigma2'],
+            var_dict['rnn_init_hidden']))
 
   def fit(self, train_sequence, train_cluster_id, args):
     """Fit UISRNN model.
