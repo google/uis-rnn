@@ -142,7 +142,8 @@ class UISRNN(object):
     np.savez(npz_file,
              transition_bias=self.transition_bias,
              crp_alpha=self.crp_alpha,
-             sigma2=self.sigma2.detach().cpu().numpy())
+             sigma2=self.sigma2.detach().cpu().numpy(),
+             rnn_init_hidden=self.rnn_init_hidden.detach().cpu().numpy())
 
     # create combined model file
     with zipfile.ZipFile(filepath, 'w') as myzip:
@@ -172,10 +173,13 @@ class UISRNN(object):
     self.crp_alpha = float(data['crp_alpha'])
     self.sigma2 = nn.Parameter(
         torch.from_numpy(data['sigma2']).to(self.device))
+    self.rnn_init_hidden = nn.Parameter(
+        torch.from_numpy(data['rnn_init_hidden']).to(self.device))
     self.logger.print(
-        3, 'Loaded model with '
-        'transition_bias={}, crp_alpha={}, sigma2={}'.format(
-            self.transition_bias, self.crp_alpha, data['sigma2']))
+        3, 'Loaded model with transition_bias={}, crp_alpha={}, sigma2={}, '
+        'rnn_init_hidden={}'.format(
+            self.transition_bias, self.crp_alpha, data['sigma2'],
+            data['rnn_init_hidden']))
 
   def fit(self, train_sequence, train_cluster_id, args):
     """Fit UISRNN model.
