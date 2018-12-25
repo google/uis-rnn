@@ -9,7 +9,4 @@ install:
   - pip install -q -r requirements.txt
 
 script:
-  - python tests/evals_test.py
-  - python tests/integration_test.py
-  - python tests/uisrnn_test.py
-  - python tests/utils_test.py
+  - bash run_tests.sh
