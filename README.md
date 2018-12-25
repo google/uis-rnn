@@ -1,6 +1,4 @@
-# UIS-RNN
-
-[![Build Status](https://travis-ci.org/google/uis-rnn.svg?branch=master)](https://travis-ci.org/google/uis-rnn)
+# UIS-RNN [![Build Status](https://travis-ci.org/google/uis-rnn.svg?branch=master)](https://travis-ci.org/google/uis-rnn)
 
 ## Overview
 
