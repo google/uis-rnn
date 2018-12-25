@@ -10,5 +10,5 @@ install:
   - pip install -q pylint
 
 script:
-  - python3 -m pylint **/*.py --indent-string="  " --max-line-length=80
+  - python3 -m pylint **/*.py --indent-string="  " --max-line-length=80 --disable=E1101,R0913,W0221,R0903,R0902,R0914,R0912,R0915
   - bash run_tests.sh

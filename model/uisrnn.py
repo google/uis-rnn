@@ -11,18 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The UISRNN model."""
-from model import loss_func
-from model import utils
-import numpy as np
+"""The UIS-RNN model."""
 import os
 import tempfile
+import zipfile
+
+import numpy as np
 import torch
 from torch import autograd
 from torch import nn
 from torch import optim
 import torch.nn.functional as F
-import zipfile
+
+from model import loss_func
+from model import utils
 
 _INITIAL_SIGMA2_VALUE = 0.1
 _SAVED_STATES_FILE = 'saved_model.states'
@@ -32,7 +34,7 @@ _SAVED_NPZ_FILE = 'saved_model.npz'
 class NormalRNN(nn.Module):
   """Normal Recurent Neural Networks."""
 
-  def __init__(self, input_dim, hidden_size, depth, dropout, observation_dim):
+  def __init__(self, input_dim, hidden_size, depth, observation_dim, dropout=0):
     super(NormalRNN, self).__init__()
     self.hidden_size = hidden_size
     if depth >= 2:
@@ -51,7 +53,7 @@ class NormalRNN(nn.Module):
     return mean, hidden
 
 
-class BeamState(object):
+class BeamState:
   """Structure that contains necessary states for beam search."""
 
   def __init__(self, source=None):
@@ -69,13 +71,14 @@ class BeamState(object):
       self.neg_likelihood = source.neg_likelihood
 
   def append(self, mean, hidden, cluster):
+    """Append new item to the BeamState."""
     self.mean_set.append(mean.clone())
     self.hidden_set.append(hidden.clone())
     self.block_counts.append(1)
     self.trace.append(cluster)
 
 
-class UISRNN(object):
+class UISRNN:
   """Unbounded Interleaved-State Recurrent Neural Networks."""
 
   def __init__(self, args):
@@ -88,8 +91,8 @@ class UISRNN(object):
     self.device = torch.device(
         'cuda:0' if torch.cuda.is_available() else 'cpu')
     self.rnn_model = NormalRNN(self.observation_dim, args.rnn_hidden_size,
-                               args.rnn_depth, args.rnn_dropout,
-                               self.observation_dim).to(self.device)
+                               args.rnn_depth, self.observation_dim,
+                               args.rnn_dropout).to(self.device)
     self.rnn_init_hidden = nn.Parameter(
         torch.zeros(args.rnn_depth, 1, args.rnn_hidden_size).to(self.device))
     self.estimate_sigma2 = (args.sigma2 is None)
@@ -212,12 +215,12 @@ class UISRNN(object):
     """
     # check type
     if (not isinstance(train_sequence, np.ndarray) or
-            train_sequence.dtype != float):
+        train_sequence.dtype != float):
       raise TypeError('train_sequence should be a numpy array of float type.')
     if isinstance(train_cluster_id, list):
       train_cluster_id = np.array(train_cluster_id)
     if (not isinstance(train_cluster_id, np.ndarray) or
-            not train_cluster_id.dtype.name.startswith('str')):
+        not train_cluster_id.dtype.name.startswith('str')):
       raise TypeError('train_cluster_id type be a numpy array of strings.')
     # check dimension
     if train_sequence.ndim != 2:
@@ -252,10 +255,10 @@ class UISRNN(object):
           self.observation_dim,
           self.device)
     train_loss = []
-    for t in range(args.train_iteration):
+    for num_iter in range(args.train_iteration):
       # Update learning rate if half life is specified.
       if args.learning_rate_half_life > 0:
-        if t > 0 and t % args.learning_rate_half_life == 0:
+        if num_iter > 0 and num_iter % args.learning_rate_half_life == 0:
           optimizer.param_groups[0]['lr'] /= 2.0
           self.logger.print(2, 'Changing learning rate to: {}'.format(
               optimizer.param_groups[0]['lr']))
@@ -303,7 +306,8 @@ class UISRNN(object):
       # avoid numerical issues
       self.sigma2.data.clamp_(min=1e-6)
 
-      if np.remainder(t, 10) == 0 or t == args.train_iteration - 1:
+      if (np.remainder(num_iter, 10) == 0 or
+          num_iter == args.train_iteration - 1):
         self.logger.print(
             2,
             'Iter: {:d}  \t'
@@ -311,7 +315,7 @@ class UISRNN(object):
             '    Negative Log Likelihood: {:.4f}\t'
             'Sigma2 Prior: {:.4f}\t'
             'Regularization: {:.4f}'.format(
-                t,
+                num_iter,
                 float(loss.data),
                 float(loss1.data),
                 float(loss2.data),
@@ -439,7 +443,7 @@ class UISRNN(object):
     """
     # check type
     if (not isinstance(test_sequence, np.ndarray) or
-            test_sequence.dtype != float):
+        test_sequence.dtype != float):
       raise TypeError('test_sequence should be a numpy array of float type.')
     # check dimension
     if test_sequence.ndim != 2:
@@ -456,10 +460,10 @@ class UISRNN(object):
         torch.from_numpy(test_sequence).float()).to(self.device)
     # bookkeeping for beam search
     beam_set = [BeamState()]
-    for t in np.arange(0, args.test_iteration * test_sequence_length,
-                       args.look_ahead):
+    for num_iter in np.arange(0, args.test_iteration * test_sequence_length,
+                              args.look_ahead):
       max_clusters = max([len(beam_state.mean_set) for beam_state in beam_set])
-      look_ahead_seq = test_sequence[t:t+args.look_ahead, :]
+      look_ahead_seq = test_sequence[num_iter :  num_iter + args.look_ahead, :]
       look_ahead_seq_length = look_ahead_seq.shape[0]
       score_set = float('inf') * np.ones(
           np.append(
@@ -479,7 +483,7 @@ class UISRNN(object):
       idx_ranked = np.argsort(score_set, axis=None)
       updated_beam_set = []
       for new_beam_rank in range(
-              np.min((len(score_ranked), args.beam_size))):
+          np.min((len(score_ranked), args.beam_size))):
         total_idx = np.unravel_index(idx_ranked[new_beam_rank],
                                      score_set.shape)
         prev_beam_rank = total_idx[0]

@@ -11,15 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Integration tests."""
+import random
+import tempfile
+import unittest
+
+import numpy as np
+import torch
 
 from model import arguments
 from model import evals
 from model import uisrnn
-import numpy as np
-import random
-import tempfile
-import torch
-import unittest
 
 
 def _generate_random_sequence(cluster_id, label_to_center, sigma=0.1):
@@ -34,16 +36,17 @@ def _generate_random_sequence(cluster_id, label_to_center, sigma=0.1):
   Returns:
     a 2-d numpy array, with shape (length, observation_dim)
   """
-  if not isinstance(cluster_id, list) or len(cluster_id) < 1:
+  if not isinstance(cluster_id, list) or not cluster_id:
     raise ValueError("cluster_id must be a non-empty list")
   result = label_to_center[cluster_id[0]]
-  for id in cluster_id[1:]:
-    result = np.vstack((result, label_to_center[id]))
+  for label in cluster_id[1:]:
+    result = np.vstack((result, label_to_center[label]))
   noises = np.random.rand(*result.shape) * sigma
   return result + noises
 
 
 class TestIntegration(unittest.TestCase):
+  """Integration test that covers training, testing, and evaluation."""
 
   def setUp(self):
     # fix random seeds for reproducing results

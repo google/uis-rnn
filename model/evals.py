@@ -32,8 +32,8 @@ def get_list_inverse_index(unique_ids):
   if not isinstance(unique_ids, list):
     raise TypeError('unique_ids must be a list')
   result = dict()
-  for i, id in enumerate(unique_ids):
-    result[id] = i
+  for i, unique_id in enumerate(unique_ids):
+    result[unique_id] = i
   return result
 
 
@@ -63,7 +63,7 @@ def compute_sequence_match_accuracy(sequence1, sequence2):
   inverse_index2 = get_list_inverse_index(unique_ids2)
   # get the count matrix
   count_matrix = np.zeros((len(unique_ids1), len(unique_ids2)))
-  for i in range(len(sequence1)):
+  for i, _ in enumerate(sequence1):
     index1 = inverse_index1[sequence1[i]]
     index2 = inverse_index2[sequence2[i]]
     count_matrix[index1, index2] += 1.0

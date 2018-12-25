@@ -18,7 +18,7 @@ import torch
 from torch import autograd
 
 
-class Logger(object):
+class Logger:
   """A class for printing logging information to screen."""
 
   def __init__(self, verbosity):
@@ -73,8 +73,8 @@ def sample_permuted_segments(index_sequence, number_samples):
   for _ in range(number_samples):
     segments_array = []
     permutation = np.random.permutation(len(segments))
-    for i in range(len(permutation)):
-      segments_array.append(segments[permutation[i]])
+    for permutation_item in permutation:
+      segments_array.append(segments[permutation_item])
     sampled_index_sequences.append(np.concatenate(segments_array))
   return sampled_index_sequences
 
@@ -119,7 +119,7 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
 
 
 def pack_sequence(
-        sub_sequences, seq_lengths, batch_size, observation_dim, device):
+    sub_sequences, seq_lengths, batch_size, observation_dim, device):
   """Pack sequences for training.
 
   Args:
@@ -168,6 +168,7 @@ def pack_sequence(
 
 
 def output_result(model_args, training_args, test_record):
+  """Produce a string to summarize the experiment."""
   accuracy_array, _ = zip(*test_record)
   total_accuracy = np.mean(accuracy_array)
   output_string = """

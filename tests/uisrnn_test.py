@@ -11,15 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from model import arguments
-from model import uisrnn
-import numpy as np
+"""Tests for uisrnn.py."""
 import tempfile
 import unittest
 
+import numpy as np
+
+from model import arguments
+from model import uisrnn
+
 
 class TestUISRNN(unittest.TestCase):
+  """Test the UISRNN class."""
 
   def test_fit_and_predict_single_label(self):
     """Train and test model while training data has single label."""
@@ -97,6 +100,7 @@ class TestUISRNN(unittest.TestCase):
     temp_file_path = tempfile.mktemp()
     model.save(temp_file_path)
     model.load(temp_file_path)
+    self.assertEqual(0.5, model.transition_bias)
 
 
 if __name__ == '__main__':

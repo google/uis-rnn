@@ -56,7 +56,7 @@ def sigma2_prior_loss(num_non_zero, sigma_alpha, sigma_beta, sigma2):
   """
   return ((2 * sigma_alpha + num_non_zero + 2) /
           (2 * num_non_zero) * torch.log(sigma2)).sum() + (
-      sigma_beta / (sigma2 * num_non_zero)).sum()
+              sigma_beta / (sigma2 * num_non_zero)).sum()
 
 
 def regularization_loss(params, weight):

@@ -11,16 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Tests for utils.py."""
 import unittest
 
-from model import utils
 import numpy as np
+
+from model import utils
 
 
 class TestSamplePermutedSegments(unittest.TestCase):
+  """Tests for utils.sample_permuted_segments()"""
 
   def test_short_sequence(self):
+    """Test for a short sequence."""
     index_sequence = [5, 2, 3, 2, 1]
     number_samples = 10
     sampled_index_sequences = utils.sample_permuted_segments(index_sequence,
@@ -32,8 +35,10 @@ class TestSamplePermutedSegments(unittest.TestCase):
 
 
 class TestResizeSequence(unittest.TestCase):
+  """Tests for utils.resize_sequence()"""
 
-  def test_resize_sequence(self):
+  def test_resize_sequence_without_permutation1(self):
+    """Test when we do not permute, output is deterministic."""
     sub_sequence, seq_lengths, _ = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [1, 1]]),
         cluster_id=np.array([1, 2, 1]),
@@ -43,7 +48,8 @@ class TestResizeSequence(unittest.TestCase):
     self.assertTrue((sub_sequence[1] == [[2, 2]]).all())
     self.assertListEqual(seq_lengths, [3, 2])
 
-  def test_resize_sequence_with_permutation(self):
+  def test_resize_sequence_without_permutation2(self):
+    """Test when we do not permute, output is deterministic."""
     sub_sequence, seq_lengths, _ = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [3, 3]]),
         cluster_id=np.array([1, 2, 1]),
@@ -53,7 +59,8 @@ class TestResizeSequence(unittest.TestCase):
     self.assertTrue((sub_sequence[1] == [[2, 2]]).all())
     self.assertListEqual(seq_lengths, [3, 2])
 
-  def test_resize_sequence_with_permutation_2(self):
+  def test_resize_sequence_with_permutation(self):
+    """Test when we permute, each output can be one of the permutations."""
     sub_sequence, seq_lengths, _ = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [3, 3]]),
         cluster_id=np.array([1, 2, 1]),
