@@ -1,5 +1,7 @@
 # UIS-RNN
 
+[![Build Status](https://travis-ci.org/google/uis-rnn.svg?branch=master)](https://travis-ci.org/google/uis-rnn)
+
 ## Overview
 
 This is the library for the
@@ -62,7 +64,7 @@ testing data.
 You can also verify the correctness of this library by running:
 
 ```bash
-sh run_tests.sh
+bash run_tests.sh
 ```
 
 If you fork this library and make local changes, be sure to use these tests
