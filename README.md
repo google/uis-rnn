@@ -40,6 +40,15 @@ This library depends on:
 
 ## Getting Started
 
+### Install the package
+
+Without downloading the repository, you can install the
+[package](https://pypi.org/project/uisrnn/) by:
+
+```
+pip3 install uisrnn
+```
+
 ### Run the demo
 
 To get started, simply run this command:
