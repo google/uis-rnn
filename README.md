@@ -13,7 +13,7 @@ This algorithm was originally proposed in the paper
 The work has been introduced by
 [Google AI Blog](https://ai.googleblog.com/2018/11/accurate-online-speaker-diarization.html).
 
-![gif](resources/uisrnn.gif)
+![gif](https://raw.githubusercontent.com/google/uis-rnn/master/resources/uisrnn.gif)
 
 ## Disclaimer
 
