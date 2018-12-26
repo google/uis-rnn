@@ -20,8 +20,6 @@ import numpy as np
 import torch
 
 import uisrnn
-from uisrnn import arguments
-from uisrnn import evals
 
 
 def _generate_random_sequence(cluster_id, label_to_center, sigma=0.1):
@@ -77,7 +75,7 @@ class TestIntegration(unittest.TestCase):
         test_cluster_id, label_to_center, sigma=0.01)
 
     # construct model
-    model_args, training_args, inference_args = arguments.parse_arguments()
+    model_args, training_args, inference_args = uisrnn.parse_arguments()
     model_args.rnn_depth = 2
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 2
@@ -102,7 +100,7 @@ class TestIntegration(unittest.TestCase):
         3, 'Asserting the equivalence between'
         '\nGround truth: {}\nPredicted: {}'.format(
             test_cluster_id, predicted_label))
-    accuracy = evals.compute_sequence_match_accuracy(
+    accuracy = uisrnn.compute_sequence_match_accuracy(
         predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)
 
@@ -118,7 +116,7 @@ class TestIntegration(unittest.TestCase):
         3, 'Asserting the equivalence between'
         '\nGround truth: {}\nPredicted: {}'.format(
             test_cluster_id, predicted_label))
-    accuracy = evals.compute_sequence_match_accuracy(
+    accuracy = uisrnn.compute_sequence_match_accuracy(
         predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)
 

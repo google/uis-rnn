@@ -18,7 +18,6 @@ import unittest
 import numpy as np
 
 import uisrnn
-from uisrnn import arguments
 
 
 class TestUISRNN(unittest.TestCase):
@@ -26,7 +25,7 @@ class TestUISRNN(unittest.TestCase):
 
   def test_fit_and_predict_single_label(self):
     """Train and test model while training data has single label."""
-    model_args, training_args, inference_args = arguments.parse_arguments()
+    model_args, training_args, inference_args = uisrnn.parse_arguments()
     model_args.rnn_depth = 1
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 16
@@ -50,7 +49,7 @@ class TestUISRNN(unittest.TestCase):
 
   def test_fit_with_wrong_dim(self):
     """Training data has wrong dimension."""
-    model_args, training_args, _ = arguments.parse_arguments()
+    model_args, training_args, _ = uisrnn.parse_arguments()
     model_args.rnn_depth = 1
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 16
@@ -69,7 +68,7 @@ class TestUISRNN(unittest.TestCase):
 
   def test_predict_with_wrong_dim(self):
     """Testing data has wrong dimension."""
-    model_args, training_args, inference_args = arguments.parse_arguments()
+    model_args, training_args, inference_args = uisrnn.parse_arguments()
     model_args.rnn_depth = 1
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 16
@@ -92,7 +91,7 @@ class TestUISRNN(unittest.TestCase):
 
   def test_save_and_load(self):
     """Save model and load it."""
-    model_args, _, _ = arguments.parse_arguments()
+    model_args, _, _ = uisrnn.parse_arguments()
     model_args.observation_dim = 16
     model_args.transition_bias = 0.5
     model_args.sigma2 = 0.05
