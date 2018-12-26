@@ -98,7 +98,7 @@ class UISRNN:
     self.sigma2 = nn.Parameter(
         sigma2 * torch.ones(self.observation_dim).to(self.device))
     self.transition_bias = args.transition_bias
-    self.transition_bias_denominator = None
+    self.transition_bias_denominator = 0.0
     self.crp_alpha = args.crp_alpha
     self.logger = utils.Logger(args.verbosity)
 
@@ -138,6 +138,7 @@ class UISRNN:
         'rnn_state_dict': self.rnn_model.state_dict(),
         'rnn_init_hidden': self.rnn_init_hidden.detach().cpu().numpy(),
         'transition_bias': self.transition_bias,
+        'transition_bias_denominator': self.transition_bias_denominator,
         'crp_alpha': self.crp_alpha,
         'sigma2': self.sigma2.detach().cpu().numpy()}, filepath)
 
@@ -152,6 +153,8 @@ class UISRNN:
     self.rnn_init_hidden = nn.Parameter(
         torch.from_numpy(var_dict['rnn_init_hidden']).to(self.device))
     self.transition_bias = float(var_dict['transition_bias'])
+    self.transition_bias_denominator = float(
+        var_dict['transition_bias_denominator'])
     self.crp_alpha = float(var_dict['crp_alpha'])
     self.sigma2 = nn.Parameter(
         torch.from_numpy(var_dict['sigma2']).to(self.device))

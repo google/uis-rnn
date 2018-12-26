@@ -169,6 +169,21 @@ length as `test_sequence`.
 The definitions of the args are described in `uisrnn/arguments.py`.
 See `inference_parser`.
 
+### Training on large datasets
+
+For large datasets, the data usually could not be loaded into memory at once.
+In such cases, the `fit()` function needs to be called multiple times.
+
+Here we provide a few guidelines as our suggestions:
+
+1. Do not feed different datasets into different calls of `fit()`. Instead,
+   for each call of `fit()`, the input should be a concatenated sequence
+   composed of subsequences from different datasets.
+2. For each call to the `fit()` function, make the size of input roughly the
+   same. And, don't make the input size too small.
+3. Manually reset the `learning_rate` before each call to `fit()`, especially
+   if you are using `learning_rate_half_life`.
+
 ## Citations
 
 Our paper is cited as:
