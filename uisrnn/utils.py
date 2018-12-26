@@ -92,6 +92,8 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
       cluster in the same list.
     seq_lengths: The length of each cluster (+1).
     bias: Flipping coin head probability.
+    bias_denominator: The denominator of the bias, used for multiple calls to
+      fit().
   """
   # merge sub-sequences that belong to a single cluster to a single sequence
   unique_id = np.unique(cluster_id)
@@ -114,8 +116,9 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
   transit_num = 0
   for entry in range(len(cluster_id) - 1):
     transit_num += (cluster_id[entry] != cluster_id[entry + 1])
-  bias = (transit_num + 1) / len(cluster_id)
-  return sub_sequences, seq_lengths, bias
+  bias_denominator = len(cluster_id)
+  bias = (transit_num + 1) / bias_denominator
+  return sub_sequences, seq_lengths, bias, bias_denominator
 
 
 def pack_sequence(

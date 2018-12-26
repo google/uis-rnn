@@ -120,6 +120,26 @@ class TestIntegration(unittest.TestCase):
         predicted_label, test_cluster_id)
     self.assertEqual(1.0, accuracy)
 
+    # keep training from loaded model on a subset of training data
+    transition_bias_1 = model.transition_bias
+    training_args.learning_rate = 0.001
+    training_args.train_iteration = 50
+    model.fit(train_sequence[:100, :], train_cluster_id[:100], training_args)
+    transition_bias_2 = model.transition_bias
+    self.assertNotAlmostEqual(transition_bias_1, transition_bias_2)
+    model.logger.print(
+        3, 'Asserting transition_bias changed from {} to {}'.format(
+            transition_bias_1, transition_bias_2))
+
+    # run evaluation
+    model.logger.print(
+        3, 'Asserting the equivalence between'
+        '\nGround truth: {}\nPredicted: {}'.format(
+            test_cluster_id, predicted_label))
+    accuracy = uisrnn.compute_sequence_match_accuracy(
+        predicted_label, test_cluster_id)
+    self.assertEqual(1.0, accuracy)
+
 
 if __name__ == '__main__':
   unittest.main()

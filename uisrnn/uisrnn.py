@@ -90,11 +90,15 @@ class UISRNN:
                              args.rnn_dropout).to(self.device)
     self.rnn_init_hidden = nn.Parameter(
         torch.zeros(args.rnn_depth, 1, args.rnn_hidden_size).to(self.device))
+    # booleans indicating which variables are trainable
     self.estimate_sigma2 = (args.sigma2 is None)
+    self.estimate_transition_bias = (args.transition_bias is None)
+    # initial values of variables
     sigma2 = _INITIAL_SIGMA2_VALUE if self.estimate_sigma2 else args.sigma2
     self.sigma2 = nn.Parameter(
         sigma2 * torch.ones(self.observation_dim).to(self.device))
     self.transition_bias = args.transition_bias
+    self.transition_bias_denominator = None
     self.crp_alpha = args.crp_alpha
     self.logger = utils.Logger(args.verbosity)
 
@@ -214,12 +218,24 @@ class UISRNN:
     optimizer = self._get_optimizer(optimizer=args.optimizer,
                                     learning_rate=args.learning_rate)
 
-    sub_sequences, seq_lengths, transition_bias = utils.resize_sequence(
-        sequence=train_sequence,
-        cluster_id=train_cluster_id,
-        num_permutations=args.num_permutations)
-    if self.transition_bias is None:
-      self.transition_bias = transition_bias
+    (sub_sequences,
+     seq_lengths,
+     transition_bias,
+     transition_bias_denominator) = utils.resize_sequence(
+         sequence=train_sequence,
+         cluster_id=train_cluster_id,
+         num_permutations=args.num_permutations)
+    if self.estimate_transition_bias:
+      if self.transition_bias is None:
+        self.transition_bias = transition_bias
+        self.transition_bias_denominator = transition_bias_denominator
+      else:
+        self.transition_bias = (
+            self.transition_bias * self.transition_bias_denominator +
+            transition_bias * transition_bias_denominator) / (
+                self.transition_bias_denominator + transition_bias_denominator)
+        self.transition_bias_denominator += transition_bias_denominator
+
     # For batch learning, pack the entire dataset.
     if args.batch_size is None:
       packed_train_sequence, rnn_truth = utils.pack_sequence(
