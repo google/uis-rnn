@@ -1,4 +1,4 @@
-# UIS-RNN [![Build Status](https://travis-ci.org/google/uis-rnn.svg?branch=master)](https://travis-ci.org/google/uis-rnn)
+# UIS-RNN [![Build Status](https://travis-ci.org/google/uis-rnn.svg?branch=master)](https://travis-ci.org/google/uis-rnn) [![PyPI Version](https://img.shields.io/pypi/v/uisrnn.svg)](https://pypi.python.org/pypi/uisrnn) [![Python Versions](https://img.shields.io/pypi/pyversions/uisrnn.svg)](https://pypi.org/project/uisrnn)
 
 ## Overview
 
@@ -47,6 +47,12 @@ Without downloading the repository, you can install the
 
 ```
 pip3 install uisrnn
+```
+
+or
+
+```
+python3 -m pip install uisrnn
 ```
 
 ### Run the demo
