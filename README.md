@@ -87,10 +87,10 @@ All algorithms are implemented as the `UISRNN` class. First, construct a
 `UISRNN` object by:
 
 ```python
-model = UISRNN(args)
+model = uisrnn.UISRNN(args)
 ```
 
-The definitions of the args are described in `model/arguments.py`.
+The definitions of the args are described in `uisrnn/arguments.py`.
 See `model_parser`.
 
 ### Training
@@ -133,7 +133,7 @@ and *block-wise* shuffling the training data as a **data augmentation**
 process, such that we result in a robust model even when there is insufficient
 number of training sequences.
 
-The definitions of the args are described in `model/arguments.py`.
+The definitions of the args are described in `uisrnn/arguments.py`.
 See `training_parser`.
 
 ### Prediction
@@ -151,7 +151,7 @@ corresponding to a **single** observation sequence.
 The returned `predicted_label` is a list of integers, with the same
 length as `test_sequence`.
 
-The definitions of the args are described in `model/arguments.py`.
+The definitions of the args are described in `uisrnn/arguments.py`.
 See `inference_parser`.
 
 ## Citations

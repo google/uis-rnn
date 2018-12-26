@@ -19,9 +19,9 @@ import unittest
 import numpy as np
 import torch
 
-from model import arguments
-from model import evals
-from model import uisrnn
+import uisrnn
+from uisrnn import arguments
+from uisrnn import evals
 
 
 def _generate_random_sequence(cluster_id, label_to_center, sigma=0.1):

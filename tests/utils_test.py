@@ -16,7 +16,7 @@ import unittest
 
 import numpy as np
 
-from model import utils
+from uisrnn import utils
 
 
 class TestSamplePermutedSegments(unittest.TestCase):

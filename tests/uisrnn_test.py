@@ -17,8 +17,8 @@ import unittest
 
 import numpy as np
 
-from model import arguments
-from model import uisrnn
+import uisrnn
+from uisrnn import arguments
 
 
 class TestUISRNN(unittest.TestCase):

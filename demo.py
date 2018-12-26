@@ -11,12 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""A demo script showing how to use the uisrnn package on toy data."""
 
-from model import arguments
-from model import evals
-from model import uisrnn
-from model import utils
 import numpy as np
+
+import uisrnn
+from uisrnn import arguments
+from uisrnn import evals
+from uisrnn import utils
+
 
 SAVED_MODEL_NAME = 'saved_model.uisrnn'
 
@@ -70,6 +73,7 @@ def diarization_experiment(model_args, training_args, inference_args):
 
 
 def main():
+  """The main function."""
   model_args, training_args, inference_args = arguments.parse_arguments()
   diarization_experiment(model_args, training_args, inference_args)
 

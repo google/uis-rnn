@@ -11,3 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""The module for Unbounded Interleaved-State Recurrent Neural Network."""
+
+from . import arguments
+from . import evals
+from . import loss_func
+from . import uisrnn
+from . import utils
+
+UISRNN = uisrnn.UISRNN

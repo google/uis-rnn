@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """The UIS-RNN model."""
+
 import numpy as np
 import torch
 from torch import autograd
@@ -19,8 +20,8 @@ from torch import nn
 from torch import optim
 import torch.nn.functional as F
 
-from model import loss_func
-from model import utils
+from uisrnn import loss_func
+from uisrnn import utils
 
 _INITIAL_SIGMA2_VALUE = 0.1
 
