@@ -73,7 +73,7 @@ def enforce_cluster_id_uniqueness(cluster_ids):
       cluster_id = cluster_id.tolist()
     if not isinstance(cluster_id, list):
       raise TypeError('Elements of cluster_ids must be list or numpy.ndarray')
-    new_cluster_id = ['_'.join([s, sequence_id]) for s in cluster_id]
+    new_cluster_id = ['_'.join([sequence_id, s]) for s in cluster_id]
     new_cluster_ids.append(new_cluster_id)
   return new_cluster_ids
 
