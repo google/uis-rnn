@@ -67,6 +67,18 @@ class TestIntegration(unittest.TestCase):
     random.shuffle(train_cluster_id)
     train_sequence = _generate_random_sequence(
         train_cluster_id, label_to_center, sigma=0.01)
+    train_sequences = [
+        train_sequence[:100, :],
+        train_sequence[100:300, :],
+        train_sequence[300:600, :],
+        train_sequence[600:, :]
+    ]
+    train_cluster_ids = [
+        train_cluster_id[:100],
+        train_cluster_id[100:300],
+        train_cluster_id[300:600],
+        train_cluster_id[600:]
+    ]
 
     # generate testing data
     test_cluster_id = ['A'] * 10 + ['B'] * 20 + ['C'] * 30 + ['D'] * 40
@@ -83,12 +95,13 @@ class TestIntegration(unittest.TestCase):
     training_args.learning_rate = 0.01
     training_args.learning_rate_half_life = 50
     training_args.train_iteration = 200
+    training_args.enforce_cluster_id_uniqueness = False
     inference_args.test_iteration = 2
 
     model = uisrnn.UISRNN(model_args)
 
     # run training, and save the model
-    model.fit(train_sequence, train_cluster_id, training_args)
+    model.fit(train_sequences, train_cluster_ids, training_args)
     temp_file_path = tempfile.mktemp()
     model.save(temp_file_path)
 

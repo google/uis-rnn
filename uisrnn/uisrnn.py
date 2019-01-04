@@ -165,8 +165,8 @@ class UISRNN:
             self.transition_bias, self.crp_alpha, var_dict['sigma2'],
             var_dict['rnn_init_hidden']))
 
-  def fit(self, train_sequence, train_cluster_id, args):
-    """Fit UISRNN model.
+  def _fit_concatenated(self, train_sequence, train_cluster_id, args):
+    """Fit UISRNN model to concatenated sequence and cluster_id.
 
     Args:
       train_sequence: 2-dim numpy array of real numbers, size: N * D
@@ -316,6 +316,48 @@ class UISRNN:
       train_loss.append(float(loss1.data))  # only save the likelihood part
     self.logger.print(
         1, 'Done training with {} iterations'.format(args.train_iteration))
+
+  def fit(self, train_sequences, train_cluster_ids, args):
+    """Fit UISRNN model.
+
+    Args:
+      train_sequences: either a list of training sequences, or a single
+        concatenated training sequence:
+        (1) train_sequences is list, and each element is a 2-dim numpy array of
+            real numbers, of size size: length * D.
+            The length varies among differnt sequences, but the D is the same.
+            In speaker diarization, each sequence is the sequence of speaker
+            embeddings of one utterance.
+        (2) train_sequences is a single concatenated sequence, which is a
+            2-dim numpy array of real numbers. See _fit_concatenated()
+            for more details.
+      train_cluster_ids: if train_sequences is a list, this must also be
+        a list of the same size, each element being a 1-dim list or numpy array
+        of strings; if train_sequences is a single concatenated sequence, this
+        must also be the concatenated 1-dim list or numpy array of strings
+      args: Training configurations. See arguments.py for details.
+
+    Raises:
+      TypeError: If train_sequences or train_cluster_ids is of wrong type.
+    """
+    if isinstance(train_sequences, np.ndarray):
+      # train_sequences is already the concatenated sequence
+      concatenated_train_sequence = train_sequences
+      concatenated_train_cluster_id = train_cluster_ids
+    elif isinstance(train_sequences, list):
+      # train_sequences is a list of un-concatenated sequences,
+      # then we concatenate them first
+      (concatenated_train_sequence,
+       concatenated_train_cluster_id) = utils.concatenate_training_data(
+           train_sequences,
+           train_cluster_ids,
+           args.enforce_cluster_id_uniqueness,
+           True)
+    else:
+      raise TypeError('train_sequences must be a list or numpy.ndarray')
+
+    self._fit_concatenated(
+        concatenated_train_sequence, concatenated_train_cluster_id, args)
 
   def _update_beam_state(self, beam_state, look_ahead_seq, cluster_seq):
     """Update a beam state given a look ahead sequence and known cluster

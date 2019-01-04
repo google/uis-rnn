@@ -151,6 +151,15 @@ def parse_arguments():
       default=5.0,
       type=float,
       help='Max norm of the gradient.')
+  training_parser.add_argument(
+      '--enforce_cluster_id_uniqueness',
+      default=True,
+      type=bool,
+      help='Whether to enforce cluster ID uniqueness across different '
+           'training sequences. Only effective when the first input to fit() '
+           'is a list of sequences. In general, assume the cluster IDs for two '
+           'sequences are [a, b] and [a, c]. If the `a` from the two sequences '
+           'are not the same label, then this arg should be True.')
 
   # inference configurations
   inference_parser = argparse.ArgumentParser(
