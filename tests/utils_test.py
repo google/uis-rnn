@@ -34,6 +34,66 @@ class TestEnforceClusterIdUniqueness(unittest.TestCase):
     self.assertEqual(7, len(set(merged)))
 
 
+class TestConcatenateTrainingData(unittest.TestCase):
+  """Tests for utils.concatenate_training_data()"""
+
+  def setUp(self):
+    """Set up input."""
+    self.train_sequences = [
+        np.zeros((3, 2)),
+        np.ones((4, 2))]
+    self.train_cluster_ids = [
+        ['a', 'b', 'a'],
+        np.array(['a', 'b', 'c', 'b'])]
+
+  def test_noenforce_noshuffle(self):
+    """Test when we do not enforce uniqueness, and do not shuffle."""
+    (concatenated_train_sequence,
+     concatenated_train_cluster_id) = utils.concatenate_training_data(
+         self.train_sequences, self.train_cluster_ids, False, False)
+    self.assertListEqual(
+        [0.0] * 6 + [1.0] * 8,
+        concatenated_train_sequence.flatten().tolist())
+    self.assertListEqual(
+        ['a', 'b', 'a', 'a', 'b', 'c', 'b'],
+        concatenated_train_cluster_id)
+
+  def test_enforce_noshuffle(self):
+    """Test when we enforce uniqueness, but do not shuffle."""
+    (concatenated_train_sequence,
+     concatenated_train_cluster_id) = utils.concatenate_training_data(
+         self.train_sequences, self.train_cluster_ids, True, False)
+    self.assertListEqual(
+        [0.0] * 6 + [1.0] * 8,
+        concatenated_train_sequence.flatten().tolist())
+    self.assertEqual(
+        7,
+        len(concatenated_train_cluster_id))
+    self.assertEqual(
+        5,
+        len(set(concatenated_train_cluster_id)))
+
+  def test_noenforce_shuffle(self):
+    """Test when we do not enforce uniqueness, but do shuffle."""
+    (concatenated_train_sequence,
+     concatenated_train_cluster_id) = utils.concatenate_training_data(
+         self.train_sequences, self.train_cluster_ids, False, True)
+    try:
+      self.assertListEqual(
+          [0.0] * 6 + [1.0] * 8,
+          concatenated_train_sequence.flatten().tolist())
+      self.assertListEqual(
+          ['a', 'b', 'a', 'a', 'b', 'c', 'b'],
+          concatenated_train_cluster_id)
+    except AssertionError:
+      self.assertListEqual(
+          [1.0] * 8 + [0.0] * 6,
+          concatenated_train_sequence.flatten().tolist())
+      self.assertListEqual(
+          ['a', 'b', 'c', 'b', 'a', 'b', 'a'],
+          concatenated_train_cluster_id)
+
+
 class TestSamplePermutedSegments(unittest.TestCase):
   """Tests for utils.sample_permuted_segments()"""
 

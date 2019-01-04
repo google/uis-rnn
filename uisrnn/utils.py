@@ -65,17 +65,79 @@ def enforce_cluster_id_uniqueness(cluster_ids):
     TypeError: if cluster_ids or its element has wrong type
   """
   if not isinstance(cluster_ids, list):
-    raise TypeError("cluster_ids must be a list")
+    raise TypeError('cluster_ids must be a list')
   new_cluster_ids = []
   for cluster_id in cluster_ids:
     sequence_id = generate_random_string()
     if isinstance(cluster_id, np.ndarray):
       cluster_id = cluster_id.tolist()
     if not isinstance(cluster_id, list):
-      raise TypeError("Elements of cluster_ids must be list or numpy.ndarray")
+      raise TypeError('Elements of cluster_ids must be list or numpy.ndarray')
     new_cluster_id = ['_'.join([s, sequence_id]) for s in cluster_id]
     new_cluster_ids.append(new_cluster_id)
   return new_cluster_ids
+
+
+def concatenate_training_data(train_sequences, train_cluster_ids,
+                              enforce_uniqueness=True, shuffle=True):
+  """Concatenate training data.
+
+  Args:
+    train_sequences: a list of 2-dim numpy arrays to be concatenated
+    train_cluster_ids: a list of 1-dim list/numpy.ndarray of strings
+    enforce_uniqueness: a boolean indicated whether we should enfore uniqueness
+      to train_cluster_ids
+    shuffle: whether to randomly shuffle input order
+
+  Returns:
+    concatenated_train_sequence: a 2-dim numpy array
+    concatenated_train_cluster_id: a list of strings
+
+  Raises:
+    TypeError: if input has wrong type
+    ValueError: if sizes/dimensions of input or their elements are incorrect
+  """
+  # check input
+  if not isinstance(train_sequences, list) or not isinstance(
+      train_cluster_ids, list):
+    raise TypeError('train_sequences and train_cluster_ids must be lists')
+  if len(train_sequences) != len(train_cluster_ids):
+    raise ValueError(
+        'train_sequences and train_cluster_ids must have same size')
+  train_cluster_ids = [
+      x.tolist() if isinstance(x, np.ndarray) else x
+      for x in train_cluster_ids]
+  global_observation_dim = None
+  for i, (train_sequence, train_cluster_id) in enumerate(
+      zip(train_sequences, train_cluster_ids)):
+    train_length, observation_dim = train_sequence.shape
+    if i == 0:
+      global_observation_dim = observation_dim
+    elif global_observation_dim != observation_dim:
+      raise ValueError(
+          'train_sequences must have consistent observation dimension')
+    if not isinstance(train_cluster_id, list):
+      raise TypeError(
+          'Elements of train_cluster_ids must be list or numpy.ndarray')
+    if len(train_cluster_id) != train_length:
+      raise ValueError(
+          'Each train_sequence and its train_cluster_id must have same length')
+
+  # enforce uniqueness
+  if enforce_uniqueness:
+    train_cluster_ids = enforce_cluster_id_uniqueness(train_cluster_ids)
+
+  # random shuffle
+  if shuffle:
+    zipped_input = list(zip(train_sequences, train_cluster_ids))
+    random.shuffle(zipped_input)
+    train_sequences, train_cluster_ids = zip(*zipped_input)
+
+  # concatenate
+  concatenated_train_sequence = np.concatenate(train_sequences, axis=0)
+  concatenated_train_cluster_id = [x for train_cluster_id in train_cluster_ids
+                                   for x in train_cluster_id]
+  return concatenated_train_sequence, concatenated_train_cluster_id
 
 
 def sample_permuted_segments(index_sequence, number_samples):
