@@ -13,6 +13,9 @@
 # limitations under the License.
 """Utils for UIS-RNN."""
 
+import random
+import string
+
 import numpy as np
 import torch
 from torch import autograd
@@ -33,6 +36,46 @@ class Logger:
     """
     if level <= self._verbosity:
       print(message)
+
+
+def generate_random_string(length=6):
+  """Generate a random string of upper case letters and digits.
+
+  Args:
+    length: length of the generated string
+
+  Returns:
+    the generated string
+  """
+  return ''.join([
+      random.choice(string.ascii_uppercase + string.digits)
+      for _ in range(length)])
+
+
+def enforce_cluster_id_uniqueness(cluster_ids):
+  """Enforce uniqueness of cluster id across sequences.
+
+  Args:
+    cluster_ids: a list of 1-dim list/numpy.ndarray of strings
+
+  Returns:
+    a new list with same length of cluster_ids
+
+  Raises:
+    TypeError: if cluster_ids or its element has wrong type
+  """
+  if not isinstance(cluster_ids, list):
+    raise TypeError("cluster_ids must be a list")
+  new_cluster_ids = []
+  for cluster_id in cluster_ids:
+    sequence_id = generate_random_string()
+    if isinstance(cluster_id, np.ndarray):
+      cluster_id = cluster_id.tolist()
+    if not isinstance(cluster_id, list):
+      raise TypeError("Elements of cluster_ids must be list or numpy.ndarray")
+    new_cluster_id = ['_'.join([s, sequence_id]) for s in cluster_id]
+    new_cluster_ids.append(new_cluster_id)
+  return new_cluster_ids
 
 
 def sample_permuted_segments(index_sequence, number_samples):

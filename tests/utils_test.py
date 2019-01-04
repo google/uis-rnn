@@ -19,6 +19,21 @@ import numpy as np
 from uisrnn import utils
 
 
+class TestEnforceClusterIdUniqueness(unittest.TestCase):
+  """Tests for utils.enforce_cluster_id_uniqueness()"""
+
+  def test_list_of_list(self):
+    """Test when cluster_ids is a list of list."""
+    cluster_ids = [['a', 'b', 'c'], ['b', 'c', 'd', 'e']]
+    new_cluster_ids = utils.enforce_cluster_id_uniqueness(cluster_ids)
+    self.assertEqual(2, len(new_cluster_ids))
+    self.assertEqual(3, len(new_cluster_ids[0]))
+    self.assertEqual(4, len(new_cluster_ids[1]))
+    merged = [x for new_cluster_id in new_cluster_ids for x in new_cluster_id]
+    self.assertEqual(7, len(merged))
+    self.assertEqual(7, len(set(merged)))
+
+
 class TestSamplePermutedSegments(unittest.TestCase):
   """Tests for utils.sample_permuted_segments()"""
 
