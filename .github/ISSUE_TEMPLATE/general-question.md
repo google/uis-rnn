@@ -13,7 +13,10 @@ A clear and concise description of what the question is.
 ## My background
 
 Have I read the `README.md` file?
-* yes/no - if you answered no, stop filing the issue, and read it first
+* yes/no - if you answered no, please stop filing the issue, and read it first
+
+Have I searched for similar questions from closed issues?
+* yes/no - if you answered no, please do it first
 
 Do I have a background in machine learning?
 * yes/no
