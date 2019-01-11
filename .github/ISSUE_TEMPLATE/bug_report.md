@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG]"
+title: "[Bug]"
 labels: bug
 assignees: ''
 
@@ -18,7 +18,7 @@ I used these commands and arguments.
 
 ### Logs
 
-Here are what have been printed to screen (screenshots, Google drive link to text file).
+Here are what have been printed to screen (screenshots, Google drive links to text files, etc.).
 
 ### Serialized models
 
