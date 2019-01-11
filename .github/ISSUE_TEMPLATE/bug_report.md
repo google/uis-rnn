@@ -30,10 +30,10 @@ Here are links to samples of my training and testing data (original audios + emb
 
 ### Versions
 
-uis-rnn git HEAD: ?????
-numpy: ???
-scipy: ???
-torch: ???
+* uis-rnn git HEAD: ?????
+* numpy: ???
+* scipy: ???
+* torch: ???
 
 ## Additional context
 Add any other context about the problem here.
