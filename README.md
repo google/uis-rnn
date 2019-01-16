@@ -265,7 +265,7 @@ To learn more about our speaker embedding system, check out
 We are aware of several third-party implementations of this work:
 
 * [TensorFlow implementation by Janghyun1230](https://github.com/Janghyun1230/Speaker_Verification)
-* [PyTorch implementaion by HarryVolek](https://github.com/HarryVolek/PyTorch_Speaker_Verification)
+* [PyTorch implementaion by HarryVolek](https://github.com/HarryVolek/PyTorch_Speaker_Verification) - with UIS-RNN integration
 
 Please use your own judgement to decide whether you want to use these
 implementations.
