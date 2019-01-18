@@ -18,12 +18,6 @@ Have I read the `README.md` file?
 Have I searched for similar questions from closed issues?
 * yes/no - if you answered no, please do it first
 
-Do I have a background in machine learning?
-* yes/no
-
-Do I have a background in speaker diarization?
-* yes/no
-
 Have I tried to find the answers in the paper *Fully Supervised Speaker Diarization*?
 * yes/no
 
