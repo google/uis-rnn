@@ -260,6 +260,8 @@ The ground truth labels for the
 dataset (Disk6 and Disk8) can be found
 [here](https://github.com/google/speaker-id/tree/master/publications/LstmDiarization/evaluation/NIST_SRE2000).
 
+For more public resources on speaker diarization, check out [awesome-diarization](https://github.com/wq2012/awesome-diarization).
+
 ### Speaker recognizer/encoder
 
 To learn more about our speaker embedding system, check out
