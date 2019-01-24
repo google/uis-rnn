@@ -1,4 +1,4 @@
-# UIS-RNN [![Build Status](https://travis-ci.org/google/uis-rnn.svg?branch=master)](https://travis-ci.org/google/uis-rnn) [![PyPI Version](https://img.shields.io/pypi/v/uisrnn.svg)](https://pypi.python.org/pypi/uisrnn) [![Python Versions](https://img.shields.io/pypi/pyversions/uisrnn.svg)](https://pypi.org/project/uisrnn)
+# UIS-RNN [![Build Status](https://travis-ci.org/google/uis-rnn.svg?branch=master)](https://travis-ci.org/google/uis-rnn) [![PyPI Version](https://img.shields.io/pypi/v/uisrnn.svg)](https://pypi.python.org/pypi/uisrnn) [![Python Versions](https://img.shields.io/pypi/pyversions/uisrnn.svg)](https://pypi.org/project/uisrnn) [![Documentation](https://img.shields.io/badge/api-reference-blue.svg)](https://google.github.io/uis-rnn)
 
 ## Overview
 
