@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The module for Unbounded Interleaved-State Recurrent Neural Network."""
+"""The module for Unbounded Interleaved-State Recurrent Neural Network.
+
+An introduction is available at [README.md].
+
+[README.md]: https://github.com/google/uis-rnn/blob/master/README.md
+"""
 
 from . import arguments
 from . import evals

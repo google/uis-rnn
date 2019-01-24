@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc ???" />
+<meta name="generator" content="pdoc 0.5.2.dev4+ge2739ce" />
 <title>uisrnn.utils API documentation</title>
 <meta name="description" content="Utils for UIS-RNN." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -124,7 +124,7 @@ def concatenate_training_data(train_sequences, train_cluster_ids,
   &#34;&#34;&#34;
   # check input
   if not isinstance(train_sequences, list) or not isinstance(
-      train_cluster_ids, list):
+          train_cluster_ids, list):
     raise TypeError(&#39;train_sequences and train_cluster_ids must be lists&#39;)
   if len(train_sequences) != len(train_cluster_ids):
     raise ValueError(
@@ -134,7 +134,7 @@ def concatenate_training_data(train_sequences, train_cluster_ids,
       for x in train_cluster_ids]
   global_observation_dim = None
   for i, (train_sequence, train_cluster_id) in enumerate(
-      zip(train_sequences, train_cluster_ids)):
+          zip(train_sequences, train_cluster_ids)):
     train_length, observation_dim = train_sequence.shape
     if i == 0:
       global_observation_dim = observation_dim
@@ -177,14 +177,16 @@ def sample_permuted_segments(index_sequence, number_samples):
       For example, number_samples = 5
 
   Returns:
-    sampled_index_sequences: (a list of numpy arrays)
-      - a list of subsampled block-preserving permuted sequences.
-      For example, sampled_index_sequences =
+    sampled_index_sequences: (a list of numpy arrays) - a list of subsampled
+      block-preserving permuted sequences. For example,
+      ```
+      sampled_index_sequences =
       [[10,11,12,1,2,6],
        [6,1,2,10,11,12],
        [1,2,10,11,12,6],
        [6,1,2,10,11,12],
        [1,2,6,10,11,12]]
+      ```
       The length of &#34;sampled_index_sequences&#34; is &#34;number_samples&#34;.
   &#34;&#34;&#34;
   segments = []
@@ -252,7 +254,7 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
 
 
 def pack_sequence(
-    sub_sequences, seq_lengths, batch_size, observation_dim, device):
+        sub_sequences, seq_lengths, batch_size, observation_dim, device):
   &#34;&#34;&#34;Pack sequences for training.
 
   Args:
@@ -262,7 +264,7 @@ def pack_sequence(
     batch_size: int or None - Run batch learning if batch_size is None. Else,
       run online learning with specified batch size.
     observation_dim: int - dimension for observation vectors
-    device: str - Your device. E.g., &#39;cuda:0&#39; or &#39;cpu&#39;.
+    device: str - Your device. E.g., `cuda:0` or `cpu`.
 
   Returns:
     packed_rnn_input: (PackedSequence object) packed rnn input
@@ -398,7 +400,7 @@ to train_cluster_ids</dd>
   &#34;&#34;&#34;
   # check input
   if not isinstance(train_sequences, list) or not isinstance(
-      train_cluster_ids, list):
+          train_cluster_ids, list):
     raise TypeError(&#39;train_sequences and train_cluster_ids must be lists&#39;)
   if len(train_sequences) != len(train_cluster_ids):
     raise ValueError(
@@ -408,7 +410,7 @@ to train_cluster_ids</dd>
       for x in train_cluster_ids]
   global_observation_dim = None
   for i, (train_sequence, train_cluster_id) in enumerate(
-      zip(train_sequences, train_cluster_ids)):
+          zip(train_sequences, train_cluster_ids)):
     train_length, observation_dim = train_sequence.shape
     if i == 0:
       global_observation_dim = observation_dim
@@ -574,7 +576,7 @@ run online learning with specified batch size.</dd>
 <dt><strong><code>observation_dim</code></strong></dt>
 <dd>int - dimension for observation vectors</dd>
 <dt><strong><code>device</code></strong></dt>
-<dd>str - Your device. E.g., 'cuda:0' or 'cpu'.</dd>
+<dd>str - Your device. E.g., <code>cuda:0</code> or <code>cpu</code>.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -586,7 +588,7 @@ run online learning with specified batch size.</dd>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def pack_sequence(
-    sub_sequences, seq_lengths, batch_size, observation_dim, device):
+        sub_sequences, seq_lengths, batch_size, observation_dim, device):
   &#34;&#34;&#34;Pack sequences for training.
 
   Args:
@@ -596,7 +598,7 @@ run online learning with specified batch size.</dd>
     batch_size: int or None - Run batch learning if batch_size is None. Else,
       run online learning with specified batch size.
     observation_dim: int - dimension for observation vectors
-    device: str - Your device. E.g., &#39;cuda:0&#39; or &#39;cpu&#39;.
+    device: str - Your device. E.g., `cuda:0` or `cpu`.
 
   Returns:
     packed_rnn_input: (PackedSequence object) packed rnn input
@@ -724,18 +726,17 @@ For example, number_samples = 5</dd>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>sampled_index_sequences</code></strong></dt>
-<dd>(a list of numpy arrays)</dd>
+<dd>(a list of numpy arrays) - a list of subsampled</dd>
 </dl>
-<ul>
-<li>a list of subsampled block-preserving permuted sequences.
-For example, sampled_index_sequences =
+<p>block-preserving permuted sequences. For example,</p>
+<pre><code>sampled_index_sequences =
 [[10,11,12,1,2,6],
-[6,1,2,10,11,12],
-[1,2,10,11,12,6],
-[6,1,2,10,11,12],
-[1,2,6,10,11,12]]
-The length of "sampled_index_sequences" is "number_samples".</li>
-</ul></section>
+ [6,1,2,10,11,12],
+ [1,2,10,11,12,6],
+ [6,1,2,10,11,12],
+ [1,2,6,10,11,12]]
+</code></pre>
+<p>The length of "sampled_index_sequences" is "number_samples".</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def sample_permuted_segments(index_sequence, number_samples):
@@ -750,14 +751,16 @@ The length of "sampled_index_sequences" is "number_samples".</li>
       For example, number_samples = 5
 
   Returns:
-    sampled_index_sequences: (a list of numpy arrays)
-      - a list of subsampled block-preserving permuted sequences.
-      For example, sampled_index_sequences =
+    sampled_index_sequences: (a list of numpy arrays) - a list of subsampled
+      block-preserving permuted sequences. For example,
+      ```
+      sampled_index_sequences =
       [[10,11,12,1,2,6],
        [6,1,2,10,11,12],
        [1,2,10,11,12,6],
        [6,1,2,10,11,12],
        [1,2,6,10,11,12]]
+      ```
       The length of &#34;sampled_index_sequences&#34; is &#34;number_samples&#34;.
   &#34;&#34;&#34;
   segments = []
@@ -891,7 +894,7 @@ See help(type(self)) for accurate signature.</p></section>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> ???</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.2.dev4+ge2739ce</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

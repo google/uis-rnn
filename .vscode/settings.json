@@ -8,7 +8,7 @@
   "files.trimTrailingWhitespace": true,
   "editor.formatOnSave": true,
   "terminal.integrated.fontSize": 13,
-  "python.formatting.provider": "autopep8",
+  "python.formatting.provider": "none",
   "python.formatting.autopep8Args": [
     "--indent-size=2",
     "--max-line-length=80"
