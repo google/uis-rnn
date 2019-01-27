@@ -80,7 +80,7 @@ class UISRNN:
     """Construct the UISRNN object.
 
     Args:
-      args: Model configurations. See arguments.py for details.
+      args: Model configurations. See `arguments.py` for details.
     """
     self.observation_dim = args.observation_dim
     self.device = torch.device(
@@ -165,33 +165,40 @@ class UISRNN:
             self.transition_bias, self.crp_alpha, var_dict['sigma2'],
             var_dict['rnn_init_hidden']))
 
-  def _fit_concatenated(self, train_sequence, train_cluster_id, args):
+  def fit_concatenated(self, train_sequence, train_cluster_id, args):
     """Fit UISRNN model to concatenated sequence and cluster_id.
 
     Args:
-      train_sequence: 2-dim numpy array of real numbers, size: N * D
-        - the training observation sequence.
-        N - summation of lengths of all utterances
-        D - observation dimension
+      train_sequence: the training observation sequence, which is a
+        2-dim numpy array of real numbers, of size `N * D`.
+
+        - `N`: summation of lengths of all utterances.
+        - `D`: observation dimension.
+
         For example,
-        ```
-        train_sequence =
-        [[1.2 3.0 -4.1 6.0]    --> an entry of speaker #0 from utterance 'iaaa'
-         [0.8 -1.1 0.4 0.5]    --> an entry of speaker #1 from utterance 'iaaa'
-         [-0.2 1.0 3.8 5.7]    --> an entry of speaker #0 from utterance 'iaaa'
-         [3.8 -0.1 1.5 2.3]    --> an entry of speaker #0 from utterance 'ibbb'
-         [1.2 1.4 3.6 -2.7]]   --> an entry of speaker #0 from utterance 'ibbb'
-        ```
-        Here N=5, D=4.
-        We concatenate all training utterances into a single sequence.
-      train_cluster_id: 1-dim list or numpy array of strings, size: N
-        - the speaker id sequence.
-        For example, train_cluster_id =
+      ```
+      train_sequence =
+      [[1.2 3.0 -4.1 6.0]    --> an entry of speaker #0 from utterance 'iaaa'
+       [0.8 -1.1 0.4 0.5]    --> an entry of speaker #1 from utterance 'iaaa'
+       [-0.2 1.0 3.8 5.7]    --> an entry of speaker #0 from utterance 'iaaa'
+       [3.8 -0.1 1.5 2.3]    --> an entry of speaker #0 from utterance 'ibbb'
+       [1.2 1.4 3.6 -2.7]]   --> an entry of speaker #0 from utterance 'ibbb'
+      ```
+        Here `N=5`, `D=4`.
+
+        We concatenate all training utterances into this single sequence.
+      train_cluster_id: the speaker id sequence, which is 1-dim list or
+        numpy array of strings, of size `N`.
+        For example,
+      ```
+      train_cluster_id =
         ['iaaa_0', 'iaaa_1', 'iaaa_0', 'ibbb_0', 'ibbb_0']
+      ```
         'iaaa_0' means the entry belongs to speaker #0 in utterance 'iaaa'.
+
         Note that the order of entries within an utterance are preserved,
         and all utterances are simply concatenated together.
-      args: Training configurations. See arguments.py for details.
+      args: Training configurations. See `arguments.py` for details.
 
     Raises:
       TypeError: If train_sequence or train_cluster_id is of wrong type.
@@ -327,25 +334,21 @@ class UISRNN:
       train_sequences: Either a list of training sequences, or a single
         concatenated training sequence:
 
-          (1) train_sequences is list, and each element is a 2-dim numpy array
-              of real numbers, of size size: length * D.
-              The length varies among differnt sequences, but the D is the same.
-              In speaker diarization, each sequence is the sequence of speaker
-              embeddings of one utterance.
-
-          (2) train_sequences is a single concatenated sequence, which is a
-              2-dim numpy array of real numbers. See _fit_concatenated()
-              for more details.
-
+        1. train_sequences is list, and each element is a 2-dim numpy array
+            of real numbers, of size: `length * D`.
+            The length varies among differnt sequences, but the D is the same.
+            In speaker diarization, each sequence is the sequence of speaker
+            embeddings of one utterance.
+        2. train_sequences is a single concatenated sequence, which is a
+            2-dim numpy array of real numbers. See `fit_concatenated()`
+            for more details.
       train_cluster_ids: Ground truth labels for train_sequences:
 
-          (1) if train_sequences is a list, this must also be a list of the same
-              size, each element being a 1-dim list or numpy array of strings.
-
-          (2) if train_sequences is a single concatenated sequence, this
-              must also be the concatenated 1-dim list or numpy array of strings
-
-      args: Training configurations. See arguments.py for details.
+        1. if train_sequences is a list, this must also be a list of the same
+           size, each element being a 1-dim list or numpy array of strings.
+        2. if train_sequences is a single concatenated sequence, this
+           must also be the concatenated 1-dim list or numpy array of strings
+      args: Training configurations. See `arguments.py` for details.
 
     Raises:
       TypeError: If train_sequences or train_cluster_ids is of wrong type.
@@ -366,7 +369,7 @@ class UISRNN:
     else:
       raise TypeError('train_sequences must be a list or numpy.ndarray')
 
-    self._fit_concatenated(
+    self.fit_concatenated(
         concatenated_train_sequence, concatenated_train_cluster_id, args)
 
   def _update_beam_state(self, beam_state, look_ahead_seq, cluster_seq):
@@ -464,12 +467,13 @@ class UISRNN:
     """Predict test sequence labels using UISRNN model.
 
     Args:
-      test_sequence: 2-dim numpy array of real numbers, size: N * D
-        - the test observation sequence.
-        N - length of one test utterance.
-        D - observation dimension.
-        For example:
+      test_sequence: the test observation sequence, which is 2-dim numpy array
+        of real numbers, of size `N * D`.
 
+        - `N`: length of one test utterance.
+        - `D` : observation dimension.
+
+        For example:
       ```
       test_sequence =
       [[2.2 -1.0 3.0 5.6]   --> 1st entry of utterance 'iccc'
@@ -478,14 +482,13 @@ class UISRNN:
       [-3.8 0.1 1.4 3.3]    --> 4th entry of utterance 'iccc'
       [0.1 2.7 3.5 -1.7]]   --> 5th entry of utterance 'iccc'
       ```
-
-        Here N=5, D=4.
-      args: Inference configurations. See arguments.py for details.
+        Here `N=5`, `D=4`.
+      args: Inference configurations. See `arguments.py` for details.
 
     Returns:
-      predicted_cluster_id: (integer array, size: N)
-        - predicted speaker id sequence.
-        For example, predicted_cluster_id = [0, 1, 0, 0, 1]
+      predicted_cluster_id: predicted speaker id sequence, which is
+        an array of integers, of size `N`.
+        For example, `predicted_cluster_id = [0, 1, 0, 0, 1]`
 
     Raises:
       TypeError: If test_sequence is of wrong type.

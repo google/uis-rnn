@@ -23,9 +23,10 @@ def parse_arguments():
 
   Returns:
     A tuple of:
-      model_args: model arguments
-      training_args: training arguments
-      inference_args: inference arguments
+
+      - `model_args`: model arguments
+      - `training_args`: training arguments
+      - `inference_args`: inference arguments
   """
   # model configurations
   model_parser = argparse.ArgumentParser(

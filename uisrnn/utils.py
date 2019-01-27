@@ -154,14 +154,14 @@ def sample_permuted_segments(index_sequence, number_samples):
   Returns:
     sampled_index_sequences: (a list of numpy arrays) - a list of subsampled
       block-preserving permuted sequences. For example,
-      ```
-      sampled_index_sequences =
-      [[10,11,12,1,2,6],
-       [6,1,2,10,11,12],
-       [1,2,10,11,12,6],
-       [6,1,2,10,11,12],
-       [1,2,6,10,11,12]]
-      ```
+    ```
+    sampled_index_sequences =
+    [[10,11,12,1,2,6],
+      [6,1,2,10,11,12],
+      [1,2,10,11,12,6],
+      [6,1,2,10,11,12],
+      [1,2,6,10,11,12]]
+    ```
       The length of "sampled_index_sequences" is "number_samples".
   """
   segments = []
@@ -229,7 +229,7 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
 
 
 def pack_sequence(
-        sub_sequences, seq_lengths, batch_size, observation_dim, device):
+    sub_sequences, seq_lengths, batch_size, observation_dim, device):
   """Pack sequences for training.
 
   Args:

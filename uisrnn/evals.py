@@ -24,7 +24,7 @@ def get_list_inverse_index(unique_ids):
     unique_ids: A list of unique integers of strings.
 
   Returns:
-    a dict from value to position
+    result: a dict from value to position
 
   Raises:
     TypeError: If unique_ids is not a list.
@@ -45,7 +45,7 @@ def compute_sequence_match_accuracy(sequence1, sequence2):
     sequence2: A list of integers or strings.
 
   Returns:
-    sequence matching accuracy as a number in [0.0, 1.0]
+    accuracy: sequence matching accuracy as a number in [0.0, 1.0]
 
   Raises:
     TypeError: If sequence1 or sequence2 is not list.

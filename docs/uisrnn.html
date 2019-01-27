@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.2.dev4+ge2739ce" />
+<meta name="generator" content="pdoc 0.5.2.dev16+gc8de804" />
 <title>uisrnn.uisrnn API documentation</title>
 <meta name="description" content="The UIS-RNN model." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:1px solid #ddd;margin:1em 0 1em 4ch}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{background:#ffc;font-weight:400;font-size:.8em;width:11em;text-transform:uppercase;padding:0px 8px;border:1px solid #fd6;border-radius:5px;cursor:pointer}.source summary:hover{background:#fe9 !important}.source[open] summary{background:#fda}.source pre{max-height:500px;overflow-y:scroll;margin-bottom:15px}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
-<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:" (" attr(href) ")"}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
 <body>
 <main>
@@ -105,7 +105,7 @@ class UISRNN:
     &#34;&#34;&#34;Construct the UISRNN object.
 
     Args:
-      args: Model configurations. See arguments.py for details.
+      args: Model configurations. See `arguments.py` for details.
     &#34;&#34;&#34;
     self.observation_dim = args.observation_dim
     self.device = torch.device(
@@ -190,33 +190,40 @@ class UISRNN:
             self.transition_bias, self.crp_alpha, var_dict[&#39;sigma2&#39;],
             var_dict[&#39;rnn_init_hidden&#39;]))
 
-  def _fit_concatenated(self, train_sequence, train_cluster_id, args):
+  def fit_concatenated(self, train_sequence, train_cluster_id, args):
     &#34;&#34;&#34;Fit UISRNN model to concatenated sequence and cluster_id.
 
     Args:
-      train_sequence: 2-dim numpy array of real numbers, size: N * D
-        - the training observation sequence.
-        N - summation of lengths of all utterances
-        D - observation dimension
+      train_sequence: the training observation sequence, which is a
+        2-dim numpy array of real numbers, of size `N * D`.
+
+        - `N`: summation of lengths of all utterances.
+        - `D`: observation dimension.
+
         For example,
-        ```
-        train_sequence =
-        [[1.2 3.0 -4.1 6.0]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
-         [0.8 -1.1 0.4 0.5]    --&gt; an entry of speaker #1 from utterance &#39;iaaa&#39;
-         [-0.2 1.0 3.8 5.7]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
-         [3.8 -0.1 1.5 2.3]    --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
-         [1.2 1.4 3.6 -2.7]]   --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
-        ```
-        Here N=5, D=4.
-        We concatenate all training utterances into a single sequence.
-      train_cluster_id: 1-dim list or numpy array of strings, size: N
-        - the speaker id sequence.
-        For example, train_cluster_id =
+      ```
+      train_sequence =
+      [[1.2 3.0 -4.1 6.0]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
+       [0.8 -1.1 0.4 0.5]    --&gt; an entry of speaker #1 from utterance &#39;iaaa&#39;
+       [-0.2 1.0 3.8 5.7]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
+       [3.8 -0.1 1.5 2.3]    --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
+       [1.2 1.4 3.6 -2.7]]   --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
+      ```
+        Here `N=5`, `D=4`.
+
+        We concatenate all training utterances into this single sequence.
+      train_cluster_id: the speaker id sequence, which is 1-dim list or
+        numpy array of strings, of size `N`.
+        For example,
+      ```
+      train_cluster_id =
         [&#39;iaaa_0&#39;, &#39;iaaa_1&#39;, &#39;iaaa_0&#39;, &#39;ibbb_0&#39;, &#39;ibbb_0&#39;]
+      ```
         &#39;iaaa_0&#39; means the entry belongs to speaker #0 in utterance &#39;iaaa&#39;.
+
         Note that the order of entries within an utterance are preserved,
         and all utterances are simply concatenated together.
-      args: Training configurations. See arguments.py for details.
+      args: Training configurations. See `arguments.py` for details.
 
     Raises:
       TypeError: If train_sequence or train_cluster_id is of wrong type.
@@ -224,12 +231,12 @@ class UISRNN:
     &#34;&#34;&#34;
     # check type
     if (not isinstance(train_sequence, np.ndarray) or
-            train_sequence.dtype != float):
+        train_sequence.dtype != float):
       raise TypeError(&#39;train_sequence should be a numpy array of float type.&#39;)
     if isinstance(train_cluster_id, list):
       train_cluster_id = np.array(train_cluster_id)
     if (not isinstance(train_cluster_id, np.ndarray) or
-            not train_cluster_id.dtype.name.startswith(&#39;str&#39;)):
+        not train_cluster_id.dtype.name.startswith(&#39;str&#39;)):
       raise TypeError(&#39;train_cluster_id type be a numpy array of strings.&#39;)
     # check dimension
     if train_sequence.ndim != 2:
@@ -328,7 +335,7 @@ class UISRNN:
       self.sigma2.data.clamp_(min=1e-6)
 
       if (np.remainder(num_iter, 10) == 0 or
-              num_iter == args.train_iteration - 1):
+          num_iter == args.train_iteration - 1):
         self.logger.print(
             2,
             &#39;Iter: {:d}  \t&#39;
@@ -352,25 +359,21 @@ class UISRNN:
       train_sequences: Either a list of training sequences, or a single
         concatenated training sequence:
 
-          (1) train_sequences is list, and each element is a 2-dim numpy array
-              of real numbers, of size size: length * D.
-              The length varies among differnt sequences, but the D is the same.
-              In speaker diarization, each sequence is the sequence of speaker
-              embeddings of one utterance.
-
-          (2) train_sequences is a single concatenated sequence, which is a
-              2-dim numpy array of real numbers. See _fit_concatenated()
-              for more details.
-
+        1. train_sequences is list, and each element is a 2-dim numpy array
+            of real numbers, of size: `length * D`.
+            The length varies among differnt sequences, but the D is the same.
+            In speaker diarization, each sequence is the sequence of speaker
+            embeddings of one utterance.
+        2. train_sequences is a single concatenated sequence, which is a
+            2-dim numpy array of real numbers. See `fit_concatenated()`
+            for more details.
       train_cluster_ids: Ground truth labels for train_sequences:
 
-          (1) if train_sequences is a list, this must also be a list of the same
-              size, each element being a 1-dim list or numpy array of strings.
-
-          (2) if train_sequences is a single concatenated sequence, this
-              must also be the concatenated 1-dim list or numpy array of strings
-
-      args: Training configurations. See arguments.py for details.
+        1. if train_sequences is a list, this must also be a list of the same
+           size, each element being a 1-dim list or numpy array of strings.
+        2. if train_sequences is a single concatenated sequence, this
+           must also be the concatenated 1-dim list or numpy array of strings
+      args: Training configurations. See `arguments.py` for details.
 
     Raises:
       TypeError: If train_sequences or train_cluster_ids is of wrong type.
@@ -391,7 +394,7 @@ class UISRNN:
     else:
       raise TypeError(&#39;train_sequences must be a list or numpy.ndarray&#39;)
 
-    self._fit_concatenated(
+    self.fit_concatenated(
         concatenated_train_sequence, concatenated_train_cluster_id, args)
 
   def _update_beam_state(self, beam_state, look_ahead_seq, cluster_seq):
@@ -489,12 +492,13 @@ class UISRNN:
     &#34;&#34;&#34;Predict test sequence labels using UISRNN model.
 
     Args:
-      test_sequence: 2-dim numpy array of real numbers, size: N * D
-        - the test observation sequence.
-        N - length of one test utterance.
-        D - observation dimension.
-        For example:
+      test_sequence: the test observation sequence, which is 2-dim numpy array
+        of real numbers, of size `N * D`.
 
+        - `N`: length of one test utterance.
+        - `D` : observation dimension.
+
+        For example:
       ```
       test_sequence =
       [[2.2 -1.0 3.0 5.6]   --&gt; 1st entry of utterance &#39;iccc&#39;
@@ -503,14 +507,13 @@ class UISRNN:
       [-3.8 0.1 1.4 3.3]    --&gt; 4th entry of utterance &#39;iccc&#39;
       [0.1 2.7 3.5 -1.7]]   --&gt; 5th entry of utterance &#39;iccc&#39;
       ```
-
-        Here N=5, D=4.
-      args: Inference configurations. See arguments.py for details.
+        Here `N=5`, `D=4`.
+      args: Inference configurations. See `arguments.py` for details.
 
     Returns:
-      predicted_cluster_id: (integer array, size: N)
-        - predicted speaker id sequence.
-        For example, predicted_cluster_id = [0, 1, 0, 0, 1]
+      predicted_cluster_id: predicted speaker id sequence, which is
+        an array of integers, of size `N`.
+        For example, `predicted_cluster_id = [0, 1, 0, 0, 1]`
 
     Raises:
       TypeError: If test_sequence is of wrong type.
@@ -518,7 +521,7 @@ class UISRNN:
     &#34;&#34;&#34;
     # check type
     if (not isinstance(test_sequence, np.ndarray) or
-            test_sequence.dtype != float):
+        test_sequence.dtype != float):
       raise TypeError(&#39;test_sequence should be a numpy array of float type.&#39;)
     # check dimension
     if test_sequence.ndim != 2:
@@ -558,7 +561,7 @@ class UISRNN:
       idx_ranked = np.argsort(score_set, axis=None)
       updated_beam_set = []
       for new_beam_rank in range(
-              np.min((len(score_ranked), args.beam_size))):
+          np.min((len(score_ranked), args.beam_size))):
         total_idx = np.unravel_index(idx_ranked[new_beam_rank],
                                      score_set.shape)
         prev_beam_rank = total_idx[0]
@@ -568,7 +571,7 @@ class UISRNN:
         updated_beam_set.append(updated_beam_state)
       beam_set = updated_beam_set
     predicted_cluster_id = beam_set[0].trace[-test_sequence_length:]
-    return predicted_cluster_id}</code></pre>
+    return predicted_cluster_id</code></pre>
 </details>
 </section>
 <section>
@@ -609,7 +612,7 @@ class UISRNN:
     self.mean_set.append(mean.clone())
     self.hidden_set.append(hidden.clone())
     self.block_counts.append(1)
-    self.trace.append(cluster)}</code></pre>
+    self.trace.append(cluster)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -633,7 +636,7 @@ See help(type(self)) for accurate signature.</p></section>
     self.hidden_set = source.hidden_set.copy()
     self.trace = source.trace.copy()
     self.block_counts = source.block_counts.copy()
-    self.neg_likelihood = source.neg_likelihood}</code></pre>
+    self.neg_likelihood = source.neg_likelihood</code></pre>
 </details>
 </dd>
 <dt id="uisrnn.uisrnn.BeamState.append"><code class="name flex">
@@ -648,7 +651,7 @@ See help(type(self)) for accurate signature.</p></section>
   self.mean_set.append(mean.clone())
   self.hidden_set.append(hidden.clone())
   self.block_counts.append(1)
-  self.trace.append(cluster)}</code></pre>
+  self.trace.append(cluster)</code></pre>
 </details>
 </dd>
 </dl>
@@ -680,7 +683,7 @@ See help(type(self)) for accurate signature.</p></section>
       output_seq, _ = torch.nn.utils.rnn.pad_packed_sequence(
           output_seq, batch_first=False)
     mean = self.linear_mean2(F.relu(self.linear_mean1(output_seq)))
-    return mean, hidden}</code></pre>
+    return mean, hidden</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -700,7 +703,7 @@ See help(type(self)) for accurate signature.</p></section>
   else:
     self.gru = nn.GRU(input_dim, hidden_size, depth)
   self.linear_mean1 = nn.Linear(hidden_size, hidden_size)
-  self.linear_mean2 = nn.Linear(hidden_size, observation_dim)}</code></pre>
+  self.linear_mean2 = nn.Linear(hidden_size, observation_dim)</code></pre>
 </details>
 </dd>
 <dt id="uisrnn.uisrnn.CoreRNN.forward"><code class="name flex">
@@ -724,7 +727,7 @@ registered hooks while the latter silently ignores them.</p>
     output_seq, _ = torch.nn.utils.rnn.pad_packed_sequence(
         output_seq, batch_first=False)
   mean = self.linear_mean2(F.relu(self.linear_mean1(output_seq)))
-  return mean, hidden}</code></pre>
+  return mean, hidden</code></pre>
 </details>
 </dd>
 </dl>
@@ -743,7 +746,7 @@ registered hooks while the latter silently ignores them.</p>
     &#34;&#34;&#34;Construct the UISRNN object.
 
     Args:
-      args: Model configurations. See arguments.py for details.
+      args: Model configurations. See `arguments.py` for details.
     &#34;&#34;&#34;
     self.observation_dim = args.observation_dim
     self.device = torch.device(
@@ -828,33 +831,40 @@ registered hooks while the latter silently ignores them.</p>
             self.transition_bias, self.crp_alpha, var_dict[&#39;sigma2&#39;],
             var_dict[&#39;rnn_init_hidden&#39;]))
 
-  def _fit_concatenated(self, train_sequence, train_cluster_id, args):
+  def fit_concatenated(self, train_sequence, train_cluster_id, args):
     &#34;&#34;&#34;Fit UISRNN model to concatenated sequence and cluster_id.
 
     Args:
-      train_sequence: 2-dim numpy array of real numbers, size: N * D
-        - the training observation sequence.
-        N - summation of lengths of all utterances
-        D - observation dimension
+      train_sequence: the training observation sequence, which is a
+        2-dim numpy array of real numbers, of size `N * D`.
+
+        - `N`: summation of lengths of all utterances.
+        - `D`: observation dimension.
+
         For example,
-        ```
-        train_sequence =
-        [[1.2 3.0 -4.1 6.0]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
-         [0.8 -1.1 0.4 0.5]    --&gt; an entry of speaker #1 from utterance &#39;iaaa&#39;
-         [-0.2 1.0 3.8 5.7]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
-         [3.8 -0.1 1.5 2.3]    --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
-         [1.2 1.4 3.6 -2.7]]   --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
-        ```
-        Here N=5, D=4.
-        We concatenate all training utterances into a single sequence.
-      train_cluster_id: 1-dim list or numpy array of strings, size: N
-        - the speaker id sequence.
-        For example, train_cluster_id =
+      ```
+      train_sequence =
+      [[1.2 3.0 -4.1 6.0]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
+       [0.8 -1.1 0.4 0.5]    --&gt; an entry of speaker #1 from utterance &#39;iaaa&#39;
+       [-0.2 1.0 3.8 5.7]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
+       [3.8 -0.1 1.5 2.3]    --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
+       [1.2 1.4 3.6 -2.7]]   --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
+      ```
+        Here `N=5`, `D=4`.
+
+        We concatenate all training utterances into this single sequence.
+      train_cluster_id: the speaker id sequence, which is 1-dim list or
+        numpy array of strings, of size `N`.
+        For example,
+      ```
+      train_cluster_id =
         [&#39;iaaa_0&#39;, &#39;iaaa_1&#39;, &#39;iaaa_0&#39;, &#39;ibbb_0&#39;, &#39;ibbb_0&#39;]
+      ```
         &#39;iaaa_0&#39; means the entry belongs to speaker #0 in utterance &#39;iaaa&#39;.
+
         Note that the order of entries within an utterance are preserved,
         and all utterances are simply concatenated together.
-      args: Training configurations. See arguments.py for details.
+      args: Training configurations. See `arguments.py` for details.
 
     Raises:
       TypeError: If train_sequence or train_cluster_id is of wrong type.
@@ -862,12 +872,12 @@ registered hooks while the latter silently ignores them.</p>
     &#34;&#34;&#34;
     # check type
     if (not isinstance(train_sequence, np.ndarray) or
-            train_sequence.dtype != float):
+        train_sequence.dtype != float):
       raise TypeError(&#39;train_sequence should be a numpy array of float type.&#39;)
     if isinstance(train_cluster_id, list):
       train_cluster_id = np.array(train_cluster_id)
     if (not isinstance(train_cluster_id, np.ndarray) or
-            not train_cluster_id.dtype.name.startswith(&#39;str&#39;)):
+        not train_cluster_id.dtype.name.startswith(&#39;str&#39;)):
       raise TypeError(&#39;train_cluster_id type be a numpy array of strings.&#39;)
     # check dimension
     if train_sequence.ndim != 2:
@@ -966,7 +976,7 @@ registered hooks while the latter silently ignores them.</p>
       self.sigma2.data.clamp_(min=1e-6)
 
       if (np.remainder(num_iter, 10) == 0 or
-              num_iter == args.train_iteration - 1):
+          num_iter == args.train_iteration - 1):
         self.logger.print(
             2,
             &#39;Iter: {:d}  \t&#39;
@@ -990,25 +1000,21 @@ registered hooks while the latter silently ignores them.</p>
       train_sequences: Either a list of training sequences, or a single
         concatenated training sequence:
 
-          (1) train_sequences is list, and each element is a 2-dim numpy array
-              of real numbers, of size size: length * D.
-              The length varies among differnt sequences, but the D is the same.
-              In speaker diarization, each sequence is the sequence of speaker
-              embeddings of one utterance.
-
-          (2) train_sequences is a single concatenated sequence, which is a
-              2-dim numpy array of real numbers. See _fit_concatenated()
-              for more details.
-
+        1. train_sequences is list, and each element is a 2-dim numpy array
+            of real numbers, of size: `length * D`.
+            The length varies among differnt sequences, but the D is the same.
+            In speaker diarization, each sequence is the sequence of speaker
+            embeddings of one utterance.
+        2. train_sequences is a single concatenated sequence, which is a
+            2-dim numpy array of real numbers. See `fit_concatenated()`
+            for more details.
       train_cluster_ids: Ground truth labels for train_sequences:
 
-          (1) if train_sequences is a list, this must also be a list of the same
-              size, each element being a 1-dim list or numpy array of strings.
-
-          (2) if train_sequences is a single concatenated sequence, this
-              must also be the concatenated 1-dim list or numpy array of strings
-
-      args: Training configurations. See arguments.py for details.
+        1. if train_sequences is a list, this must also be a list of the same
+           size, each element being a 1-dim list or numpy array of strings.
+        2. if train_sequences is a single concatenated sequence, this
+           must also be the concatenated 1-dim list or numpy array of strings
+      args: Training configurations. See `arguments.py` for details.
 
     Raises:
       TypeError: If train_sequences or train_cluster_ids is of wrong type.
@@ -1029,7 +1035,7 @@ registered hooks while the latter silently ignores them.</p>
     else:
       raise TypeError(&#39;train_sequences must be a list or numpy.ndarray&#39;)
 
-    self._fit_concatenated(
+    self.fit_concatenated(
         concatenated_train_sequence, concatenated_train_cluster_id, args)
 
   def _update_beam_state(self, beam_state, look_ahead_seq, cluster_seq):
@@ -1127,12 +1133,13 @@ registered hooks while the latter silently ignores them.</p>
     &#34;&#34;&#34;Predict test sequence labels using UISRNN model.
 
     Args:
-      test_sequence: 2-dim numpy array of real numbers, size: N * D
-        - the test observation sequence.
-        N - length of one test utterance.
-        D - observation dimension.
-        For example:
+      test_sequence: the test observation sequence, which is 2-dim numpy array
+        of real numbers, of size `N * D`.
 
+        - `N`: length of one test utterance.
+        - `D` : observation dimension.
+
+        For example:
       ```
       test_sequence =
       [[2.2 -1.0 3.0 5.6]   --&gt; 1st entry of utterance &#39;iccc&#39;
@@ -1141,14 +1148,13 @@ registered hooks while the latter silently ignores them.</p>
       [-3.8 0.1 1.4 3.3]    --&gt; 4th entry of utterance &#39;iccc&#39;
       [0.1 2.7 3.5 -1.7]]   --&gt; 5th entry of utterance &#39;iccc&#39;
       ```
-
-        Here N=5, D=4.
-      args: Inference configurations. See arguments.py for details.
+        Here `N=5`, `D=4`.
+      args: Inference configurations. See `arguments.py` for details.
 
     Returns:
-      predicted_cluster_id: (integer array, size: N)
-        - predicted speaker id sequence.
-        For example, predicted_cluster_id = [0, 1, 0, 0, 1]
+      predicted_cluster_id: predicted speaker id sequence, which is
+        an array of integers, of size `N`.
+        For example, `predicted_cluster_id = [0, 1, 0, 0, 1]`
 
     Raises:
       TypeError: If test_sequence is of wrong type.
@@ -1156,7 +1162,7 @@ registered hooks while the latter silently ignores them.</p>
     &#34;&#34;&#34;
     # check type
     if (not isinstance(test_sequence, np.ndarray) or
-            test_sequence.dtype != float):
+        test_sequence.dtype != float):
       raise TypeError(&#39;test_sequence should be a numpy array of float type.&#39;)
     # check dimension
     if test_sequence.ndim != 2:
@@ -1196,7 +1202,7 @@ registered hooks while the latter silently ignores them.</p>
       idx_ranked = np.argsort(score_set, axis=None)
       updated_beam_set = []
       for new_beam_rank in range(
-              np.min((len(score_ranked), args.beam_size))):
+          np.min((len(score_ranked), args.beam_size))):
         total_idx = np.unravel_index(idx_ranked[new_beam_rank],
                                      score_set.shape)
         prev_beam_rank = total_idx[0]
@@ -1206,7 +1212,7 @@ registered hooks while the latter silently ignores them.</p>
         updated_beam_set.append(updated_beam_state)
       beam_set = updated_beam_set
     predicted_cluster_id = beam_set[0].trace[-test_sequence_length:]
-    return predicted_cluster_id}</code></pre>
+    return predicted_cluster_id</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1218,7 +1224,7 @@ registered hooks while the latter silently ignores them.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>args</code></strong></dt>
-<dd>Model configurations. See arguments.py for details.</dd>
+<dd>Model configurations. See <code>arguments.py</code> for details.</dd>
 </dl></section>
 <details class="source">
 <summary>Source code</summary>
@@ -1226,7 +1232,7 @@ registered hooks while the latter silently ignores them.</p>
   &#34;&#34;&#34;Construct the UISRNN object.
 
   Args:
-    args: Model configurations. See arguments.py for details.
+    args: Model configurations. See `arguments.py` for details.
   &#34;&#34;&#34;
   self.observation_dim = args.observation_dim
   self.device = torch.device(
@@ -1246,7 +1252,7 @@ registered hooks while the latter silently ignores them.</p>
   self.transition_bias = args.transition_bias
   self.transition_bias_denominator = 0.0
   self.crp_alpha = args.crp_alpha
-  self.logger = utils.Logger(args.verbosity)}</code></pre>
+  self.logger = utils.Logger(args.verbosity)</code></pre>
 </details>
 </dd>
 <dt id="uisrnn.uisrnn.UISRNN.fit"><code class="name flex">
@@ -1260,25 +1266,29 @@ registered hooks while the latter silently ignores them.</p>
 <dd>
 <p>Either a list of training sequences, or a single
 concatenated training sequence:</p>
-<p>(1) train_sequences is list, and each element is a 2-dim numpy array
-of real numbers, of size size: length * D.
+<ol>
+<li>train_sequences is list, and each element is a 2-dim numpy array
+of real numbers, of size: <code>length * D</code>.
 The length varies among differnt sequences, but the D is the same.
 In speaker diarization, each sequence is the sequence of speaker
-embeddings of one utterance.</p>
-<p>(2) train_sequences is a single concatenated sequence, which is a
-2-dim numpy array of real numbers. See _fit_concatenated()
-for more details.</p>
+embeddings of one utterance.</li>
+<li>train_sequences is a single concatenated sequence, which is a
+2-dim numpy array of real numbers. See <code>fit_concatenated()</code>
+for more details.</li>
+</ol>
 </dd>
 <dt><strong><code>train_cluster_ids</code></strong></dt>
 <dd>
 <p>Ground truth labels for train_sequences:</p>
-<p>(1) if train_sequences is a list, this must also be a list of the same
-size, each element being a 1-dim list or numpy array of strings.</p>
-<p>(2) if train_sequences is a single concatenated sequence, this
-must also be the concatenated 1-dim list or numpy array of strings</p>
+<ol>
+<li>if train_sequences is a list, this must also be a list of the same
+size, each element being a 1-dim list or numpy array of strings.</li>
+<li>if train_sequences is a single concatenated sequence, this
+must also be the concatenated 1-dim list or numpy array of strings</li>
+</ol>
 </dd>
 <dt><strong><code>args</code></strong></dt>
-<dd>Training configurations. See arguments.py for details.</dd>
+<dd>Training configurations. See <code>arguments.py</code> for details.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -1294,25 +1304,21 @@ must also be the concatenated 1-dim list or numpy array of strings</p>
     train_sequences: Either a list of training sequences, or a single
       concatenated training sequence:
 
-        (1) train_sequences is list, and each element is a 2-dim numpy array
-            of real numbers, of size size: length * D.
-            The length varies among differnt sequences, but the D is the same.
-            In speaker diarization, each sequence is the sequence of speaker
-            embeddings of one utterance.
-
-        (2) train_sequences is a single concatenated sequence, which is a
-            2-dim numpy array of real numbers. See _fit_concatenated()
-            for more details.
-
+      1. train_sequences is list, and each element is a 2-dim numpy array
+          of real numbers, of size: `length * D`.
+          The length varies among differnt sequences, but the D is the same.
+          In speaker diarization, each sequence is the sequence of speaker
+          embeddings of one utterance.
+      2. train_sequences is a single concatenated sequence, which is a
+          2-dim numpy array of real numbers. See `fit_concatenated()`
+          for more details.
     train_cluster_ids: Ground truth labels for train_sequences:
 
-        (1) if train_sequences is a list, this must also be a list of the same
-            size, each element being a 1-dim list or numpy array of strings.
-
-        (2) if train_sequences is a single concatenated sequence, this
-            must also be the concatenated 1-dim list or numpy array of strings
-
-    args: Training configurations. See arguments.py for details.
+      1. if train_sequences is a list, this must also be a list of the same
+         size, each element being a 1-dim list or numpy array of strings.
+      2. if train_sequences is a single concatenated sequence, this
+         must also be the concatenated 1-dim list or numpy array of strings
+    args: Training configurations. See `arguments.py` for details.
 
   Raises:
     TypeError: If train_sequences or train_cluster_ids is of wrong type.
@@ -1333,8 +1339,223 @@ must also be the concatenated 1-dim list or numpy array of strings</p>
   else:
     raise TypeError(&#39;train_sequences must be a list or numpy.ndarray&#39;)
 
-  self._fit_concatenated(
-      concatenated_train_sequence, concatenated_train_cluster_id, args)}</code></pre>
+  self.fit_concatenated(
+      concatenated_train_sequence, concatenated_train_cluster_id, args)</code></pre>
+</details>
+</dd>
+<dt id="uisrnn.uisrnn.UISRNN.fit_concatenated"><code class="name flex">
+<span>def <span class="ident">fit_concatenated</span></span>(<span>self, train_sequence, train_cluster_id, args)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Fit UISRNN model to concatenated sequence and cluster_id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>train_sequence</code></strong></dt>
+<dd>
+<p>the training observation sequence, which is a
+2-dim numpy array of real numbers, of size <code>N * D</code>.</p>
+<ul>
+<li><code>N</code>: summation of lengths of all utterances.</li>
+<li><code>D</code>: observation dimension.</li>
+</ul>
+<p>For example,</p>
+</dd>
+</dl>
+<pre><code>train_sequence =
+[[1.2 3.0 -4.1 6.0]    --&gt; an entry of speaker #0 from utterance 'iaaa'
+ [0.8 -1.1 0.4 0.5]    --&gt; an entry of speaker #1 from utterance 'iaaa'
+ [-0.2 1.0 3.8 5.7]    --&gt; an entry of speaker #0 from utterance 'iaaa'
+ [3.8 -0.1 1.5 2.3]    --&gt; an entry of speaker #0 from utterance 'ibbb'
+ [1.2 1.4 3.6 -2.7]]   --&gt; an entry of speaker #0 from utterance 'ibbb'
+</code></pre>
+<p>Here <code>N=5</code>, <code>D=4</code>.</p>
+<dl>
+<dt>We concatenate all training utterances into this single sequence.</dt>
+<dt><strong><code>train_cluster_id</code></strong></dt>
+<dd>the speaker id sequence, which is 1-dim list or
+numpy array of strings, of size <code>N</code>.
+For example,</dd>
+</dl>
+<pre><code>train_cluster_id =
+  ['iaaa_0', 'iaaa_1', 'iaaa_0', 'ibbb_0', 'ibbb_0']
+</code></pre>
+<p>'iaaa_0' means the entry belongs to speaker #0 in utterance 'iaaa'.</p>
+<dl>
+<dt>Note that the order of entries within an utterance are preserved,</dt>
+<dt>and all utterances are simply concatenated together.</dt>
+<dt><strong><code>args</code></strong></dt>
+<dd>Training configurations. See <code>arguments.py</code> for details.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>If train_sequence or train_cluster_id is of wrong type.</dd>
+<dt><strong><code>ValueError</code></strong></dt>
+<dd>If train_sequence or train_cluster_id has wrong dimension.</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def fit_concatenated(self, train_sequence, train_cluster_id, args):
+  &#34;&#34;&#34;Fit UISRNN model to concatenated sequence and cluster_id.
+
+  Args:
+    train_sequence: the training observation sequence, which is a
+      2-dim numpy array of real numbers, of size `N * D`.
+
+      - `N`: summation of lengths of all utterances.
+      - `D`: observation dimension.
+
+      For example,
+    ```
+    train_sequence =
+    [[1.2 3.0 -4.1 6.0]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
+     [0.8 -1.1 0.4 0.5]    --&gt; an entry of speaker #1 from utterance &#39;iaaa&#39;
+     [-0.2 1.0 3.8 5.7]    --&gt; an entry of speaker #0 from utterance &#39;iaaa&#39;
+     [3.8 -0.1 1.5 2.3]    --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
+     [1.2 1.4 3.6 -2.7]]   --&gt; an entry of speaker #0 from utterance &#39;ibbb&#39;
+    ```
+      Here `N=5`, `D=4`.
+
+      We concatenate all training utterances into this single sequence.
+    train_cluster_id: the speaker id sequence, which is 1-dim list or
+      numpy array of strings, of size `N`.
+      For example,
+    ```
+    train_cluster_id =
+      [&#39;iaaa_0&#39;, &#39;iaaa_1&#39;, &#39;iaaa_0&#39;, &#39;ibbb_0&#39;, &#39;ibbb_0&#39;]
+    ```
+      &#39;iaaa_0&#39; means the entry belongs to speaker #0 in utterance &#39;iaaa&#39;.
+
+      Note that the order of entries within an utterance are preserved,
+      and all utterances are simply concatenated together.
+    args: Training configurations. See `arguments.py` for details.
+
+  Raises:
+    TypeError: If train_sequence or train_cluster_id is of wrong type.
+    ValueError: If train_sequence or train_cluster_id has wrong dimension.
+  &#34;&#34;&#34;
+  # check type
+  if (not isinstance(train_sequence, np.ndarray) or
+      train_sequence.dtype != float):
+    raise TypeError(&#39;train_sequence should be a numpy array of float type.&#39;)
+  if isinstance(train_cluster_id, list):
+    train_cluster_id = np.array(train_cluster_id)
+  if (not isinstance(train_cluster_id, np.ndarray) or
+      not train_cluster_id.dtype.name.startswith(&#39;str&#39;)):
+    raise TypeError(&#39;train_cluster_id type be a numpy array of strings.&#39;)
+  # check dimension
+  if train_sequence.ndim != 2:
+    raise ValueError(&#39;train_sequence must be 2-dim array.&#39;)
+  if train_cluster_id.ndim != 1:
+    raise ValueError(&#39;train_cluster_id must be 1-dim array.&#39;)
+  # check length and size
+  train_total_length, observation_dim = train_sequence.shape
+  if observation_dim != self.observation_dim:
+    raise ValueError(&#39;train_sequence does not match the dimension specified &#39;
+                     &#39;by args.observation_dim.&#39;)
+  if train_total_length != len(train_cluster_id):
+    raise ValueError(&#39;train_sequence length is not equal to &#39;
+                     &#39;train_cluster_id length.&#39;)
+
+  self.rnn_model.train()
+  optimizer = self._get_optimizer(optimizer=args.optimizer,
+                                  learning_rate=args.learning_rate)
+
+  (sub_sequences,
+   seq_lengths,
+   transition_bias,
+   transition_bias_denominator) = utils.resize_sequence(
+       sequence=train_sequence,
+       cluster_id=train_cluster_id,
+       num_permutations=args.num_permutations)
+  if self.estimate_transition_bias:
+    if self.transition_bias is None:
+      self.transition_bias = transition_bias
+      self.transition_bias_denominator = transition_bias_denominator
+    else:
+      self.transition_bias = (
+          self.transition_bias * self.transition_bias_denominator +
+          transition_bias * transition_bias_denominator) / (
+              self.transition_bias_denominator + transition_bias_denominator)
+      self.transition_bias_denominator += transition_bias_denominator
+
+  # For batch learning, pack the entire dataset.
+  if args.batch_size is None:
+    packed_train_sequence, rnn_truth = utils.pack_sequence(
+        sub_sequences,
+        seq_lengths,
+        args.batch_size,
+        self.observation_dim,
+        self.device)
+  train_loss = []
+  for num_iter in range(args.train_iteration):
+    # Update learning rate if half life is specified.
+    if args.learning_rate_half_life &gt; 0:
+      if num_iter &gt; 0 and num_iter % args.learning_rate_half_life == 0:
+        optimizer.param_groups[0][&#39;lr&#39;] /= 2.0
+        self.logger.print(2, &#39;Changing learning rate to: {}&#39;.format(
+            optimizer.param_groups[0][&#39;lr&#39;]))
+    optimizer.zero_grad()
+    # For online learning, pack a subset in each iteration.
+    if args.batch_size is not None:
+      packed_train_sequence, rnn_truth = utils.pack_sequence(
+          sub_sequences,
+          seq_lengths,
+          args.batch_size,
+          self.observation_dim,
+          self.device)
+    hidden = self.rnn_init_hidden.repeat(1, args.batch_size, 1)
+    mean, _ = self.rnn_model(packed_train_sequence, hidden)
+    # use mean to predict
+    mean = torch.cumsum(mean, dim=0)
+    mean_size = mean.size()
+    mean = torch.mm(
+        torch.diag(
+            1.0 / torch.arange(1, mean_size[0] + 1).float().to(self.device)),
+        mean.view(mean_size[0], -1))
+    mean = mean.view(mean_size)
+
+    # Likelihood part.
+    loss1 = loss_func.weighted_mse_loss(
+        input_tensor=(rnn_truth != 0).float() * mean[:-1, :, :],
+        target_tensor=rnn_truth,
+        weight=1 / (2 * self.sigma2))
+
+    # Sigma2 prior part.
+    weight = (((rnn_truth != 0).float() * mean[:-1, :, :] - rnn_truth)
+              ** 2).view(-1, observation_dim)
+    num_non_zero = torch.sum((weight != 0).float(), dim=0).squeeze()
+    loss2 = loss_func.sigma2_prior_loss(
+        num_non_zero, args.sigma_alpha, args.sigma_beta, self.sigma2)
+
+    # Regularization part.
+    loss3 = loss_func.regularization_loss(
+        self.rnn_model.parameters(), args.regularization_weight)
+
+    loss = loss1 + loss2 + loss3
+    loss.backward()
+    nn.utils.clip_grad_norm_(self.rnn_model.parameters(), args.grad_max_norm)
+    optimizer.step()
+    # avoid numerical issues
+    self.sigma2.data.clamp_(min=1e-6)
+
+    if (np.remainder(num_iter, 10) == 0 or
+        num_iter == args.train_iteration - 1):
+      self.logger.print(
+          2,
+          &#39;Iter: {:d}  \t&#39;
+          &#39;Training Loss: {:.4f}    \n&#39;
+          &#39;    Negative Log Likelihood: {:.4f}\t&#39;
+          &#39;Sigma2 Prior: {:.4f}\t&#39;
+          &#39;Regularization: {:.4f}&#39;.format(
+              num_iter,
+              float(loss.data),
+              float(loss1.data),
+              float(loss2.data),
+              float(loss3.data)))
+    train_loss.append(float(loss1.data))  # only save the likelihood part
+  self.logger.print(
+      1, &#39;Done training with {} iterations&#39;.format(args.train_iteration))</code></pre>
 </details>
 </dd>
 <dt id="uisrnn.uisrnn.UISRNN.load"><code class="name flex">
@@ -1370,7 +1591,7 @@ must also be the concatenated 1-dim list or numpy array of strings</p>
       3, &#39;Loaded model with transition_bias={}, crp_alpha={}, sigma2={}, &#39;
       &#39;rnn_init_hidden={}&#39;.format(
           self.transition_bias, self.crp_alpha, var_dict[&#39;sigma2&#39;],
-          var_dict[&#39;rnn_init_hidden&#39;]))}</code></pre>
+          var_dict[&#39;rnn_init_hidden&#39;]))</code></pre>
 </details>
 </dd>
 <dt id="uisrnn.uisrnn.UISRNN.predict"><code class="name flex">
@@ -1381,11 +1602,15 @@ must also be the concatenated 1-dim list or numpy array of strings</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>test_sequence</code></strong></dt>
-<dd>2-dim numpy array of real numbers, size: N * D
-- the test observation sequence.
-N - length of one test utterance.
-D - observation dimension.
-For example:</dd>
+<dd>
+<p>the test observation sequence, which is 2-dim numpy array
+of real numbers, of size <code>N * D</code>.</p>
+<ul>
+<li><code>N</code>: length of one test utterance.</li>
+<li><code>D</code> : observation dimension.</li>
+</ul>
+<p>For example:</p>
+</dd>
 </dl>
 <pre><code>test_sequence =
 [[2.2 -1.0 3.0 5.6]   --&gt; 1st entry of utterance 'iccc'
@@ -1395,19 +1620,17 @@ For example:</dd>
 [0.1 2.7 3.5 -1.7]]   --&gt; 5th entry of utterance 'iccc'
 </code></pre>
 <dl>
-<dt>Here N=5, D=4.</dt>
+<dt>Here <code>N=5</code>, <code>D=4</code>.</dt>
 <dt><strong><code>args</code></strong></dt>
-<dd>Inference configurations. See arguments.py for details.</dd>
+<dd>Inference configurations. See <code>arguments.py</code> for details.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>predicted_cluster_id</code></strong></dt>
-<dd>(integer array, size: N)</dd>
+<dd>predicted speaker id sequence, which is
+an array of integers, of size <code>N</code>.
+For example, <code>predicted_cluster_id = [0, 1, 0, 0, 1]</code></dd>
 </dl>
-<ul>
-<li>predicted speaker id sequence.
-For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
-</ul>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><strong><code>TypeError</code></strong></dt>
@@ -1421,12 +1644,13 @@ For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
   &#34;&#34;&#34;Predict test sequence labels using UISRNN model.
 
   Args:
-    test_sequence: 2-dim numpy array of real numbers, size: N * D
-      - the test observation sequence.
-      N - length of one test utterance.
-      D - observation dimension.
-      For example:
+    test_sequence: the test observation sequence, which is 2-dim numpy array
+      of real numbers, of size `N * D`.
 
+      - `N`: length of one test utterance.
+      - `D` : observation dimension.
+
+      For example:
     ```
     test_sequence =
     [[2.2 -1.0 3.0 5.6]   --&gt; 1st entry of utterance &#39;iccc&#39;
@@ -1435,14 +1659,13 @@ For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
     [-3.8 0.1 1.4 3.3]    --&gt; 4th entry of utterance &#39;iccc&#39;
     [0.1 2.7 3.5 -1.7]]   --&gt; 5th entry of utterance &#39;iccc&#39;
     ```
-
-      Here N=5, D=4.
-    args: Inference configurations. See arguments.py for details.
+      Here `N=5`, `D=4`.
+    args: Inference configurations. See `arguments.py` for details.
 
   Returns:
-    predicted_cluster_id: (integer array, size: N)
-      - predicted speaker id sequence.
-      For example, predicted_cluster_id = [0, 1, 0, 0, 1]
+    predicted_cluster_id: predicted speaker id sequence, which is
+      an array of integers, of size `N`.
+      For example, `predicted_cluster_id = [0, 1, 0, 0, 1]`
 
   Raises:
     TypeError: If test_sequence is of wrong type.
@@ -1450,7 +1673,7 @@ For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
   &#34;&#34;&#34;
   # check type
   if (not isinstance(test_sequence, np.ndarray) or
-          test_sequence.dtype != float):
+      test_sequence.dtype != float):
     raise TypeError(&#39;test_sequence should be a numpy array of float type.&#39;)
   # check dimension
   if test_sequence.ndim != 2:
@@ -1490,7 +1713,7 @@ For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
     idx_ranked = np.argsort(score_set, axis=None)
     updated_beam_set = []
     for new_beam_rank in range(
-            np.min((len(score_ranked), args.beam_size))):
+        np.min((len(score_ranked), args.beam_size))):
       total_idx = np.unravel_index(idx_ranked[new_beam_rank],
                                    score_set.shape)
       prev_beam_rank = total_idx[0]
@@ -1500,7 +1723,7 @@ For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
       updated_beam_set.append(updated_beam_state)
     beam_set = updated_beam_set
   predicted_cluster_id = beam_set[0].trace[-test_sequence_length:]
-  return predicted_cluster_id}</code></pre>
+  return predicted_cluster_id</code></pre>
 </details>
 </dd>
 <dt id="uisrnn.uisrnn.UISRNN.save"><code class="name flex">
@@ -1527,7 +1750,7 @@ For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
       &#39;transition_bias&#39;: self.transition_bias,
       &#39;transition_bias_denominator&#39;: self.transition_bias_denominator,
       &#39;crp_alpha&#39;: self.crp_alpha,
-      &#39;sigma2&#39;: self.sigma2.detach().cpu().numpy()}, filepath)}</code></pre>
+      &#39;sigma2&#39;: self.sigma2.detach().cpu().numpy()}, filepath)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1564,9 +1787,10 @@ For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
 </li>
 <li>
 <h4><code><a title="uisrnn.uisrnn.UISRNN" href="#uisrnn.uisrnn.UISRNN">UISRNN</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="uisrnn.uisrnn.UISRNN.__init__" href="#uisrnn.uisrnn.UISRNN.__init__">__init__</a></code></li>
 <li><code><a title="uisrnn.uisrnn.UISRNN.fit" href="#uisrnn.uisrnn.UISRNN.fit">fit</a></code></li>
+<li><code><a title="uisrnn.uisrnn.UISRNN.fit_concatenated" href="#uisrnn.uisrnn.UISRNN.fit_concatenated">fit_concatenated</a></code></li>
 <li><code><a title="uisrnn.uisrnn.UISRNN.load" href="#uisrnn.uisrnn.UISRNN.load">load</a></code></li>
 <li><code><a title="uisrnn.uisrnn.UISRNN.predict" href="#uisrnn.uisrnn.UISRNN.predict">predict</a></code></li>
 <li><code><a title="uisrnn.uisrnn.UISRNN.save" href="#uisrnn.uisrnn.UISRNN.save">save</a></code></li>
@@ -1578,7 +1802,7 @@ For example, predicted_cluster_id = [0, 1, 0, 0, 1]</li>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.2.dev4+ge2739ce</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.2.dev16+gc8de804</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
