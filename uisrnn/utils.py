@@ -157,10 +157,10 @@ def sample_permuted_segments(index_sequence, number_samples):
     ```
     sampled_index_sequences =
     [[10,11,12,1,2,6],
-      [6,1,2,10,11,12],
-      [1,2,10,11,12,6],
-      [6,1,2,10,11,12],
-      [1,2,6,10,11,12]]
+     [6,1,2,10,11,12],
+     [1,2,10,11,12,6],
+     [6,1,2,10,11,12],
+     [1,2,6,10,11,12]]
     ```
       The length of "sampled_index_sequences" is "number_samples".
   """
