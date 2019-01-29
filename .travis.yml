@@ -8,7 +8,18 @@ cache: pip
 install:
   - pip install -q -r requirements.txt
   - pip install -q pylint
+  - pip install -q codecov
 
 script:
   - bash run_pylint.sh
   - bash run_tests.sh
+
+after_success:
+  - codecov
+
+notifications:
+  email: false
+
+branches:
+  only:
+    - master
