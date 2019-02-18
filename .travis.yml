@@ -13,6 +13,7 @@ install:
 script:
   - bash run_pylint.sh
   - bash run_tests.sh
+  - python3 demo.py --train_iteration=1000 -l=0.001 -hl=100
 
 after_success:
   - codecov

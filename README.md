@@ -219,14 +219,18 @@ Once we are done with training, we can run the trained model to perform
 inference on new sequences by calling the `predict()` function:
 
 ```python
-predicted_cluster_id = model.predict(test_sequence, args)
+predicted_cluster_ids = model.predict(test_sequences, args)
 ```
 
-Here `test_sequence` should be a 2-dim numpy array of type `float`,
-corresponding to a **single** observation sequence.
+Here `test_sequences` should be a list of 2-dim numpy arrays of type `float`,
+corresponding to the observation sequences for testing.
 
-The returned `predicted_cluster_id` is a list of integers, with the same
-length as `test_sequence`.
+The returned `predicted_cluster_ids` is a list of the same size as
+`test_sequences`. Each element of `predicted_cluster_ids` is a list of integers,
+with the same length as the corresponding test sequence.
+
+You can also use a single test sequence for `test_sequences`. Then the returned
+`predicted_cluster_ids` will also be a single list of integers.
 
 The definitions of the args are described in `uisrnn/arguments.py`.
 See `inference_parser`.
