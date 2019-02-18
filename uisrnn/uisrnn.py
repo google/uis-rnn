@@ -335,13 +335,13 @@ class UISRNN:
         concatenated training sequence:
 
         1. train_sequences is list, and each element is a 2-dim numpy array
-            of real numbers, of size: `length * D`.
-            The length varies among differnt sequences, but the D is the same.
-            In speaker diarization, each sequence is the sequence of speaker
-            embeddings of one utterance.
+           of real numbers, of size: `length * D`.
+           The length varies among differnt sequences, but the D is the same.
+           In speaker diarization, each sequence is the sequence of speaker
+           embeddings of one utterance.
         2. train_sequences is a single concatenated sequence, which is a
-            2-dim numpy array of real numbers. See `fit_concatenated()`
-            for more details.
+           2-dim numpy array of real numbers. See `fit_concatenated()`
+           for more details.
       train_cluster_ids: Ground truth labels for train_sequences:
 
         1. if train_sequences is a list, this must also be a list of the same
@@ -463,8 +463,8 @@ class UISRNN:
       beam_score_set[cluster_seq] = updated_beam_state.neg_likelihood
     return beam_score_set
 
-  def predict(self, test_sequence, args):
-    """Predict test sequence labels using UISRNN model.
+  def predict_single(self, test_sequence, args):
+    """Predict labels for a single test sequence using UISRNN model.
 
     Args:
       test_sequence: the test observation sequence, which is 2-dim numpy array
@@ -476,11 +476,11 @@ class UISRNN:
         For example:
       ```
       test_sequence =
-      [[2.2 -1.0 3.0 5.6]   --> 1st entry of utterance 'iccc'
-      [0.5 1.8 -3.2 0.4]    --> 2nd entry of utterance 'iccc'
-      [-2.2 5.0 1.8 3.7]    --> 3rd entry of utterance 'iccc'
-      [-3.8 0.1 1.4 3.3]    --> 4th entry of utterance 'iccc'
-      [0.1 2.7 3.5 -1.7]]   --> 5th entry of utterance 'iccc'
+      [[2.2 -1.0 3.0 5.6]    --> 1st entry of utterance 'iccc'
+       [0.5 1.8 -3.2 0.4]    --> 2nd entry of utterance 'iccc'
+       [-2.2 5.0 1.8 3.7]    --> 3rd entry of utterance 'iccc'
+       [-3.8 0.1 1.4 3.3]    --> 4th entry of utterance 'iccc'
+       [0.1 2.7 3.5 -1.7]]   --> 5th entry of utterance 'iccc'
       ```
         Here `N=5`, `D=4`.
       args: Inference configurations. See `arguments.py` for details.
@@ -547,3 +547,31 @@ class UISRNN:
       beam_set = updated_beam_set
     predicted_cluster_id = beam_set[0].trace[-test_sequence_length:]
     return predicted_cluster_id
+
+  def predict(self, test_sequences, args):
+    """Predict labels for a single or many test sequences using UISRNN model.
+
+    Args:
+      test_sequences: Either a list of test sequences, or a single test
+        sequence. Each test sequence is a 2-dim numpy array
+        of real numbers. See `predict_single()` for details.
+      args: Inference configurations. See `arguments.py` for details.
+
+    Returns:
+      predicted_cluster_ids: Predicted labels for test_sequences.
+
+        1. if test_sequences is a list, predicted_cluster_ids will be a list
+           of the same size, where each element being a 1-dim list of strings.
+        2. if test_sequences is a single sequence, predicted_cluster_ids will
+           be a 1-dim list of strings
+
+    Raises:
+      TypeError: If test_sequences is of wrong type.
+    """
+    # check type
+    if isinstance(test_sequences, np.ndarray):
+      return self.predict_single(test_sequences, args)
+    if isinstance(test_sequences, list):
+      return [self.predict_single(test_sequence, args)
+              for test_sequence in test_sequences]
+    raise TypeError('test_sequences should be either a list or numpy array.')

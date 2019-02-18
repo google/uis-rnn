@@ -50,6 +50,16 @@ class TestUISRNN(unittest.TestCase):
     predicted_label = model.predict(test_sequence, inference_args)
     self.assertListEqual([0] * 10, predicted_label)
 
+    # testing on two sequences
+    test_sequence1 = np.random.rand(10, model_args.observation_dim) / 10.0
+    test_sequence2 = np.random.rand(10, model_args.observation_dim) / 10.0
+    predicted_cluster_ids = model.predict(
+        [test_sequence1, test_sequence2], inference_args)
+    self.assertIsInstance(predicted_cluster_ids, list)
+    self.assertEqual(2, len(predicted_cluster_ids))
+    self.assertListEqual([0] * 10, predicted_cluster_ids[0])
+    self.assertListEqual([0] * 10, predicted_cluster_ids[1])
+
   def test_fit_list_and_predict_single_label(self):
     """Train and test model while training data has single label.
 
