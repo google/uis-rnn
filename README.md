@@ -40,6 +40,8 @@ This library depends on:
 
 ## Getting Started
 
+[![YouTube](resources/YouTube_lecture_screenshot.png)](https://www.youtube.com/watch?v=pGkqwRPzx9U)
+
 ### Install the package
 
 Without downloading the repository, you can install the
