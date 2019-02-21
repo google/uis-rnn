@@ -65,8 +65,8 @@ To get started, simply run this command:
 python3 demo.py --train_iteration=1000 -l=0.001 -hl=100
 ```
 
-This will train a UIS-RNN model using `data/training_data.npz`,
-then store the model on disk, perform inference on `data/testing_data.npz`,
+This will train a UIS-RNN model using `data/toy_training_data.npz`,
+then store the model on disk, perform inference on `data/toy_testing_data.npz`,
 print the inference results, and save the averaged accuracy in a text file.
 
 PS. The files under `data/` are manually generated *toy data*,
