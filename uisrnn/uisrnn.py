@@ -336,7 +336,7 @@ class UISRNN:
 
         1. train_sequences is list, and each element is a 2-dim numpy array
            of real numbers, of size: `length * D`.
-           The length varies among differnt sequences, but the D is the same.
+           The length varies among different sequences, but the D is the same.
            In speaker diarization, each sequence is the sequence of speaker
            embeddings of one utterance.
         2. train_sequences is a single concatenated sequence, which is a
