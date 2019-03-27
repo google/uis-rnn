@@ -259,12 +259,6 @@ class UISRNN:
           self.device)
     train_loss = []
     for num_iter in range(args.train_iteration):
-      # Update learning rate if half life is specified.
-      if args.learning_rate_half_life > 0:
-        if num_iter > 0 and num_iter % args.learning_rate_half_life == 0:
-          optimizer.param_groups[0]['lr'] /= 2.0
-          self.logger.print(2, 'Changing learning rate to: {}'.format(
-              optimizer.param_groups[0]['lr']))
       optimizer.zero_grad()
       # For online learning, pack a subset in each iteration.
       if args.batch_size is not None:

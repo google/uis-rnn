@@ -99,18 +99,9 @@ def parse_arguments():
   training_parser.add_argument(
       '--learning_rate',
       '-l',
-      default=1e-5,
+      default=1e-3,
       type=float,
       help='The leaning rate for training.')
-  training_parser.add_argument(
-      '--learning_rate_half_life',
-      '-hl',
-      default=0,
-      type=int,
-      help='The half life of the leaning rate for training. If this value is '
-           'positive, we reduce learning rate by half every this many '
-           'iterations during training. If this value is 0 or negative, '
-           'we do not decay learning rate.')
   training_parser.add_argument(
       '--train_iteration',
       '-t',

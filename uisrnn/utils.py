@@ -287,7 +287,6 @@ Config:
   sigma_beta: {}
   crp_alpha: {}
   learning rate: {}
-  learning rate half life: {}
   regularization: {}
   batch size: {}
 
@@ -299,7 +298,6 @@ Performance:
       training_args.sigma_beta,
       model_args.crp_alpha,
       training_args.learning_rate,
-      training_args.learning_rate_half_life,
       training_args.regularization_weight,
       training_args.batch_size,
       total_accuracy)

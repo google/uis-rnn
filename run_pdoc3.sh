@@ -6,7 +6,7 @@ PROJECT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 pushd ${PROJECT_PATH}
 
-rm -r docs
+rm -r -f docs
 
 # This script requires pdoc3 at least 0.5.2:
 # pip3 install pdoc3

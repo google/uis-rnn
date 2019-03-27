@@ -93,7 +93,6 @@ class TestIntegration(unittest.TestCase):
     model_args.observation_dim = 2
     model_args.verbosity = 3
     training_args.learning_rate = 0.01
-    training_args.learning_rate_half_life = 50
     training_args.train_iteration = 200
     training_args.enforce_cluster_id_uniqueness = False
     inference_args.test_iteration = 2

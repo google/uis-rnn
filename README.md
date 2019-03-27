@@ -62,7 +62,7 @@ python3 -m pip install uisrnn
 To get started, simply run this command:
 
 ```bash
-python3 demo.py --train_iteration=1000 -l=0.001 -hl=100
+python3 demo.py --train_iteration=1000 -l=0.001
 ```
 
 This will train a UIS-RNN model using `data/toy_training_data.npz`,
@@ -212,8 +212,6 @@ Here we provide a few guidelines as our suggestions:
    different datasets.
 2. For each call to the `fit()` function, make the size of input roughly the
    same. And, don't make the input size too small.
-3. Manually reset the `learning_rate` before each call to `fit()`, especially
-   if you are using `learning_rate_half_life`.
 
 ### Prediction
 
