@@ -18,6 +18,15 @@ import argparse
 _DEFAULT_OBSERVATION_DIM = 256
 
 
+def str2bool(v):
+  if v.lower() in ('yes', 'true', 't', 'y', '1'):
+      return True
+  elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+      return False
+  else:
+      raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 def parse_arguments():
   """Parse arguments.
 
@@ -85,6 +94,12 @@ def parse_arguments():
       '0 for errors; 1 for finishing important steps; '
       '2 for finishing less important steps; 3 or above for debugging '
       'information.')
+  model_parser.add_argument(
+      '--enable_cuda',
+      default=True,
+      type=str2bool,
+      help='Whether we should use CUDA if it is avaiable. If False, we will '
+      'always use CPU.')
 
   # training configurations
   training_parser = argparse.ArgumentParser(
@@ -146,7 +161,7 @@ def parse_arguments():
   training_parser.add_argument(
       '--enforce_cluster_id_uniqueness',
       default=True,
-      type=bool,
+      type=str2bool,
       help='Whether to enforce cluster ID uniqueness across different '
            'training sequences. Only effective when the first input to fit() '
            'is a list of sequences. In general, assume the cluster IDs for two '
