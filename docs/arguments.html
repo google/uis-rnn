@@ -43,6 +43,15 @@ import argparse
 _DEFAULT_OBSERVATION_DIM = 256
 
 
+def str2bool(value):
+  &#34;&#34;&#34;A function to convert string to bool value.&#34;&#34;&#34;
+  if value.lower() in {&#39;yes&#39;, &#39;true&#39;, &#39;t&#39;, &#39;y&#39;, &#39;1&#39;}:
+    return True
+  if value.lower() in {&#39;no&#39;, &#39;false&#39;, &#39;f&#39;, &#39;n&#39;, &#39;0&#39;}:
+    return False
+  raise argparse.ArgumentTypeError(&#39;Boolean value expected.&#39;)
+
+
 def parse_arguments():
   &#34;&#34;&#34;Parse arguments.
 
@@ -110,6 +119,12 @@ def parse_arguments():
       &#39;0 for errors; 1 for finishing important steps; &#39;
       &#39;2 for finishing less important steps; 3 or above for debugging &#39;
       &#39;information.&#39;)
+  model_parser.add_argument(
+      &#39;--enable_cuda&#39;,
+      default=True,
+      type=str2bool,
+      help=&#39;Whether we should use CUDA if it is avaiable. If False, we will &#39;
+      &#39;always use CPU.&#39;)
 
   # training configurations
   training_parser = argparse.ArgumentParser(
@@ -171,7 +186,7 @@ def parse_arguments():
   training_parser.add_argument(
       &#39;--enforce_cluster_id_uniqueness&#39;,
       default=True,
-      type=bool,
+      type=str2bool,
       help=&#39;Whether to enforce cluster ID uniqueness across different &#39;
            &#39;training sequences. Only effective when the first input to fit() &#39;
            &#39;is a list of sequences. In general, assume the cluster IDs for two &#39;
@@ -303,6 +318,12 @@ def parse_arguments():
       &#39;0 for errors; 1 for finishing important steps; &#39;
       &#39;2 for finishing less important steps; 3 or above for debugging &#39;
       &#39;information.&#39;)
+  model_parser.add_argument(
+      &#39;--enable_cuda&#39;,
+      default=True,
+      type=str2bool,
+      help=&#39;Whether we should use CUDA if it is avaiable. If False, we will &#39;
+      &#39;always use CPU.&#39;)
 
   # training configurations
   training_parser = argparse.ArgumentParser(
@@ -364,7 +385,7 @@ def parse_arguments():
   training_parser.add_argument(
       &#39;--enforce_cluster_id_uniqueness&#39;,
       default=True,
-      type=bool,
+      type=str2bool,
       help=&#39;Whether to enforce cluster ID uniqueness across different &#39;
            &#39;training sequences. Only effective when the first input to fit() &#39;
            &#39;is a list of sequences. In general, assume the cluster IDs for two &#39;
@@ -408,6 +429,22 @@ def parse_arguments():
   return (model_args, training_args, inference_args)</code></pre>
 </details>
 </dd>
+<dt id="uisrnn.arguments.str2bool"><code class="name flex">
+<span>def <span class="ident">str2bool</span></span>(<span>value)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A function to convert string to bool value.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def str2bool(value):
+  &#34;&#34;&#34;A function to convert string to bool value.&#34;&#34;&#34;
+  if value.lower() in {&#39;yes&#39;, &#39;true&#39;, &#39;t&#39;, &#39;y&#39;, &#39;1&#39;}:
+    return True
+  if value.lower() in {&#39;no&#39;, &#39;false&#39;, &#39;f&#39;, &#39;n&#39;, &#39;0&#39;}:
+    return False
+  raise argparse.ArgumentTypeError(&#39;Boolean value expected.&#39;)</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -427,6 +464,7 @@ def parse_arguments():
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="uisrnn.arguments.parse_arguments" href="#uisrnn.arguments.parse_arguments">parse_arguments</a></code></li>
+<li><code><a title="uisrnn.arguments.str2bool" href="#uisrnn.arguments.str2bool">str2bool</a></code></li>
 </ul>
 </li>
 </ul>

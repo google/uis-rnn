@@ -109,7 +109,7 @@ class UISRNN:
     &#34;&#34;&#34;
     self.observation_dim = args.observation_dim
     self.device = torch.device(
-        &#39;cuda:0&#39; if torch.cuda.is_available() else &#39;cpu&#39;)
+        &#39;cuda:0&#39; if (torch.cuda.is_available() and args.enable_cuda) else &#39;cpu&#39;)
     self.rnn_model = CoreRNN(self.observation_dim, args.rnn_hidden_size,
                              args.rnn_depth, self.observation_dim,
                              args.rnn_dropout).to(self.device)
@@ -236,7 +236,7 @@ class UISRNN:
     if isinstance(train_cluster_id, list):
       train_cluster_id = np.array(train_cluster_id)
     if (not isinstance(train_cluster_id, np.ndarray) or
-        not train_cluster_id.dtype.name.startswith(&#39;str&#39;)):
+        not train_cluster_id.dtype.name.startswith((&#39;str&#39;, &#39;unicode&#39;))):
       raise TypeError(&#39;train_cluster_id type be a numpy array of strings.&#39;)
     # check dimension
     if train_sequence.ndim != 2:
@@ -772,7 +772,7 @@ registered hooks while the latter silently ignores them.</p>
     &#34;&#34;&#34;
     self.observation_dim = args.observation_dim
     self.device = torch.device(
-        &#39;cuda:0&#39; if torch.cuda.is_available() else &#39;cpu&#39;)
+        &#39;cuda:0&#39; if (torch.cuda.is_available() and args.enable_cuda) else &#39;cpu&#39;)
     self.rnn_model = CoreRNN(self.observation_dim, args.rnn_hidden_size,
                              args.rnn_depth, self.observation_dim,
                              args.rnn_dropout).to(self.device)
@@ -899,7 +899,7 @@ registered hooks while the latter silently ignores them.</p>
     if isinstance(train_cluster_id, list):
       train_cluster_id = np.array(train_cluster_id)
     if (not isinstance(train_cluster_id, np.ndarray) or
-        not train_cluster_id.dtype.name.startswith(&#39;str&#39;)):
+        not train_cluster_id.dtype.name.startswith((&#39;str&#39;, &#39;unicode&#39;))):
       raise TypeError(&#39;train_cluster_id type be a numpy array of strings.&#39;)
     # check dimension
     if train_sequence.ndim != 2:
@@ -1280,7 +1280,7 @@ registered hooks while the latter silently ignores them.</p>
   &#34;&#34;&#34;
   self.observation_dim = args.observation_dim
   self.device = torch.device(
-      &#39;cuda:0&#39; if torch.cuda.is_available() else &#39;cpu&#39;)
+      &#39;cuda:0&#39; if (torch.cuda.is_available() and args.enable_cuda) else &#39;cpu&#39;)
   self.rnn_model = CoreRNN(self.observation_dim, args.rnn_hidden_size,
                            args.rnn_depth, self.observation_dim,
                            args.rnn_dropout).to(self.device)
@@ -1485,7 +1485,7 @@ For example,</dd>
   if isinstance(train_cluster_id, list):
     train_cluster_id = np.array(train_cluster_id)
   if (not isinstance(train_cluster_id, np.ndarray) or
-      not train_cluster_id.dtype.name.startswith(&#39;str&#39;)):
+      not train_cluster_id.dtype.name.startswith((&#39;str&#39;, &#39;unicode&#39;))):
     raise TypeError(&#39;train_cluster_id type be a numpy array of strings.&#39;)
   # check dimension
   if train_sequence.ndim != 2:
