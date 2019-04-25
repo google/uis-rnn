@@ -211,7 +211,7 @@ class UISRNN:
     if isinstance(train_cluster_id, list):
       train_cluster_id = np.array(train_cluster_id)
     if (not isinstance(train_cluster_id, np.ndarray) or
-        not train_cluster_id.dtype.name.startswith('str')):
+        not train_cluster_id.dtype.name.startswith(('str', 'unicode'))):
       raise TypeError('train_cluster_id type be a numpy array of strings.')
     # check dimension
     if train_sequence.ndim != 2:
