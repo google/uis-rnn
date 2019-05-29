@@ -240,11 +240,13 @@ See `inference_parser`.
 Our paper is cited as:
 
 ```
-@article{zhang2018fully,
-  title={Fully Supervised Speaker Diarization},
+@inproceedings{zhang2019fully,
+  title={Fully supervised speaker diarization},
   author={Zhang, Aonan and Wang, Quan and Zhu, Zhenyao and Paisley, John and Wang, Chong},
-  journal={arXiv preprint arXiv:1810.04719},
-  year={2018}
+  booktitle={International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages={6301--6305},
+  year={2019},
+  organization={IEEE}
 }
 ```
 
