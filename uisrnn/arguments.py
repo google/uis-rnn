@@ -191,6 +191,13 @@ def parse_arguments():
            'sequence, and run inference on this concatenated sequence. '
            'Then we return the inference results on the last duplicate as the '
            'final prediction for the test sequence.')
+  inference_parser.add_argument(
+      '--num_speaker',
+      default=0,
+      type=int,
+      help='specify how many speakers in the test sequences'
+           'if 0, as unbounded number of speakers'
+  )
 
   # a super parser for sanity checks
   super_parser = argparse.ArgumentParser(

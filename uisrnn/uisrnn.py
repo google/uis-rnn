@@ -433,7 +433,7 @@ class UISRNN:
       new_beam_state.neg_likelihood += loss
     return new_beam_state
 
-  def _calculate_score(self, beam_state, look_ahead_seq):
+  def _calculate_score(self, beam_state, look_ahead_seq, args):
     """Calculate negative log likelihoods for all possible state allocations
        of a look ahead sequence, according to the current beam state.
 
@@ -454,7 +454,8 @@ class UISRNN:
     for cluster_seq, _ in np.ndenumerate(beam_score_set):
       updated_beam_state = self._update_beam_state(beam_state,
                                                    look_ahead_seq, cluster_seq)
-      beam_score_set[cluster_seq] = updated_beam_state.neg_likelihood
+      if cluster_seq[0] < args.num_speaker or args.num_speaker == 0:
+          beam_score_set[cluster_seq] = updated_beam_state.neg_likelihood
     return beam_score_set
 
   def predict_single(self, test_sequence, args):
@@ -517,7 +518,7 @@ class UISRNN:
               args.beam_size, max_clusters + 1 + np.arange(
                   look_ahead_seq_length)))
       for beam_rank, beam_state in enumerate(beam_set):
-        beam_score_set = self._calculate_score(beam_state, look_ahead_seq)
+        beam_score_set = self._calculate_score(beam_state, look_ahead_seq, args)
         score_set[beam_rank, :] = np.pad(
             beam_score_set,
             np.tile([[0, max_clusters - len(beam_state.mean_set)]],
