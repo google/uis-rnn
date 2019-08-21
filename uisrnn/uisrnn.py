@@ -231,23 +231,10 @@ class UISRNN:
     optimizer = self._get_optimizer(optimizer=args.optimizer,
                                     learning_rate=args.learning_rate)
 
-    (sub_sequences,
-     seq_lengths,
-     transition_bias,
-     transition_bias_denominator) = utils.resize_sequence(
-         sequence=train_sequence,
-         cluster_id=train_cluster_id,
-         num_permutations=args.num_permutations)
-    if self.estimate_transition_bias:
-      if self.transition_bias is None:
-        self.transition_bias = transition_bias
-        self.transition_bias_denominator = transition_bias_denominator
-      else:
-        self.transition_bias = (
-            self.transition_bias * self.transition_bias_denominator +
-            transition_bias * transition_bias_denominator) / (
-                self.transition_bias_denominator + transition_bias_denominator)
-        self.transition_bias_denominator += transition_bias_denominator
+    sub_sequences, seq_lengths = utils.resize_sequence(
+        sequence=train_sequence,
+        cluster_id=train_cluster_id,
+        num_permutations=args.num_permutations)
 
     # For batch learning, pack the entire dataset.
     if args.batch_size is None:
@@ -349,19 +336,46 @@ class UISRNN:
     """
     if isinstance(train_sequences, np.ndarray):
       # train_sequences is already the concatenated sequence
-      concatenated_train_sequence = train_sequences
-      concatenated_train_cluster_id = train_cluster_ids
+      if self.estimate_transition_bias:
+        # see issue #55: https://github.com/google/uis-rnn/issues/55
+        self.logger.print(2, \
+            'Warning: transition_bias cannot be correctly estimated from a '
+            'concatenated sequence; train_sequences will be treated as a '
+            'single sequence. This can lead to inaccurate estimation of '
+            'transition_bias. Please, consider estimating transition_bias '
+            'before concatenating the sequences and passing it as argument.')
+      train_sequences = [train_sequences]
+      train_cluster_ids = [train_cluster_ids]
     elif isinstance(train_sequences, list):
-      # train_sequences is a list of un-concatenated sequences,
-      # then we concatenate them first
-      (concatenated_train_sequence,
-       concatenated_train_cluster_id) = utils.concatenate_training_data(
-           train_sequences,
-           train_cluster_ids,
-           args.enforce_cluster_id_uniqueness,
-           True)
+      # train_sequences is a list of un-concatenated sequences
+      # we will concatenate it later, after estimating transition_bias
+      pass
     else:
       raise TypeError('train_sequences must be a list or numpy.ndarray')
+
+    # estimate transition_bias
+    if self.estimate_transition_bias:
+      (transition_bias,
+       transition_bias_denominator) = utils.estimate_transition_bias(
+           train_cluster_ids)
+      # set or update transition_bias
+      if self.transition_bias is None:
+        self.transition_bias = transition_bias
+        self.transition_bias_denominator = transition_bias_denominator
+      else:
+        self.transition_bias = (
+            self.transition_bias * self.transition_bias_denominator +
+            transition_bias * transition_bias_denominator) / (
+                self.transition_bias_denominator + transition_bias_denominator)
+        self.transition_bias_denominator += transition_bias_denominator
+
+    # concatenate train_sequences
+    (concatenated_train_sequence,
+     concatenated_train_cluster_id) = utils.concatenate_training_data(
+         train_sequences,
+         train_cluster_ids,
+         args.enforce_cluster_id_uniqueness,
+         True)
 
     self.fit_concatenated(
         concatenated_train_sequence, concatenated_train_cluster_id, args)

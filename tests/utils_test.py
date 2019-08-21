@@ -114,7 +114,7 @@ class TestResizeSequence(unittest.TestCase):
 
   def test_resize_sequence_without_permutation1(self):
     """Test when we do not permute, output is deterministic."""
-    sub_sequence, seq_lengths, _, _ = utils.resize_sequence(
+    sub_sequence, seq_lengths = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [1, 1]]),
         cluster_id=np.array([1, 2, 1]),
         num_permutations=None)
@@ -125,7 +125,7 @@ class TestResizeSequence(unittest.TestCase):
 
   def test_resize_sequence_without_permutation2(self):
     """Test when we do not permute, output is deterministic."""
-    sub_sequence, seq_lengths, _, _ = utils.resize_sequence(
+    sub_sequence, seq_lengths = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [3, 3]]),
         cluster_id=np.array([1, 2, 1]),
         num_permutations=None)
@@ -136,7 +136,7 @@ class TestResizeSequence(unittest.TestCase):
 
   def test_resize_sequence_with_permutation(self):
     """Test when we permute, each output can be one of the permutations."""
-    sub_sequence, seq_lengths, _, _ = utils.resize_sequence(
+    sub_sequence, seq_lengths = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [3, 3]]),
         cluster_id=np.array([1, 2, 1]),
         num_permutations=2)
