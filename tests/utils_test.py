@@ -114,7 +114,7 @@ class TestResizeSequence(unittest.TestCase):
 
   def test_resize_sequence_without_permutation1(self):
     """Test when we do not permute, output is deterministic."""
-    sub_sequence, seq_lengths, _, _ = utils.resize_sequence(
+    sub_sequence, seq_lengths = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [1, 1]]),
         cluster_id=np.array([1, 2, 1]),
         num_permutations=None)
@@ -125,7 +125,7 @@ class TestResizeSequence(unittest.TestCase):
 
   def test_resize_sequence_without_permutation2(self):
     """Test when we do not permute, output is deterministic."""
-    sub_sequence, seq_lengths, _, _ = utils.resize_sequence(
+    sub_sequence, seq_lengths = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [3, 3]]),
         cluster_id=np.array([1, 2, 1]),
         num_permutations=None)
@@ -136,7 +136,7 @@ class TestResizeSequence(unittest.TestCase):
 
   def test_resize_sequence_with_permutation(self):
     """Test when we permute, each output can be one of the permutations."""
-    sub_sequence, seq_lengths, _, _ = utils.resize_sequence(
+    sub_sequence, seq_lengths = utils.resize_sequence(
         sequence=np.array([[1, 1], [2, 2], [3, 3]]),
         cluster_id=np.array([1, 2, 1]),
         num_permutations=2)
@@ -148,6 +148,33 @@ class TestResizeSequence(unittest.TestCase):
     self.assertTrue((sub_sequence[2] == [[2, 2]]).all())
     self.assertTrue((sub_sequence[3] == [[2, 2]]).all())
     self.assertListEqual(seq_lengths, [3, 3, 2, 2])
+
+
+class TestEstimateTransitionBias(unittest.TestCase):
+  """Tests for utils.estimate_transition_bias()"""
+
+  def test_transition_bias_empty_sequences(self):
+    """Test when the input cluster_id sequences are empty"""
+    (transition_bias,
+     denominator) = utils.estimate_transition_bias(cluster_ids=[[], [], []])
+    self.assertTrue(np.log(transition_bias) != -np.inf)
+    self.assertTrue(np.log(1 - transition_bias) != -np.inf)
+    self.assertTrue(denominator != 0)
+
+  def test_transition_bias_unique_speaker(self):
+    """Test when the input cluster_id sequences contain a unique speaker
+    and therefore no speaker changes"""
+    transition_bias, _ = utils.estimate_transition_bias(cluster_ids=[[1] * 100])
+    self.assertTrue(np.log(transition_bias) != -np.inf)
+    self.assertTrue(np.log(1 - transition_bias) != -np.inf)
+
+  def test_transition_bias_always_changing_speaker(self):
+    """Test when in the input cluster_id sequences the speaker always
+    changes"""
+    transition_bias, _ = utils.estimate_transition_bias(
+        cluster_ids=[[1, 2, 1], [2, 1, 2]])
+    self.assertTrue(np.log(transition_bias) != -np.inf)
+    self.assertTrue(np.log(1 - transition_bias) != -np.inf)
 
 
 if __name__ == '__main__':

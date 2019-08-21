@@ -198,9 +198,6 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
     sub_sequences: A list of numpy array, with obsevation vector from the same
       cluster in the same list.
     seq_lengths: The length of each cluster (+1).
-    bias: Flipping coin head probability.
-    bias_denominator: The denominator of the bias, used for multiple calls to
-      fit().
   """
   # merge sub-sequences that belong to a single cluster to a single sequence
   unique_id = np.unique(cluster_id)
@@ -218,14 +215,7 @@ def resize_sequence(sequence, cluster_id, num_permutations=None):
       idx_set = np.where(cluster_id == i)
       sub_sequences.append(sequence[idx_set, :][0])
       seq_lengths.append(len(idx_set[0]) + 1)
-
-  # compute bias
-  transit_num = 0
-  for entry in range(len(cluster_id) - 1):
-    transit_num += (cluster_id[entry] != cluster_id[entry + 1])
-  bias_denominator = len(cluster_id)
-  bias = (transit_num + 1) / bias_denominator
-  return sub_sequences, seq_lengths, bias, bias_denominator
+  return sub_sequences, seq_lengths
 
 
 def pack_sequence(
@@ -310,3 +300,31 @@ Performance:
   with open(filename, 'a') as file_object:
     file_object.write(output_string)
   return output_string
+
+
+def estimate_transition_bias(cluster_ids, smooth=1):
+  """Estimate the transition bias.
+
+  Args:
+    cluster_id: Either a list of cluster indicator sequences, or a single
+      concatenated sequence. The former is strongly preferred, since the
+      transition_bias estimated from the latter will be inaccurate.
+    smooth: int or float - Smoothing coefficient, avoids -inf value in np.log
+      in the case of a sequence with a single speaker and division by 0 in the
+      case of empty sequences. Using a small value for smooth decreases the
+      bias in the calculation of transition_bias but can also lead to underflow
+      in some remote cases, larger values are safer but less accurate.
+
+  Returns:
+    bias: Flipping coin head probability.
+    bias_denominator: The denominator of the bias, used for multiple calls to
+      fit().
+  """
+  transit_num = smooth
+  bias_denominator = 2 * smooth
+  for cluster_id_seq in cluster_ids:
+    for entry in range(len(cluster_id_seq) - 1):
+      transit_num += (cluster_id_seq[entry] != cluster_id_seq[entry + 1])
+      bias_denominator += 1
+  bias = transit_num / bias_denominator
+  return bias, bias_denominator
