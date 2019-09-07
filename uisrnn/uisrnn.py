@@ -338,7 +338,7 @@ class UISRNN:
       # train_sequences is already the concatenated sequence
       if self.estimate_transition_bias:
         # see issue #55: https://github.com/google/uis-rnn/issues/55
-        self.logger.print(2, \
+        self.logger.print(2,
             'Warning: transition_bias cannot be correctly estimated from a '
             'concatenated sequence; train_sequences will be treated as a '
             'single sequence. This can lead to inaccurate estimation of '
