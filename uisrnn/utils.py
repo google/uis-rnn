@@ -303,11 +303,17 @@ Performance:
 
 
 def estimate_transition_bias(cluster_ids, smooth=1):
-  """estimate transition bias.
+  """Estimate the transition bias.
 
   Args:
-    cluster_id: A list of cluster indicator sequences, must be a
-      non-concatenated sequence.
+    cluster_id: Either a list of cluster indicator sequences, or a single
+      concatenated sequence. The former is strongly preferred, since the
+      transition_bias estimated from the latter will be inaccurate.
+    smooth: int or float - Smoothing coefficient, avoids -inf value in np.log
+      in the case of a sequence with a single speaker and division by 0 in the
+      case of empty sequences. Using a small value for smooth decreases the
+      bias in the calculation of transition_bias but can also lead to underflow
+      in some remote cases, larger values are safer but less accurate.
 
   Returns:
     bias: Flipping coin head probability.
@@ -321,4 +327,4 @@ def estimate_transition_bias(cluster_ids, smooth=1):
       transit_num += (cluster_id_seq[entry] != cluster_id_seq[entry + 1])
       bias_denominator += 1
   bias = (transit_num + smooth) / (bias_denominator + smooth)
-  return bias, bias_denominator
+  return bias, bias_denominator + smooth
