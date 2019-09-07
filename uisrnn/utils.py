@@ -320,11 +320,11 @@ def estimate_transition_bias(cluster_ids, smooth=1):
     bias_denominator: The denominator of the bias, used for multiple calls to
       fit().
   """
-  transit_num = 0
-  bias_denominator = 0
+  transit_num = smooth
+  bias_denominator = 2 * smooth
   for cluster_id_seq in cluster_ids:
     for entry in range(len(cluster_id_seq) - 1):
       transit_num += (cluster_id_seq[entry] != cluster_id_seq[entry + 1])
       bias_denominator += 1
-  bias = (transit_num + smooth) / (bias_denominator + smooth)
-  return bias, bias_denominator + smooth
+  bias = transit_num / bias_denominator
+  return bias, bias_denominator
