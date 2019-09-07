@@ -172,7 +172,7 @@ class TestEstimateTransitionBias(unittest.TestCase):
     """Test when in the input cluster_id sequences the speaker always
     changes"""
     transition_bias, _ = utils.estimate_transition_bias(
-        cluster_ids=[[1, 2, 1], [2,1,2]])
+        cluster_ids=[[1, 2, 1], [2, 1, 2]])
     self.assertTrue(np.log(transition_bias) != -np.inf)
     self.assertTrue(np.log(1 - transition_bias) != -np.inf)
 
