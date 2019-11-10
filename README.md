@@ -283,3 +283,13 @@ Please use your own judgement to decide whether you want to use these
 implementations.
 
 **We are NOT responsible for the correctness of any third-party implementations.**
+
+## Variants
+
+Here we list the repositories that are based on UIS-RNN, but integrated with
+other technologies or added some improvements.
+
+| Link | Description |
+| ---- | ----------- |
+| [taylorlu/Speaker-Diarization](https://github.com/taylorlu/Speaker-Diarization) ![GitHub stars](https://img.shields.io/github/stars/taylorlu/Speaker-Diarization?style=social) | Speaker diarization using UIS-RNN and GhostVLAD. An easier way to support openset speakers. |
+| [DonkeyShot21/uis-rnn-sml](https://github.com/DonkeyShot21/uis-rnn-sml) ![GitHub stars](https://img.shields.io/github/stars/DonkeyShot21/uis-rnn-sml?style=social) | A variant of UIS-RNN, for the paper Supervised Online Diarization with Sample Mean Loss for Multi-Domain Data. |
