@@ -35,7 +35,7 @@ This library depends on:
 
 * python 3.5+
 * numpy 1.15.1
-* pytorch 0.4.0
+* pytorch 1.0.0
 * scipy 1.1.0 (for evaluation only)
 
 ## Getting Started
