@@ -13,9 +13,11 @@
 # limitations under the License.
 """The UIS-RNN model."""
 
+import functools
 import numpy as np
 import torch
 from torch import autograd
+from torch import multiprocessing
 from torch import nn
 from torch import optim
 import torch.nn.functional as F
@@ -584,3 +586,36 @@ class UISRNN:
       return [self.predict_single(test_sequence, args)
               for test_sequence in test_sequences]
     raise TypeError('test_sequences should be either a list or numpy array.')
+
+
+def parallel_predict(model, test_sequences, args, num_processes=4):
+  """Run prediction in parallel using torch.multiprocessing.
+
+  This is a beta feature. It makes prediction slower on CPU. But it's reported
+  that it makes prediction faster on GPU.
+
+  Args:
+    model: instance of UISRNN model
+    test_sequences: a list of test sequences, or a single test
+      sequence. Each test sequence is a 2-dim numpy array
+      of real numbers. See `predict_single()` for details.
+    args: Inference configurations. See `arguments.py` for details.
+    num_processes: number of parallel processes.
+
+  Returns:
+    a list of the same size as test_sequences, where each element
+    being a 1-dim list of strings.
+
+  Raises:
+      TypeError: If test_sequences is of wrong type.
+  """
+  if not isinstance(test_sequences, list):
+    raise TypeError('test_sequences must be a list.')
+  ctx = multiprocessing.get_context('forkserver')
+  model.rnn_model.share_memory()
+  pool = ctx.Pool(num_processes)
+  results = pool.map(
+      functools.partial(model.predict_single, args=args),
+      test_sequences)
+  pool.close()
+  return results
