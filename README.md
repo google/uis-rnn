@@ -29,6 +29,10 @@ heavily depends on Google's internal infrastructure and proprietary data.
 
 **This library is NOT an official Google product.**
 
+We welcome community contributions ([guidelines](CONTRIBUTING.md))
+to the `uisrnn/contrib` folder.
+But we won't be responsible for the correctness of any community contributions.
+
 ## Dependencies
 
 This library depends on:

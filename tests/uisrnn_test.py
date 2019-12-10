@@ -29,6 +29,7 @@ class TestUISRNN(unittest.TestCase):
     Training data have already been concatenated.
     """
     model_args, training_args, inference_args = uisrnn.parse_arguments()
+    model_args.enable_cuda = False
     model_args.rnn_depth = 1
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 16
@@ -74,6 +75,7 @@ class TestUISRNN(unittest.TestCase):
     Training data are not concatenated.
     """
     model_args, training_args, inference_args = uisrnn.parse_arguments()
+    model_args.enable_cuda = False
     model_args.rnn_depth = 1
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 16
@@ -104,6 +106,7 @@ class TestUISRNN(unittest.TestCase):
   def test_fit_with_wrong_dim(self):
     """Training data has wrong dimension."""
     model_args, training_args, _ = uisrnn.parse_arguments()
+    model_args.enable_cuda = False
     model_args.rnn_depth = 1
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 16
@@ -123,6 +126,7 @@ class TestUISRNN(unittest.TestCase):
   def test_predict_with_wrong_dim(self):
     """Testing data has wrong dimension."""
     model_args, training_args, inference_args = uisrnn.parse_arguments()
+    model_args.enable_cuda = False
     model_args.rnn_depth = 1
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 16
@@ -146,6 +150,7 @@ class TestUISRNN(unittest.TestCase):
   def test_save_and_load(self):
     """Save model and load it."""
     model_args, _, _ = uisrnn.parse_arguments()
+    model_args.enable_cuda = False
     model_args.observation_dim = 16
     model_args.transition_bias = 0.5
     model_args.sigma2 = 0.05
