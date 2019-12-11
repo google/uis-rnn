@@ -4,7 +4,6 @@
 #   Email: aluminumbox@alumni.sjtu.edu.cn
 #   Organization: Ping An Technology (Shanghai) Co., Ltd.
 import numpy as np
-from tqdm import tqdm
 
 SEARCH_RANGE = 100
 SEARCH_STEP = 0.01
@@ -20,7 +19,7 @@ def get_alpha(train_cluster_id):
     cur_alpha: a float variable.
   """
   cur_alpha, cur_cdf = np.nan, -np.inf
-  for alpha in tqdm(range(1, SEARCH_RANGE)):
+  for alpha in range(1, SEARCH_RANGE):
     cdf = get_cdf(train_cluster_id, alpha * SEARCH_STEP)
     if cdf > cur_cdf:
       cur_alpha, cur_cdf = alpha * SEARCH_STEP, cdf
