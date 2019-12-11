@@ -88,6 +88,7 @@ class TestIntegration(unittest.TestCase):
 
     # construct model
     model_args, training_args, inference_args = uisrnn.parse_arguments()
+    model_args.enable_cuda = False
     model_args.rnn_depth = 2
     model_args.rnn_hidden_size = 8
     model_args.observation_dim = 2
