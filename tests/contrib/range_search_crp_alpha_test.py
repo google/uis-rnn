@@ -20,8 +20,8 @@ class TestRangeSearchCrpAlpha(unittest.TestCase):
         ['0_0', '0_0', '0_1', '0_1', '0_1', '0_0', '0_0', '1_0', '1_0', '1_0',
          '1_1', '1_1', '1_1', '1_0', '1_0', '1_0', '1_2', '1_2', '1_2'])
     self.assertEqual(
-        range_search_crp_alpha.estimate_crp_alpha(train_cluster_id, 1,
-                                                  0.01), 0.5)
+        range_search_crp_alpha.estimate_crp_alpha(train_cluster_id, 1, 0.01),
+        0.5)
 
   def test_get_k_t(self):
     """Test the return value of get_k_t(cluster_id_single)."""
