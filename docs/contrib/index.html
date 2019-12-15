@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.5.2" />
-<title>uisrnn API documentation</title>
-<meta name="description" content="The module for Unbounded Interleaved-State Recurrent Neural Network …" />
+<title>uisrnn.contrib API documentation</title>
+<meta name="description" content="The module for community contributed code …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -17,10 +17,10 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title"><code>uisrnn</code> module</h1>
+<h1 class="title"><code>uisrnn.contrib</code> module</h1>
 </header>
 <section id="section-intro">
-<p>The module for Unbounded Interleaved-State Recurrent Neural Network.</p>
+<p>The module for community contributed code.</p>
 <p>An introduction is available at <a href="https://github.com/google/uis-rnn/blob/master/README.md">README.md</a>.</p>
 <details class="source">
 <summary>Source code</summary>
@@ -37,53 +37,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-&#34;&#34;&#34;The module for Unbounded Interleaved-State Recurrent Neural Network.
+&#34;&#34;&#34;The module for community contributed code.
 
 An introduction is available at [README.md].
 
 [README.md]: https://github.com/google/uis-rnn/blob/master/README.md
 &#34;&#34;&#34;
-
-from . import arguments
-from . import evals
-from . import loss_func
-from . import uisrnn
-from . import utils
-
-#pylint: disable=C0103
-parse_arguments = arguments.parse_arguments
-compute_sequence_match_accuracy = evals.compute_sequence_match_accuracy
-output_result = utils.output_result
-UISRNN = uisrnn.UISRNN
-parallel_predict = uisrnn.parallel_predict</code></pre>
+from . import contrib_template
+from . import range_search_crp_alpha</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt><code class="name"><a title="uisrnn.arguments" href="arguments.html">uisrnn.arguments</a></code></dt>
+<dt><code class="name"><a title="uisrnn.contrib.contrib_template" href="contrib_template.html">uisrnn.contrib.contrib_template</a></code></dt>
 <dd>
-<section class="desc"><p>Arguments for UISRNN.</p></section>
+<section class="desc"><p>This is a template for community contributions.</p></section>
 </dd>
-<dt><code class="name"><a title="uisrnn.contrib" href="contrib/index.html">uisrnn.contrib</a></code></dt>
+<dt><code class="name"><a title="uisrnn.contrib.range_search_crp_alpha" href="range_search_crp_alpha.html">uisrnn.contrib.range_search_crp_alpha</a></code></dt>
 <dd>
-<section class="desc"><p>The module for community contributed code …</p></section>
-</dd>
-<dt><code class="name"><a title="uisrnn.evals" href="evals.html">uisrnn.evals</a></code></dt>
-<dd>
-<section class="desc"><p>Utils for model evaluation.</p></section>
-</dd>
-<dt><code class="name"><a title="uisrnn.loss_func" href="loss_func.html">uisrnn.loss_func</a></code></dt>
-<dd>
-<section class="desc"><p>Loss functions for training.</p></section>
-</dd>
-<dt><code class="name"><a title="uisrnn.uisrnn" href="uisrnn.html">uisrnn.uisrnn</a></code></dt>
-<dd>
-<section class="desc"><p>The UIS-RNN model.</p></section>
-</dd>
-<dt><code class="name"><a title="uisrnn.utils" href="utils.html">uisrnn.utils</a></code></dt>
-<dd>
-<section class="desc"><p>Utils for UIS-RNN.</p></section>
+<section class="desc"><p>This module implements method to search for best crp_alpha within a range for
+a given data set.
+For example
+```
+train_cluster_id = np.array(
+…</p></section>
 </dd>
 </dl>
 </section>
@@ -100,14 +78,15 @@ parallel_predict = uisrnn.parallel_predict</code></pre>
 <ul></ul>
 </div>
 <ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="uisrnn" href="../index.html">uisrnn</a></code></li>
+</ul>
+</li>
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
-<li><code><a title="uisrnn.arguments" href="arguments.html">uisrnn.arguments</a></code></li>
-<li><code><a title="uisrnn.contrib" href="contrib/index.html">uisrnn.contrib</a></code></li>
-<li><code><a title="uisrnn.evals" href="evals.html">uisrnn.evals</a></code></li>
-<li><code><a title="uisrnn.loss_func" href="loss_func.html">uisrnn.loss_func</a></code></li>
-<li><code><a title="uisrnn.uisrnn" href="uisrnn.html">uisrnn.uisrnn</a></code></li>
-<li><code><a title="uisrnn.utils" href="utils.html">uisrnn.utils</a></code></li>
+<li><code><a title="uisrnn.contrib.contrib_template" href="contrib_template.html">uisrnn.contrib.contrib_template</a></code></li>
+<li><code><a title="uisrnn.contrib.range_search_crp_alpha" href="range_search_crp_alpha.html">uisrnn.contrib.range_search_crp_alpha</a></code></li>
 </ul>
 </li>
 </ul>

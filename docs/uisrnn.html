@@ -38,9 +38,11 @@
 # limitations under the License.
 &#34;&#34;&#34;The UIS-RNN model.&#34;&#34;&#34;
 
+import functools
 import numpy as np
 import torch
 from torch import autograd
+from torch import multiprocessing
 from torch import nn
 from torch import optim
 import torch.nn.functional as F
@@ -608,7 +610,40 @@ class UISRNN:
     if isinstance(test_sequences, list):
       return [self.predict_single(test_sequence, args)
               for test_sequence in test_sequences]
-    raise TypeError(&#39;test_sequences should be either a list or numpy array.&#39;)</code></pre>
+    raise TypeError(&#39;test_sequences should be either a list or numpy array.&#39;)
+
+
+def parallel_predict(model, test_sequences, args, num_processes=4):
+  &#34;&#34;&#34;Run prediction in parallel using torch.multiprocessing.
+
+  This is a beta feature. It makes prediction slower on CPU. But it&#39;s reported
+  that it makes prediction faster on GPU.
+
+  Args:
+    model: instance of UISRNN model
+    test_sequences: a list of test sequences, or a single test
+      sequence. Each test sequence is a 2-dim numpy array
+      of real numbers. See `predict_single()` for details.
+    args: Inference configurations. See `arguments.py` for details.
+    num_processes: number of parallel processes.
+
+  Returns:
+    a list of the same size as test_sequences, where each element
+    being a 1-dim list of strings.
+
+  Raises:
+      TypeError: If test_sequences is of wrong type.
+  &#34;&#34;&#34;
+  if not isinstance(test_sequences, list):
+    raise TypeError(&#39;test_sequences must be a list.&#39;)
+  ctx = multiprocessing.get_context(&#39;forkserver&#39;)
+  model.rnn_model.share_memory()
+  pool = ctx.Pool(num_processes)
+  results = pool.map(
+      functools.partial(model.predict_single, args=args),
+      test_sequences)
+  pool.close()
+  return results</code></pre>
 </details>
 </section>
 <section>
@@ -616,6 +651,72 @@ class UISRNN:
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="uisrnn.uisrnn.parallel_predict"><code class="name flex">
+<span>def <span class="ident">parallel_predict</span></span>(<span>model, test_sequences, args, num_processes=4)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Run prediction in parallel using torch.multiprocessing.</p>
+<p>This is a beta feature. It makes prediction slower on CPU. But it's reported
+that it makes prediction faster on GPU.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>model</code></strong></dt>
+<dd>instance of UISRNN model</dd>
+<dt><strong><code>test_sequences</code></strong></dt>
+<dd>a list of test sequences, or a single test
+sequence. Each test sequence is a 2-dim numpy array
+of real numbers. See <code>predict_single()</code> for details.</dd>
+<dt><strong><code>args</code></strong></dt>
+<dd>Inference configurations. See <code>arguments.py</code> for details.</dd>
+<dt><strong><code>num_processes</code></strong></dt>
+<dd>number of parallel processes.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>a list of the same size as test_sequences, where each element
+being a 1-dim list of strings.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>If test_sequences is of wrong type.</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def parallel_predict(model, test_sequences, args, num_processes=4):
+  &#34;&#34;&#34;Run prediction in parallel using torch.multiprocessing.
+
+  This is a beta feature. It makes prediction slower on CPU. But it&#39;s reported
+  that it makes prediction faster on GPU.
+
+  Args:
+    model: instance of UISRNN model
+    test_sequences: a list of test sequences, or a single test
+      sequence. Each test sequence is a 2-dim numpy array
+      of real numbers. See `predict_single()` for details.
+    args: Inference configurations. See `arguments.py` for details.
+    num_processes: number of parallel processes.
+
+  Returns:
+    a list of the same size as test_sequences, where each element
+    being a 1-dim list of strings.
+
+  Raises:
+      TypeError: If test_sequences is of wrong type.
+  &#34;&#34;&#34;
+  if not isinstance(test_sequences, list):
+    raise TypeError(&#39;test_sequences must be a list.&#39;)
+  ctx = multiprocessing.get_context(&#39;forkserver&#39;)
+  model.rnn_model.share_memory()
+  pool = ctx.Pool(num_processes)
+  results = pool.map(
+      functools.partial(model.predict_single, args=args),
+      test_sequences)
+  pool.close()
+  return results</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
@@ -1913,6 +2014,11 @@ For example, <code>predicted_cluster_id = [0, 1, 0, 0, 1]</code></dd>
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="uisrnn" href="index.html">uisrnn</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="uisrnn.uisrnn.parallel_predict" href="#uisrnn.uisrnn.parallel_predict">parallel_predict</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
