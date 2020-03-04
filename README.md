@@ -279,6 +279,7 @@ To learn more about our speaker embedding system, check out
 
 We are aware of several third-party implementations of this work:
 
+* [Resemblyzer: PyTorch implementation by resemble-ai](https://github.com/resemble-ai/Resemblyzer)
 * [TensorFlow implementation by Janghyun1230](https://github.com/Janghyun1230/Speaker_Verification)
 * [PyTorch implementaion by HarryVolek](https://github.com/HarryVolek/PyTorch_Speaker_Verification) - with UIS-RNN integration
 * [PyTorch implementation as part of SV2TTS](https://github.com/CorentinJ/Real-Time-Voice-Cloning)
