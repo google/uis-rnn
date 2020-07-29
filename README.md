@@ -136,7 +136,7 @@ See `training_parser`.
 
 The `fit()` function accepts two types of input, as described below.
 
-#### Input as list of sequences (recommanded)
+#### Input as list of sequences (recommended)
 
 Here, `train_sequences` is a list of observation sequences.
 Each observation sequence is a 2-dim numpy array of type `float`.
