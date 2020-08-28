@@ -32,7 +32,7 @@ class CoreRNN(nn.Module):
   """The core Recurent Neural Network used by UIS-RNN."""
 
   def __init__(self, input_dim, hidden_size, depth, observation_dim, dropout=0):
-    super(CoreRNN, self).__init__()
+    super().__init__()
     self.hidden_size = hidden_size
     if depth >= 2:
       self.gru = nn.GRU(input_dim, hidden_size, depth, dropout=dropout)
@@ -42,6 +42,7 @@ class CoreRNN(nn.Module):
     self.linear_mean2 = nn.Linear(hidden_size, observation_dim)
 
   def forward(self, input_seq, hidden=None):
+    """The forward function of the module."""
     output_seq, hidden = self.gru(input_seq, hidden)
     if isinstance(output_seq, torch.nn.utils.rnn.PackedSequence):
       output_seq, _ = torch.nn.utils.rnn.pad_packed_sequence(
@@ -550,7 +551,7 @@ class UISRNN:
           np.min((len(score_ranked), args.beam_size))):
         total_idx = np.unravel_index(idx_ranked[new_beam_rank],
                                      score_set.shape)
-        prev_beam_rank = total_idx[0]
+        prev_beam_rank = total_idx[0].item()
         cluster_seq = total_idx[1:]
         updated_beam_state = self._update_beam_state(
             beam_set[prev_beam_rank], look_ahead_seq, cluster_seq)
