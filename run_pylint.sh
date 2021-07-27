@@ -13,6 +13,6 @@ pushd ${PROJECT_PATH}
 python3 -m pylint **/*.py *.py\
     --indent-string="  " \
     --max-line-length=80 \
-    --disable=E1101,R0913,W0221,R0903,R0902,R0914,R0912,R0915,R1723,W1114,W0223
+    --disable=E1101,R0913,W0221,R0903,R0902,R0914,R0912,R0915,R1723,W1114,W0223,E1102
 
 popd
