@@ -21,3 +21,5 @@ done
 echo "All tests passed!"
 
 popd
+
+python3 -m codecov
