@@ -87,12 +87,12 @@ def parse_arguments():
            'value is None, we will estimate it from training data.')
   model_parser.add_argument(
       '--verbosity',
-      default=2,
+      default=3,
       type=int,
       help='How verbose will the logging information be. Higher value '
       'represents more verbose information. A general guideline: '
-      '0 for errors; 1 for finishing important steps; '
-      '2 for finishing less important steps; 3 or above for debugging '
+      '0 for fatals; 1 for errors; 2 for finishing important steps; '
+      '3 for finishing less important steps; 4 or above for debugging '
       'information.')
   model_parser.add_argument(
       '--enable_cuda',

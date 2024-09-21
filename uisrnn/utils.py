@@ -21,23 +21,6 @@ import torch
 from torch import autograd
 
 
-class Logger:
-  """A class for printing logging information to screen."""
-
-  def __init__(self, verbosity):
-    self._verbosity = verbosity
-
-  def print(self, level, message):
-    """Print a message if level is not higher than verbosity.
-
-    Args:
-      level: the level of this message, smaller value means more important
-      message: the message to be printed
-    """
-    if level <= self._verbosity:
-      print(message)
-
-
 def generate_random_string(length=6):
   """Generate a random string of upper case letters and digits.
 

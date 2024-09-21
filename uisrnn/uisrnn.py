@@ -13,6 +13,7 @@
 # limitations under the License.
 """The UIS-RNN model."""
 
+import colortimelog
 import functools
 import numpy as np
 import torch
@@ -103,7 +104,7 @@ class UISRNN:
     self.transition_bias = args.transition_bias
     self.transition_bias_denominator = 0.0
     self.crp_alpha = args.crp_alpha
-    self.logger = utils.Logger(args.verbosity)
+    self.logger = colortimelog.Logger(args.verbosity)
 
   def _get_optimizer(self, optimizer, learning_rate):
     """Get optimizer for UISRNN.

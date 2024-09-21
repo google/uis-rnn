@@ -109,8 +109,8 @@ class TestIntegration(unittest.TestCase):
     predicted_label = model.predict(test_sequence, inference_args)
 
     # run evaluation
-    model.logger.print(
-        3, 'Asserting the equivalence between'
+    model.logger.info(
+        'Asserting the equivalence between'
         '\nGround truth: {}\nPredicted: {}'.format(
             test_cluster_id, predicted_label))
     accuracy = uisrnn.compute_sequence_match_accuracy(
@@ -125,8 +125,8 @@ class TestIntegration(unittest.TestCase):
     predicted_label = loaded_model.predict(test_sequence, inference_args)
 
     # run evaluation with loaded model
-    model.logger.print(
-        3, 'Asserting the equivalence between'
+    model.logger.info(
+        'Asserting the equivalence between'
         '\nGround truth: {}\nPredicted: {}'.format(
             test_cluster_id, predicted_label))
     accuracy = uisrnn.compute_sequence_match_accuracy(
@@ -140,13 +140,13 @@ class TestIntegration(unittest.TestCase):
     model.fit(train_sequence[:100, :], train_cluster_id[:100], training_args)
     transition_bias_2 = model.transition_bias
     self.assertNotAlmostEqual(transition_bias_1, transition_bias_2)
-    model.logger.print(
-        3, 'Asserting transition_bias changed from {} to {}'.format(
+    model.logger.info(
+        'Asserting transition_bias changed from {} to {}'.format(
             transition_bias_1, transition_bias_2))
 
     # run evaluation
-    model.logger.print(
-        3, 'Asserting the equivalence between'
+    model.logger.info(
+        'Asserting the equivalence between'
         '\nGround truth: {}\nPredicted: {}'.format(
             test_cluster_id, predicted_label))
     accuracy = uisrnn.compute_sequence_match_accuracy(
