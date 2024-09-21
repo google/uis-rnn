@@ -91,7 +91,7 @@ class TestUISRNN(unittest.TestCase):
     train_cluster_ids = [
         np.array(['A'] * 100),
         np.array(['A'] * 200),
-        np.array(['A'] * 300),]
+        np.array(['A'] * 300)]
 
     model = uisrnn.UISRNN(model_args)
 

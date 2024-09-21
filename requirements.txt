@@ -3,3 +3,4 @@ scipy>=1.1.0
 torch>=1.4.0
 codecov==2.1.13
 coverage==7.6.0
+colortimelog
